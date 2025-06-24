@@ -10,7 +10,7 @@ use rust_mcp_sdk::schema::{
 
 use cargo::{
     CargoAddTool, CargoBuildTool, CargoCheckTool, CargoCleanTool, CargoClippyTool, CargoFmtTool,
-    CargoGenerateLockfileTool, CargoListTool, CargoTestTool,
+    CargoGenerateLockfileTool, CargoListTool, CargoMetadataTool, CargoTestTool,
 };
 use cargo_deny::{CargoDenyCheckTool, CargoDenyInitTool, CargoDenyInstallTool, CargoDenyListTool};
 use cargo_machete::{CargoMacheteInstallTool, CargoMacheteTool};
@@ -73,7 +73,8 @@ rust_mcp_sdk::tool_box!(
         CargoDenyInstallTool,
         CargoAddTool,
         CargoListTool,
-        CargoTestTool
+        CargoTestTool,
+        CargoMetadataTool
     ]
 );
 
@@ -107,5 +108,6 @@ pub fn handle_request(request: CallToolRequest) -> Result<CallToolResult, CallTo
         AllTools::CargoAddTool(cargo_add_tool) => cargo_add_tool.call_tool(),
         AllTools::CargoListTool(cargo_list_tool) => cargo_list_tool.call_tool(),
         AllTools::CargoTestTool(cargo_test_tool) => cargo_test_tool.call_tool(),
+        AllTools::CargoMetadataTool(cargo_metadata_tool) => cargo_metadata_tool.call_tool(),
     }
 }
