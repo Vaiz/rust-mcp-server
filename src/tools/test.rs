@@ -1,7 +1,6 @@
-use rust_mcp_sdk::schema::{schema_utils::CallToolError, CallToolResult};
+use rust_mcp_sdk::schema::{CallToolResult, schema_utils::CallToolError};
 use rust_mcp_sdk::{
-    macros::{mcp_tool, JsonSchema},
-    tool_box,
+    macros::{JsonSchema, mcp_tool}    
 };
 
 //****************//
@@ -51,8 +50,3 @@ impl SayGoodbyeTool {
     }
 }
 
-//******************//
-//  GreetingTools  //
-//******************//
-// Generates an enum names GreetingTools, with SayHelloTool and SayGoodbyeTool variants
-tool_box!(GreetingTools, [SayHelloTool, SayGoodbyeTool]);

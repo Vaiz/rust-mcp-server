@@ -1,11 +1,11 @@
 use async_trait::async_trait;
 use rust_mcp_sdk::schema::{
-    schema_utils::CallToolError, CallToolRequest, CallToolResult, ListToolsRequest,
-    ListToolsResult, RpcError,
+    CallToolRequest, CallToolResult, ListToolsRequest, ListToolsResult, RpcError,
+    schema_utils::CallToolError,
 };
-use rust_mcp_sdk::{mcp_server::ServerHandler, McpServer};
+use rust_mcp_sdk::{McpServer, mcp_server::ServerHandler};
 
-use crate::tools::GreetingTools;
+use crate::tools::AllTools;
 
 // Custom Handler to handle MCP Messages
 pub struct MyServerHandler;
@@ -21,11 +21,13 @@ impl ServerHandler for MyServerHandler {
         &self,
         request: ListToolsRequest,
         runtime: &dyn McpServer,
-    ) -> std::result::Result<ListToolsResult, RpcError> {
+    ) -> Result<ListToolsResult, RpcError> {
+        let mut tools = AllTools::tools();
+
         Ok(ListToolsResult {
             meta: None,
             next_cursor: None,
-            tools: GreetingTools::tools(),
+            tools,
         })
     }
 
@@ -34,15 +36,16 @@ impl ServerHandler for MyServerHandler {
         &self,
         request: CallToolRequest,
         runtime: &dyn McpServer,
-    ) -> std::result::Result<CallToolResult, CallToolError> {
+    ) -> Result<CallToolResult, CallToolError> {
         // Attempt to convert request parameters into GreetingTools enum
-        let tool_params: GreetingTools =
-            GreetingTools::try_from(request.params).map_err(CallToolError::new)?;
+        let tool_params: AllTools =
+            AllTools::try_from(request.params).map_err(CallToolError::new)?;
 
         // Match the tool variant and execute its corresponding logic
         match tool_params {
-            GreetingTools::SayHelloTool(say_hello_tool) => say_hello_tool.call_tool(),
-            GreetingTools::SayGoodbyeTool(say_goodbye_tool) => say_goodbye_tool.call_tool(),
+            AllTools::SayHelloTool(say_hello_tool) => say_hello_tool.call_tool(),
+            AllTools::SayGoodbyeTool(say_goodbye_tool) => say_goodbye_tool.call_tool(),
+            AllTools::CargoBuildTool(cargo_build_tool) => cargo_build_tool.call_tool(),
         }
     }
 }
