@@ -74,12 +74,11 @@ async fn main() -> SdkResult<()> {
             version: "0.1.0".to_string(),
         },
         capabilities: ServerCapabilities {
-            // indicates that server support mcp tools
             tools: Some(ServerCapabilitiesTools { list_changed: None }),
-            ..Default::default() // Using default values for other fields
+            ..Default::default()
         },
         meta: None,
-        instructions: Some("server instructions...".to_string()),
+        instructions: Some(include_str!("../docs/instructions.md").into()),
         protocol_version: LATEST_PROTOCOL_VERSION.to_string(),
     };
 
