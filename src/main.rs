@@ -1,22 +1,68 @@
 mod handler;
 mod tools;
 
+use clap::Parser;
 use rust_mcp_sdk::McpServer;
 use rust_mcp_sdk::{
     StdioTransport, TransportOptions,
     error::SdkResult,
-    mcp_server::{ServerRuntime, server_runtime},
+    mcp_server::server_runtime,
     schema::{
         Implementation, InitializeResult, LATEST_PROTOCOL_VERSION, ServerCapabilities,
         ServerCapabilitiesTools,
     },
 };
+use std::fs::File;
+use tracing_subscriber::{EnvFilter, fmt};
+
+#[derive(Parser, Debug)]
+#[command(author, version, about = "Rust MCP Server", long_about = None)]
+struct Args {
+    /// Timeout for processing a request (seconds)
+    #[arg(long, default_value_t = 600)]
+    timeout: u64,
+
+    /// Log level (error, warn, info, debug, trace)
+    #[arg(long, default_value = "info")]
+    log_level: String,
+
+    /// Log file path (if not set, logs to stderr)
+    #[arg(long)]
+    log_file: Option<String>,
+}
 
 #[tokio::main]
 async fn main() -> SdkResult<()> {
-    // STEP 1: Define server details and capabilities
+    // Parse command line arguments
+    let args = Args::parse();
+
+    // Set up logging
+    let env_filter = EnvFilter::new(&args.log_level);
+    if let Some(ref path) = args.log_file {
+        let path = path.clone();
+        fmt()
+            .with_env_filter(env_filter)
+            .with_writer(move || File::create(&path).expect("Failed to create log file"))
+            .init();
+    } else {
+        fmt().with_env_filter(env_filter).init();
+    }
+    tracing::info!(?args, "Starting Rust MCP Server");
+
+    // Warn about long-running requests
+    if args.timeout < 60 {
+        tracing::warn!(
+            timeout = args.timeout,
+            "Short timeout may interrupt long-running requests like cargo-build"
+        );
+    } else if args.timeout >= 600 {
+        tracing::info!(
+            timeout = args.timeout,
+            "Long timeout set; some requests (e.g., cargo-build) may take a while"
+        );
+    }
+
     let server_details = InitializeResult {
-        // server name and version
         server_info: Implementation {
             name: "Rust MCP Server".to_string(),
             version: "0.1.0".to_string(),
@@ -31,17 +77,11 @@ async fn main() -> SdkResult<()> {
         protocol_version: LATEST_PROTOCOL_VERSION.to_string(),
     };
 
-    // STEP 2: create a std transport with default options
     let transport = StdioTransport::new(TransportOptions {
-        timeout: std::time::Duration::from_secs(600), // 10 minutes
+        timeout: std::time::Duration::from_secs(args.timeout),
     })?;
 
-    // STEP 3: instantiate our custom handler for handling MCP messages
-    let handler = handler::MyServerHandler {};
-
-    // STEP 4: create a MCP server
-    let server: ServerRuntime = server_runtime::create_server(server_details, transport, handler);
-
-    // STEP 5: Start the server
+    let server =
+        server_runtime::create_server(server_details, transport, handler::MyServerHandler {});
     server.start().await
 }
