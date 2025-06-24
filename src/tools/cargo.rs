@@ -103,19 +103,19 @@ pub struct CargoFmtTool {
     package: Option<Vec<String>>,
 
     /// Format all packages in the workspace and their dependencies
-    #[serde(default = "default_false")]
+    #[serde(default)]
     all: bool,
 
     /// Run rustfmt in check mode (don't write changes, just check if formatting is needed)
-    #[serde(default = "default_false")]
+    #[serde(default)]
     check: bool,
 
     /// No output printed to stdout
-    #[serde(default = "default_false")]
+    #[serde(default)]
     quiet: bool,
 
     /// Use verbose output
-    #[serde(default = "default_false")]
+    #[serde(default)]
     verbose: bool,
 }
 
@@ -161,53 +161,53 @@ pub struct CargoCheckTool {
     package: Option<Vec<String>>,
 
     /// Check all packages in the workspace
-    #[serde(default = "default_false")]
+    #[serde(default)]
     workspace: bool,
 
     /// Check artifacts in release mode, with optimizations
-    #[serde(default = "default_false")]
+    #[serde(default)]
     release: bool,
 
     /// Check for the specified target triple
     target: Option<String>,
 
     /// Check all targets (lib, bins, examples, tests, benches)
-    #[serde(default = "default_false")]
+    #[serde(default)]
     all_targets: bool,
 
     /// Check only this package's library
-    #[serde(default = "default_false")]
+    #[serde(default)]
     lib: bool,
 
     /// Check all binaries
-    #[serde(default = "default_false")]
+    #[serde(default)]
     bins: bool,
 
     /// Check all examples
-    #[serde(default = "default_false")]
+    #[serde(default)]
     examples: bool,
 
     /// Check all tests
-    #[serde(default = "default_false")]
+    #[serde(default)]
     tests: bool,
 
     /// Space or comma separated list of features to activate
     features: Option<Vec<String>>,
 
     /// Activate all available features
-    #[serde(default = "default_false")]
+    #[serde(default)]
     all_features: bool,
 
     /// Do not activate the default feature
-    #[serde(default = "default_false")]
+    #[serde(default)]
     no_default_features: bool,
 
     /// Use verbose output
-    #[serde(default = "default_false")]
+    #[serde(default)]
     verbose: bool,
 
     /// Do not print cargo log messages
-    #[serde(default = "default_false")]
+    #[serde(default)]
     quiet: bool,
 }
 
@@ -290,61 +290,61 @@ pub struct CargoClippyTool {
     package: Option<Vec<String>>,
 
     /// Check all packages in the workspace
-    #[serde(default = "default_false")]
+    #[serde(default)]
     workspace: bool,
 
     /// Run Clippy only on the given crate, without linting the dependencies
-    #[serde(default = "default_false")]
+    #[serde(default)]
     no_deps: bool,
 
     /// Automatically apply lint suggestions (implies --no-deps and --all-targets)
-    #[serde(default = "default_false")]
+    #[serde(default)]
     fix: bool,
 
     /// Check artifacts in release mode, with optimizations
-    #[serde(default = "default_false")]
+    #[serde(default)]
     release: bool,
 
     /// Check for the specified target triple
     target: Option<String>,
 
     /// Check all targets (lib, bins, examples, tests, benches)
-    #[serde(default = "default_false")]
+    #[serde(default)]
     all_targets: bool,
 
     /// Check only this package's library
-    #[serde(default = "default_false")]
+    #[serde(default)]
     lib: bool,
 
     /// Check all binaries
-    #[serde(default = "default_false")]
+    #[serde(default)]
     bins: bool,
 
     /// Check all examples
-    #[serde(default = "default_false")]
+    #[serde(default)]
     examples: bool,
 
     /// Check all tests
-    #[serde(default = "default_false")]
+    #[serde(default)]
     tests: bool,
 
     /// Space or comma separated list of features to activate
     features: Option<Vec<String>>,
 
     /// Activate all available features
-    #[serde(default = "default_false")]
+    #[serde(default)]
     all_features: bool,
 
     /// Do not activate the default feature
-    #[serde(default = "default_false")]
+    #[serde(default)]
     no_default_features: bool,
 
     /// Use verbose output
-    #[serde(default = "default_false")]
+    #[serde(default)]
     verbose: bool,
 
     /// Do not print cargo log messages
-    #[serde(default = "default_false")]
+    #[serde(default)]
     quiet: bool,
 
     /// Additional clippy arguments (e.g., lint warnings/denials)
@@ -437,6 +437,62 @@ impl CargoClippyTool {
     }
 }
 
-const fn default_false() -> bool {
-    false
+
+#[mcp_tool(
+    name = "cargo-add",
+    description = "Adds a dependency to a Rust project using cargo add.",
+    openWorldHint = false,
+)]
+#[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
+pub struct CargoAddTool {
+    /// The name of the dependency to add.
+    pub package: String,
+    /// Optional version requirement.
+    pub version: Option<String>,
+    /// Add as a dev-dependency
+    #[serde(default)]
+    pub dev: bool,
+    /// Add as a build-dependency
+    #[serde(default)]
+    pub build: bool,
+    /// Add as an optional dependency
+    #[serde(default)]
+    pub optional: bool,
 }
+
+impl CargoAddTool {
+    pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
+        let mut cmd = Command::new("cargo");
+        cmd.arg("add").arg(&self.package);
+        if let Some(version) = &self.version {
+            cmd.arg("--vers").arg(version);
+        }
+        if self.dev {
+            cmd.arg("--dev");
+        }
+        if self.build {
+            cmd.arg("--build");
+        }
+        if self.optional {
+            cmd.arg("--optional");
+        }
+        execute_command(cmd)
+    }
+}
+
+#[mcp_tool(
+    name = "cargo-list",
+    description = "Lists installed cargo commands using 'cargo --list'.",
+    openWorldHint = false,
+)]
+#[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
+pub struct CargoListTool {}
+
+impl CargoListTool {
+    pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
+        let mut cmd = Command::new("cargo");
+        cmd.arg("--list");
+        execute_command(cmd)
+    }
+}
+

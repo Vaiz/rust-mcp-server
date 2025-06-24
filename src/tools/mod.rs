@@ -8,7 +8,7 @@ use rust_mcp_sdk::schema::{
     schema_utils::CallToolError,
 };
 
-use cargo::{CargoBuildTool, CargoCheckTool, CargoCleanTool, CargoClippyTool, CargoFmtTool, CargoGenerateLockfileTool};
+use cargo::{CargoBuildTool, CargoCheckTool, CargoCleanTool, CargoClippyTool, CargoFmtTool, CargoGenerateLockfileTool, CargoAddTool, CargoListTool};
 use cargo_deny::{CargoDenyCheckTool, CargoDenyInitTool, CargoDenyListTool, CargoDenyInstallTool};
 use cargo_machete::{CargoMacheteTool, CargoMacheteInstallTool};
 use test::{SayGoodbyeTool, SayHelloTool};
@@ -67,7 +67,9 @@ rust_mcp_sdk::tool_box!(
         CargoDenyCheckTool,
         CargoDenyInitTool,
         CargoDenyListTool,
-        CargoDenyInstallTool
+        CargoDenyInstallTool,
+        CargoAddTool,
+        CargoListTool
     ]
 );
 
@@ -92,5 +94,7 @@ pub fn handle_request(request: CallToolRequest) -> Result<CallToolResult, CallTo
         AllTools::CargoDenyInitTool(cargo_deny_init_tool) => cargo_deny_init_tool.call_tool(),
         AllTools::CargoDenyListTool(cargo_deny_list_tool) => cargo_deny_list_tool.call_tool(),
         AllTools::CargoDenyInstallTool(cargo_deny_install_tool) => cargo_deny_install_tool.call_tool(),
+        AllTools::CargoAddTool(cargo_add_tool) => cargo_add_tool.call_tool(),
+        AllTools::CargoListTool(cargo_list_tool) => cargo_list_tool.call_tool(),
     }
 }
