@@ -22,10 +22,26 @@ fn execute_command(mut cmd: std::process::Command) -> Result<CallToolResult, Cal
         "Executing command"
     );
     let output = cmd.output();
+
     match output {
         Ok(output) => {
             let stdout = String::from_utf8_lossy(output.stdout.trim_ascii());
             let stderr = String::from_utf8_lossy(output.stderr.trim_ascii());
+
+            if output.status.success() {
+                tracing::info!(
+                    stdout = ?stdout,
+                    stderr = ?stderr,
+                    "Command executed successfully"
+                );
+            } else {
+                tracing::warn!(
+                    stdout = ?stdout,
+                    stderr = ?stderr,
+                    status = ?output.status,
+                    "Command execution failed",
+                );
+            }
 
             let mut content = Vec::new();
             if !stdout.is_empty() {
@@ -54,7 +70,10 @@ fn execute_command(mut cmd: std::process::Command) -> Result<CallToolResult, Cal
                 meta: None,
             })
         }
-        Err(e) => Err(CallToolError::new(e)),
+        Err(e) => {
+            tracing::error!(error = ?e, "Failed to execute command");
+            Err(CallToolError::new(e))
+        }
     }
 }
 
