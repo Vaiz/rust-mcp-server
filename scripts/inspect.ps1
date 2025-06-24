@@ -2,4 +2,14 @@
 # Prerequisites:
 # - winget install OpenJS.NodeJS
 
-npx @modelcontextprotocol/inspector $PSScriptRoot/../target/debug/rustmcp.exe
+$tempDir = "$PSScriptRoot/../tmp"
+$toolPath = "$PSScriptRoot/../target/debug/rustmcp.exe"
+
+cargo b
+
+if (-not (Test-Path $tempDir)) {
+    New-Item -ItemType Directory -Path $tempDir | Out-Null
+}
+
+cp $toolPath $tempDir
+npx @modelcontextprotocol/inspector $tempDir/rustmcp.exe
