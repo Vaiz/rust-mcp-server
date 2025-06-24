@@ -474,7 +474,7 @@ pub struct CargoAddTool {
 impl CargoAddTool {
     pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
         let mut cmd = Command::new("cargo");
-        cmd.arg("add").arg(&self.package);
+        cmd.arg("add");
         if let Some(version) = &self.version {
             cmd.arg(format!("{}@{version}", self.package));
         } else {
