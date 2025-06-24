@@ -1,6 +1,9 @@
+mod tools;
+mod handler;
+
 use rust_mcp_sdk::{
     error::SdkResult,
-    mcp_server::{server_runtime, ServerHandler, ServerRuntime},
+    mcp_server::{server_runtime, ServerRuntime},
     schema::{
         Implementation, InitializeResult, ServerCapabilities, ServerCapabilitiesTools,
         LATEST_PROTOCOL_VERSION,
@@ -32,23 +35,11 @@ async fn main() -> SdkResult<()> {
     let transport = StdioTransport::new(TransportOptions::default())?;
 
     // STEP 3: instantiate our custom handler for handling MCP messages
-    let handler = MyServerHandler {};
+    let handler = handler::MyServerHandler {};
 
     // STEP 4: create a MCP server
     let server: ServerRuntime = server_runtime::create_server(server_details, transport, handler);
 
     // STEP 5: Start the server
     server.start().await
-}
-
-struct MyServerHandler;
-
-#[async_trait::async_trait]
-impl ServerHandler for MyServerHandler {
-    // Implement the required methods for handling MCP messages
-    // For example, handle initialization, requests, notifications, etc.
-    async fn on_initialized(&self, _runtime: &dyn McpServer) {
-        println!("Server initialized successfully!");
-    }
-
 }

@@ -398,6 +398,8 @@ version = "0.1.0"
 dependencies = [
  "async-trait",
  "rust-mcp-sdk",
+ "serde",
+ "serde_json",
  "tokio",
 ]
 
