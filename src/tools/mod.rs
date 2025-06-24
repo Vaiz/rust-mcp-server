@@ -2,11 +2,12 @@ pub mod cargo;
 pub mod test;
 
 use rust_mcp_sdk::schema::{
-    schema_utils::CallToolError, Annotations, CallToolResult, CallToolResultContentItem, Role
+    Annotations, CallToolRequest, CallToolResult, CallToolResultContentItem, Role,
+    schema_utils::CallToolError,
 };
 
-use test::{SayHelloTool, SayGoodbyeTool};
 use cargo::{CargoBuildTool, CargoCleanTool};
+use test::{SayGoodbyeTool, SayHelloTool};
 
 fn execute_command(mut cmd: std::process::Command) -> Result<CallToolResult, CallToolError> {
     let output = cmd.output();
@@ -17,18 +18,24 @@ fn execute_command(mut cmd: std::process::Command) -> Result<CallToolResult, Cal
 
             let mut content = Vec::new();
             if !stdout.is_empty() {
-                let annotations = Some(Annotations{
+                let annotations = Some(Annotations {
                     audience: vec![Role::User, Role::Assistant],
-                    priority: Some(0.1)
+                    priority: Some(0.1),
                 });
-                content.push(CallToolResultContentItem::text_content(stdout.into(), annotations));
+                content.push(CallToolResultContentItem::text_content(
+                    stdout.into(),
+                    annotations,
+                ));
             }
             if !stderr.is_empty() {
-                let annotations = Some(Annotations{
+                let annotations = Some(Annotations {
                     audience: vec![Role::User, Role::Assistant],
-                    priority: Some(1.)
+                    priority: Some(1.),
                 });
-                content.push(CallToolResultContentItem::text_content(stderr.into(), annotations));
+                content.push(CallToolResultContentItem::text_content(
+                    stderr.into(),
+                    annotations,
+                ));
             }
             Ok(CallToolResult {
                 content,
@@ -40,4 +47,21 @@ fn execute_command(mut cmd: std::process::Command) -> Result<CallToolResult, Cal
     }
 }
 
-rust_mcp_sdk::tool_box!(AllTools, [SayHelloTool, SayGoodbyeTool, CargoBuildTool, CargoCleanTool]);
+rust_mcp_sdk::tool_box!(
+    AllTools,
+    [SayHelloTool, SayGoodbyeTool, CargoBuildTool, CargoCleanTool]
+);
+
+/// Handles incoming CallToolRequest and processes it using the appropriate tool.
+pub fn handle_request(request: CallToolRequest) -> Result<CallToolResult, CallToolError> {
+    // Attempt to convert request parameters into GreetingTools enum
+    let tool_params: AllTools = AllTools::try_from(request.params).map_err(CallToolError::new)?;
+
+    // Match the tool variant and execute its corresponding logic
+    match tool_params {
+        AllTools::SayHelloTool(say_hello_tool) => say_hello_tool.call_tool(),
+        AllTools::SayGoodbyeTool(say_goodbye_tool) => say_goodbye_tool.call_tool(),
+        AllTools::CargoBuildTool(cargo_build_tool) => cargo_build_tool.call_tool(),
+        AllTools::CargoCleanTool(cargo_clean_tool) => cargo_clean_tool.call_tool(),
+    }
+}

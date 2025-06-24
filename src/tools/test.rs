@@ -1,7 +1,5 @@
+use rust_mcp_sdk::macros::{JsonSchema, mcp_tool};
 use rust_mcp_sdk::schema::{CallToolResult, schema_utils::CallToolError};
-use rust_mcp_sdk::{
-    macros::{JsonSchema, mcp_tool}    
-};
 
 //****************//
 //  SayHelloTool  //
@@ -49,4 +47,3 @@ impl SayGoodbyeTool {
         Ok(CallToolResult::text_content(hello_message, None))
     }
 }
-

@@ -32,7 +32,7 @@ async fn main() -> SdkResult<()> {
     };
 
     // STEP 2: create a std transport with default options
-    let transport = StdioTransport::new(TransportOptions{
+    let transport = StdioTransport::new(TransportOptions {
         timeout: std::time::Duration::from_secs(600), // 10 minutes
     })?;
 

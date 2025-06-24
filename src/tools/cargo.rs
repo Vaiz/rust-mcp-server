@@ -42,7 +42,7 @@ impl CargoBuildTool {
 
 #[mcp_tool(
     name = "cargo.clean",
-    description = "Cleans the target directory for a Rust project using Cargo. By default, it cleans the entire workspace.",
+    description = "Cleans the target directory for a Rust project using Cargo. By default, it cleans the entire workspace."
 )]
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoCleanTool {

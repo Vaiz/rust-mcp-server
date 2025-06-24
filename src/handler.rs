@@ -37,16 +37,6 @@ impl ServerHandler for MyServerHandler {
         request: CallToolRequest,
         runtime: &dyn McpServer,
     ) -> Result<CallToolResult, CallToolError> {
-        // Attempt to convert request parameters into GreetingTools enum
-        let tool_params: AllTools =
-            AllTools::try_from(request.params).map_err(CallToolError::new)?;
-
-        // Match the tool variant and execute its corresponding logic
-        match tool_params {
-            AllTools::SayHelloTool(say_hello_tool) => say_hello_tool.call_tool(),
-            AllTools::SayGoodbyeTool(say_goodbye_tool) => say_goodbye_tool.call_tool(),
-            AllTools::CargoBuildTool(cargo_build_tool) => cargo_build_tool.call_tool(),
-            AllTools::CargoCleanTool(cargo_clean_tool) => cargo_clean_tool.call_tool(),
-        }
+        crate::tools::handle_request(request)
     }
 }
