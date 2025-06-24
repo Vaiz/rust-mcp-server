@@ -69,10 +69,7 @@ impl CargoCleanTool {
     }
 }
 
-#[mcp_tool(
-    name = "cargo.fmt",
-    description = "Formats Rust code using rustfmt"
-)]
+#[mcp_tool(name = "cargo.fmt", description = "Formats Rust code using rustfmt")]
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoFmtTool {
     /// The name of the package(s) to format. If not specified, formats the current package.
@@ -110,7 +107,7 @@ impl CargoFmtTool {
             cmd.arg("--all");
         }
 
-        if self.check{
+        if self.check {
             cmd.arg("--check");
         }
 
@@ -136,43 +133,54 @@ pub struct CargoCheckTool {
     package: Option<Vec<String>>,
 
     /// Check all packages in the workspace
-    workspace: Option<bool>,
+    #[serde(default = "default_false")]
+    workspace: bool,
 
     /// Check artifacts in release mode, with optimizations
-    release: Option<bool>,
+    #[serde(default = "default_false")]
+    release: bool,
 
     /// Check for the specified target triple
     target: Option<String>,
 
     /// Check all targets (lib, bins, examples, tests, benches)
-    all_targets: Option<bool>,
+    #[serde(default = "default_false")]
+    all_targets: bool,
 
     /// Check only this package's library
-    lib: Option<bool>,
+    #[serde(default = "default_false")]
+    lib: bool,
 
     /// Check all binaries
-    bins: Option<bool>,
+    #[serde(default = "default_false")]
+    bins: bool,
 
     /// Check all examples
-    examples: Option<bool>,
+    #[serde(default = "default_false")]
+    examples: bool,
 
     /// Check all tests
-    tests: Option<bool>,
+    #[serde(default = "default_false")]
+    tests: bool,
 
     /// Space or comma separated list of features to activate
     features: Option<Vec<String>>,
 
     /// Activate all available features
-    all_features: Option<bool>,
+    #[serde(default = "default_false")]
+    all_features: bool,
 
     /// Do not activate the default feature
-    no_default_features: Option<bool>,
+    #[serde(default = "default_false")]
+    no_default_features: bool,
 
     /// Use verbose output
-    verbose: Option<bool>,
+    #[serde(default = "default_false")]
+    verbose: bool,
 
     /// Do not print cargo log messages
-    quiet: Option<bool>,
+    #[serde(default = "default_false")]
+    quiet: bool,
 }
 
 impl CargoCheckTool {
@@ -186,11 +194,11 @@ impl CargoCheckTool {
             }
         }
 
-        if self.workspace.unwrap_or(false) {
+        if self.workspace {
             cmd.arg("--workspace");
         }
 
-        if self.release.unwrap_or(false) {
+        if self.release {
             cmd.arg("--release");
         }
 
@@ -198,23 +206,23 @@ impl CargoCheckTool {
             cmd.arg("--target").arg(target);
         }
 
-        if self.all_targets.unwrap_or(false) {
+        if self.all_targets {
             cmd.arg("--all-targets");
         }
 
-        if self.lib.unwrap_or(false) {
+        if self.lib {
             cmd.arg("--lib");
         }
 
-        if self.bins.unwrap_or(false) {
+        if self.bins {
             cmd.arg("--bins");
         }
 
-        if self.examples.unwrap_or(false) {
+        if self.examples {
             cmd.arg("--examples");
         }
 
-        if self.tests.unwrap_or(false) {
+        if self.tests {
             cmd.arg("--tests");
         }
 
@@ -222,19 +230,19 @@ impl CargoCheckTool {
             cmd.arg("--features").arg(features.join(","));
         }
 
-        if self.all_features.unwrap_or(false) {
+        if self.all_features {
             cmd.arg("--all-features");
         }
 
-        if self.no_default_features.unwrap_or(false) {
+        if self.no_default_features {
             cmd.arg("--no-default-features");
         }
 
-        if self.verbose.unwrap_or(false) {
+        if self.verbose {
             cmd.arg("--verbose");
         }
 
-        if self.quiet.unwrap_or(false) {
+        if self.quiet {
             cmd.arg("--quiet");
         }
 
@@ -252,49 +260,62 @@ pub struct CargoClippyTool {
     package: Option<Vec<String>>,
 
     /// Check all packages in the workspace
-    workspace: Option<bool>,
+    #[serde(default = "default_false")]
+    workspace: bool,
 
     /// Run Clippy only on the given crate, without linting the dependencies
-    no_deps: Option<bool>,
+    #[serde(default = "default_false")]
+    no_deps: bool,
 
     /// Automatically apply lint suggestions (implies --no-deps and --all-targets)
-    fix: Option<bool>,
+    #[serde(default = "default_false")]
+    fix: bool,
 
     /// Check artifacts in release mode, with optimizations
-    release: Option<bool>,
+    #[serde(default = "default_false")]
+    release: bool,
 
     /// Check for the specified target triple
     target: Option<String>,
 
     /// Check all targets (lib, bins, examples, tests, benches)
-    all_targets: Option<bool>,
+    #[serde(default = "default_false")]
+    all_targets: bool,
 
     /// Check only this package's library
-    lib: Option<bool>,
+    #[serde(default = "default_false")]
+    lib: bool,
 
     /// Check all binaries
-    bins: Option<bool>,
+    #[serde(default = "default_false")]
+    bins: bool,
 
     /// Check all examples
-    examples: Option<bool>,
+    #[serde(default = "default_false")]
+    examples: bool,
 
     /// Check all tests
-    tests: Option<bool>,
+    #[serde(default = "default_false")]
+    tests: bool,
 
     /// Space or comma separated list of features to activate
     features: Option<Vec<String>>,
 
     /// Activate all available features
-    all_features: Option<bool>,
+    #[serde(default = "default_false")]
+    all_features: bool,
 
     /// Do not activate the default feature
-    no_default_features: Option<bool>,
+    #[serde(default = "default_false")]
+    no_default_features: bool,
 
     /// Use verbose output
-    verbose: Option<bool>,
+    #[serde(default = "default_false")]
+    verbose: bool,
 
     /// Do not print cargo log messages
-    quiet: Option<bool>,
+    #[serde(default = "default_false")]
+    quiet: bool,
 
     /// Additional clippy arguments (e.g., lint warnings/denials)
     clippy_args: Option<Vec<String>>,
@@ -311,19 +332,19 @@ impl CargoClippyTool {
             }
         }
 
-        if self.workspace.unwrap_or(false) {
+        if self.workspace {
             cmd.arg("--workspace");
         }
 
-        if self.no_deps.unwrap_or(false) {
+        if self.no_deps {
             cmd.arg("--no-deps");
         }
 
-        if self.fix.unwrap_or(false) {
+        if self.fix {
             cmd.arg("--fix");
         }
 
-        if self.release.unwrap_or(false) {
+        if self.release {
             cmd.arg("--release");
         }
 
@@ -331,23 +352,23 @@ impl CargoClippyTool {
             cmd.arg("--target").arg(target);
         }
 
-        if self.all_targets.unwrap_or(false) {
+        if self.all_targets {
             cmd.arg("--all-targets");
         }
 
-        if self.lib.unwrap_or(false) {
+        if self.lib {
             cmd.arg("--lib");
         }
 
-        if self.bins.unwrap_or(false) {
+        if self.bins {
             cmd.arg("--bins");
         }
 
-        if self.examples.unwrap_or(false) {
+        if self.examples {
             cmd.arg("--examples");
         }
 
-        if self.tests.unwrap_or(false) {
+        if self.tests {
             cmd.arg("--tests");
         }
 
@@ -355,19 +376,19 @@ impl CargoClippyTool {
             cmd.arg("--features").arg(features.join(","));
         }
 
-        if self.all_features.unwrap_or(false) {
+        if self.all_features {
             cmd.arg("--all-features");
         }
 
-        if self.no_default_features.unwrap_or(false) {
+        if self.no_default_features {
             cmd.arg("--no-default-features");
         }
 
-        if self.verbose.unwrap_or(false) {
+        if self.verbose {
             cmd.arg("--verbose");
         }
 
-        if self.quiet.unwrap_or(false) {
+        if self.quiet {
             cmd.arg("--quiet");
         }
 
@@ -384,7 +405,6 @@ impl CargoClippyTool {
         execute_command(cmd)
     }
 }
-
 
 const fn default_false() -> bool {
     false

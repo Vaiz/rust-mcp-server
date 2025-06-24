@@ -49,7 +49,15 @@ fn execute_command(mut cmd: std::process::Command) -> Result<CallToolResult, Cal
 
 rust_mcp_sdk::tool_box!(
     AllTools,
-    [SayHelloTool, SayGoodbyeTool, CargoBuildTool, CargoCleanTool, CargoFmtTool, CargoCheckTool, CargoClippyTool]
+    [
+        SayHelloTool,
+        SayGoodbyeTool,
+        CargoBuildTool,
+        CargoCleanTool,
+        CargoFmtTool,
+        CargoCheckTool,
+        CargoClippyTool
+    ]
 );
 
 /// Handles incoming CallToolRequest and processes it using the appropriate tool.
