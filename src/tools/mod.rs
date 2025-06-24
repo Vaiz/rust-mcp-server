@@ -1,4 +1,6 @@
 pub mod cargo;
+pub mod cargo_deny;
+pub mod cargo_machete;
 pub mod test;
 
 use rust_mcp_sdk::schema::{
@@ -7,6 +9,8 @@ use rust_mcp_sdk::schema::{
 };
 
 use cargo::{CargoBuildTool, CargoCheckTool, CargoCleanTool, CargoClippyTool, CargoFmtTool, CargoGenerateLockfileTool};
+use cargo_deny::{CargoDenyCheckTool, CargoDenyInitTool, CargoDenyListTool, CargoDenyInstallTool};
+use cargo_machete::{CargoMacheteTool, CargoMacheteInstallTool};
 use test::{SayGoodbyeTool, SayHelloTool};
 
 fn execute_command(mut cmd: std::process::Command) -> Result<CallToolResult, CallToolError> {
@@ -57,7 +61,13 @@ rust_mcp_sdk::tool_box!(
         CargoFmtTool,
         CargoCheckTool,
         CargoClippyTool,
-        CargoGenerateLockfileTool
+        CargoGenerateLockfileTool,
+        CargoMacheteTool,
+        CargoMacheteInstallTool,
+        CargoDenyCheckTool,
+        CargoDenyInitTool,
+        CargoDenyListTool,
+        CargoDenyInstallTool
     ]
 );
 
@@ -76,5 +86,11 @@ pub fn handle_request(request: CallToolRequest) -> Result<CallToolResult, CallTo
         AllTools::CargoCheckTool(cargo_check_tool) => cargo_check_tool.call_tool(),
         AllTools::CargoClippyTool(cargo_clippy_tool) => cargo_clippy_tool.call_tool(),
         AllTools::CargoGenerateLockfileTool(cargo_generate_lockfile_tool) => cargo_generate_lockfile_tool.call_tool(),
+        AllTools::CargoMacheteTool(cargo_machete_tool) => cargo_machete_tool.call_tool(),
+        AllTools::CargoMacheteInstallTool(cargo_machete_install_tool) => cargo_machete_install_tool.call_tool(),
+        AllTools::CargoDenyCheckTool(cargo_deny_check_tool) => cargo_deny_check_tool.call_tool(),
+        AllTools::CargoDenyInitTool(cargo_deny_init_tool) => cargo_deny_init_tool.call_tool(),
+        AllTools::CargoDenyListTool(cargo_deny_list_tool) => cargo_deny_list_tool.call_tool(),
+        AllTools::CargoDenyInstallTool(cargo_deny_install_tool) => cargo_deny_install_tool.call_tool(),
     }
 }
