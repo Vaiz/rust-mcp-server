@@ -18,7 +18,7 @@ async fn main() -> SdkResult<()> {
     let server_details = InitializeResult {
         // server name and version
         server_info: Implementation {
-            name: "Hello World MCP Server".to_string(),
+            name: "Rust MCP Server".to_string(),
             version: "0.1.0".to_string(),
         },
         capabilities: ServerCapabilities {
@@ -32,7 +32,9 @@ async fn main() -> SdkResult<()> {
     };
 
     // STEP 2: create a std transport with default options
-    let transport = StdioTransport::new(TransportOptions::default())?;
+    let transport = StdioTransport::new(TransportOptions{
+        timeout: std::time::Duration::from_secs(600), // 10 minutes
+    })?;
 
     // STEP 3: instantiate our custom handler for handling MCP messages
     let handler = handler::MyServerHandler {};

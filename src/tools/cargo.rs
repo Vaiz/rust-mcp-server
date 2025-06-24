@@ -40,4 +40,31 @@ impl CargoBuildTool {
     }
 }
 
-//rust_mcp_sdk::tool_box!(CargoTools, [CargoBuildTool]);
+#[mcp_tool(
+    name = "cargo.clean",
+    description = "Cleans the target directory for a Rust project using Cargo. By default, it cleans the entire workspace.",
+)]
+#[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
+pub struct CargoCleanTool {
+    /// The name of the package to clean. If not specified, cleans the entire workspace.
+    package: Option<String>,
+
+    /// The profile to use for the build. Defaults to "dev".
+    /// Default rust profiles:
+    /// - `dev`: Optimized for development, with debug information.
+    /// - `release`: Optimized for performance, without debug information.
+    profile: Option<String>,
+}
+
+impl CargoCleanTool {
+    pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
+        let mut cmd = Command::new("cargo");
+        cmd.arg("clean");
+
+        if let Some(package) = &self.package {
+            cmd.arg("--package").arg(package);
+        }
+
+        execute_command(cmd)
+    }
+}

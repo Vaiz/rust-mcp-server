@@ -6,7 +6,7 @@ use rust_mcp_sdk::schema::{
 };
 
 use test::{SayHelloTool, SayGoodbyeTool};
-use cargo::CargoBuildTool;
+use cargo::{CargoBuildTool, CargoCleanTool};
 
 fn execute_command(mut cmd: std::process::Command) -> Result<CallToolResult, CallToolError> {
     let output = cmd.output();
@@ -40,4 +40,4 @@ fn execute_command(mut cmd: std::process::Command) -> Result<CallToolResult, Cal
     }
 }
 
-rust_mcp_sdk::tool_box!(AllTools, [SayHelloTool, SayGoodbyeTool, CargoBuildTool]);
+rust_mcp_sdk::tool_box!(AllTools, [SayHelloTool, SayGoodbyeTool, CargoBuildTool, CargoCleanTool]);

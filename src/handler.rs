@@ -46,6 +46,7 @@ impl ServerHandler for MyServerHandler {
             AllTools::SayHelloTool(say_hello_tool) => say_hello_tool.call_tool(),
             AllTools::SayGoodbyeTool(say_goodbye_tool) => say_goodbye_tool.call_tool(),
             AllTools::CargoBuildTool(cargo_build_tool) => cargo_build_tool.call_tool(),
+            AllTools::CargoCleanTool(cargo_clean_tool) => cargo_clean_tool.call_tool(),
         }
     }
 }
