@@ -8,8 +8,33 @@ use rust_mcp_sdk::{
 use crate::tools::execute_command;
 
 #[mcp_tool(
+    name = "cargo.generate_lockfile",
+    description = "Generates or updates the Cargo.lock file for a Rust project",
+    openWorldHint = false,
+)]
+#[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
+pub struct CargoGenerateLockfileTool {
+    /// The name of the package to generate lockfile for. If not specified, generates for the current package/workspace.
+    package: Option<String>,
+}
+
+impl CargoGenerateLockfileTool {
+    pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
+        let mut cmd = Command::new("cargo");
+        cmd.arg("generate-lockfile");
+
+        if let Some(package) = &self.package {
+            cmd.arg("--package").arg(package);
+        }
+
+        execute_command(cmd)
+    }
+}
+
+#[mcp_tool(
     name = "cargo.build",
-    description = "Builds a Rust project using Cargo"
+    description = "Builds a Rust project using Cargo",
+    openWorldHint = false,
 )]
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoBuildTool {
@@ -27,6 +52,7 @@ impl CargoBuildTool {
     pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
         let mut cmd = Command::new("cargo");
         cmd.arg("build");
+        cmd.arg("--locked");
 
         if let Some(profile) = &self.profile {
             cmd.arg("--profile").arg(profile);
@@ -42,7 +68,8 @@ impl CargoBuildTool {
 
 #[mcp_tool(
     name = "cargo.clean",
-    description = "Cleans the target directory for a Rust project using Cargo. By default, it cleans the entire workspace."
+    description = "Cleans the target directory for a Rust project using Cargo. By default, it cleans the entire workspace.",
+    openWorldHint = false,
 )]
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoCleanTool {
@@ -69,7 +96,7 @@ impl CargoCleanTool {
     }
 }
 
-#[mcp_tool(name = "cargo.fmt", description = "Formats Rust code using rustfmt")]
+#[mcp_tool(name = "cargo.fmt", description = "Formats Rust code using rustfmt", openWorldHint = false)]
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoFmtTool {
     /// The name of the package(s) to format. If not specified, formats the current package.
@@ -125,7 +152,8 @@ impl CargoFmtTool {
 
 #[mcp_tool(
     name = "cargo.check",
-    description = "Checks a Rust package and all of its dependencies for errors"
+    description = "Checks a Rust package and all of its dependencies for errors",
+    openWorldHint = false,
 )]
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoCheckTool {
@@ -187,6 +215,7 @@ impl CargoCheckTool {
     pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
         let mut cmd = Command::new("cargo");
         cmd.arg("check");
+        cmd.arg("--locked");
 
         if let Some(packages) = &self.package {
             for package in packages {
@@ -252,7 +281,8 @@ impl CargoCheckTool {
 
 #[mcp_tool(
     name = "cargo.clippy",
-    description = "Checks a Rust package to catch common mistakes and improve code quality using Clippy"
+    description = "Checks a Rust package to catch common mistakes and improve code quality using Clippy",
+    openWorldHint = false,
 )]
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoClippyTool {
@@ -325,6 +355,7 @@ impl CargoClippyTool {
     pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
         let mut cmd = Command::new("cargo");
         cmd.arg("clippy");
+        cmd.arg("--locked");
 
         if let Some(packages) = &self.package {
             for package in packages {

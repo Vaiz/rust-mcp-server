@@ -6,7 +6,7 @@ use rust_mcp_sdk::schema::{
     schema_utils::CallToolError,
 };
 
-use cargo::{CargoBuildTool, CargoCheckTool, CargoCleanTool, CargoClippyTool, CargoFmtTool};
+use cargo::{CargoBuildTool, CargoCheckTool, CargoCleanTool, CargoClippyTool, CargoFmtTool, CargoGenerateLockfileTool};
 use test::{SayGoodbyeTool, SayHelloTool};
 
 fn execute_command(mut cmd: std::process::Command) -> Result<CallToolResult, CallToolError> {
@@ -56,7 +56,8 @@ rust_mcp_sdk::tool_box!(
         CargoCleanTool,
         CargoFmtTool,
         CargoCheckTool,
-        CargoClippyTool
+        CargoClippyTool,
+        CargoGenerateLockfileTool
     ]
 );
 
@@ -74,5 +75,6 @@ pub fn handle_request(request: CallToolRequest) -> Result<CallToolResult, CallTo
         AllTools::CargoFmtTool(cargo_fmt_tool) => cargo_fmt_tool.call_tool(),
         AllTools::CargoCheckTool(cargo_check_tool) => cargo_check_tool.call_tool(),
         AllTools::CargoClippyTool(cargo_clippy_tool) => cargo_clippy_tool.call_tool(),
+        AllTools::CargoGenerateLockfileTool(cargo_generate_lockfile_tool) => cargo_generate_lockfile_tool.call_tool(),
     }
 }
