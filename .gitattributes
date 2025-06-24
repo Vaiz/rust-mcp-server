@@ -44,7 +44,9 @@
 *.svg binary
 *.pdf binary
 
-# Rust-specific binary files
+# Rust-specific files
 *.rlib binary
 target/ binary
-Cargo.lock linguist-generated=true
+
+# Cargo.lock should be treated as text but keep existing line endings
+Cargo.lock text eol=lf linguist-generated=true
