@@ -2,7 +2,7 @@
     "servers": {
         "RustMcp": {
             "type": "stdio",
-            "command": "./target/debug/rustmcp.exe",
+            "command": "./tmp/rustmcp.exe",
             "args": []
         }
     }

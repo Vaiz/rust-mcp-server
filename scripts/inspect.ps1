@@ -11,5 +11,5 @@ if (-not (Test-Path $tempDir)) {
     New-Item -ItemType Directory -Path $tempDir | Out-Null
 }
 
-cp $toolPath $tempDir
-npx @modelcontextprotocol/inspector $tempDir/rustmcp.exe
+cp $toolPath $tempDir/rustmcp-inspect.exe
+npx @modelcontextprotocol/inspector $tempDir/rustmcp-inspect.exe
