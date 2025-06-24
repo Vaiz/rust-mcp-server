@@ -476,7 +476,9 @@ impl CargoAddTool {
         let mut cmd = Command::new("cargo");
         cmd.arg("add").arg(&self.package);
         if let Some(version) = &self.version {
-            cmd.arg("--vers").arg(version);
+            cmd.arg(format!("{}@{version}", self.package));
+        } else {
+            cmd.arg(&self.package);
         }
         if self.dev {
             cmd.arg("--dev");
