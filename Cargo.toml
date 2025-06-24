@@ -6,8 +6,10 @@ description = "A Model Context Protocol (MCP) server implementation in Rust"
 authors = ["Vaiz"]
 license = "Unlicense"
 
+[package.metadata.cargo-machete]
+ignored = ["serde_json"]
+
 [dependencies]
-anyhow = "1.0.98"
 async-trait = "0.1.88"
 clap = { version = "4.5.40", features = ["derive"] }
 rust-mcp-sdk = { version = "0.4.5", default-features = false, features = ["server", "2025_03_26", "macros"] }
