@@ -1,0 +1,50 @@
+# Set default behavior to automatically normalize line endings.
+* text=auto
+
+# Explicitly declare text files you want to always be normalized and converted
+# to native line endings on checkout.
+*.rs text
+*.toml text
+*.md text
+*.txt text
+*.json text
+*.yml text
+*.yaml text
+
+# Declare files that will always have CRLF line endings on checkout.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Declare files that will always have LF line endings on checkout.
+*.sh text eol=lf
+
+# Denote all files that are truly binary and should not be modified.
+*.exe binary
+*.dll binary
+*.pdb binary
+*.lib binary
+*.so binary
+*.dylib binary
+*.a binary
+*.o binary
+*.obj binary
+*.bin binary
+*.zip binary
+*.tar binary
+*.gz binary
+*.7z binary
+*.rar binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.bmp binary
+*.tiff binary
+*.svg binary
+*.pdf binary
+
+# Rust-specific binary files
+*.rlib binary
+target/ binary
+Cargo.lock linguist-generated=true
