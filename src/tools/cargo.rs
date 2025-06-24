@@ -8,7 +8,7 @@ use rust_mcp_sdk::{
 use crate::tools::execute_command;
 
 #[mcp_tool(
-    name = "cargo.generate_lockfile",
+    name = "cargo-generate_lockfile",
     description = "Generates or updates the Cargo.lock file for a Rust project",
     openWorldHint = false,
 )]
@@ -32,7 +32,7 @@ impl CargoGenerateLockfileTool {
 }
 
 #[mcp_tool(
-    name = "cargo.build",
+    name = "cargo-build",
     description = "Builds a Rust project using Cargo",
     openWorldHint = false,
 )]
@@ -67,7 +67,7 @@ impl CargoBuildTool {
 }
 
 #[mcp_tool(
-    name = "cargo.clean",
+    name = "cargo-clean",
     description = "Cleans the target directory for a Rust project using Cargo. By default, it cleans the entire workspace.",
     openWorldHint = false,
 )]
@@ -96,7 +96,7 @@ impl CargoCleanTool {
     }
 }
 
-#[mcp_tool(name = "cargo.fmt", description = "Formats Rust code using rustfmt", openWorldHint = false)]
+#[mcp_tool(name = "cargo-fmt", description = "Formats Rust code using rustfmt", openWorldHint = false)]
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoFmtTool {
     /// The name of the package(s) to format. If not specified, formats the current package.
@@ -151,7 +151,7 @@ impl CargoFmtTool {
 }
 
 #[mcp_tool(
-    name = "cargo.check",
+    name = "cargo-check",
     description = "Checks a Rust package and all of its dependencies for errors",
     openWorldHint = false,
 )]
@@ -280,7 +280,7 @@ impl CargoCheckTool {
 }
 
 #[mcp_tool(
-    name = "cargo.clippy",
+    name = "cargo-clippy",
     description = "Checks a Rust package to catch common mistakes and improve code quality using Clippy",
     openWorldHint = false,
 )]
