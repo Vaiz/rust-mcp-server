@@ -9,7 +9,7 @@ use crate::tools::execute_command;
 
 #[mcp_tool(
     name = "cargo-generate_lockfile",
-    description = "Generates or updates the Cargo.lock file for a Rust project",
+    description = "Generates or updates the Cargo.lock file for a Rust project. Usually, run without any additional arguments.",
     openWorldHint = false,
 )]
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
@@ -33,7 +33,7 @@ impl CargoGenerateLockfileTool {
 
 #[mcp_tool(
     name = "cargo-build",
-    description = "Builds a Rust project using Cargo",
+    description = "Builds a Rust project using Cargo. Usually, run without any additional arguments.",
     openWorldHint = false,
 )]
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
@@ -96,7 +96,7 @@ impl CargoCleanTool {
     }
 }
 
-#[mcp_tool(name = "cargo-fmt", description = "Formats Rust code using rustfmt", openWorldHint = false)]
+#[mcp_tool(name = "cargo-fmt", description = "Formats Rust code using rustfmt. Usually, run without any additional arguments.", openWorldHint = false)]
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoFmtTool {
     /// The name of the package(s) to format. If not specified, formats the current package.
@@ -152,7 +152,7 @@ impl CargoFmtTool {
 
 #[mcp_tool(
     name = "cargo-check",
-    description = "Checks a Rust package and all of its dependencies for errors",
+    description = "Checks a Rust package and all of its dependencies for errors. Usually, run without any additional arguments.",
     openWorldHint = false,
 )]
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
