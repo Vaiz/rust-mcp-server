@@ -3,7 +3,7 @@
         "RustMcp": {
             "type": "stdio",
             "command": "./tmp/rustmcp.exe",
-            "args": []
+            "args": ["--log-file", "./tmp/rustmcp.log"],
         }
     }
 }

@@ -4,15 +4,15 @@ mod tools;
 use clap::Parser;
 use rust_mcp_sdk::McpServer;
 use rust_mcp_sdk::{
-    StdioTransport, TransportOptions,
     error::SdkResult,
     mcp_server::server_runtime,
     schema::{
         Implementation, InitializeResult, LATEST_PROTOCOL_VERSION, ServerCapabilities,
         ServerCapabilitiesTools,
     },
+    StdioTransport, TransportOptions,
 };
-use std::fs::File;
+use tracing_appender::rolling;
 use tracing_subscriber::{EnvFilter, fmt};
 
 #[derive(Parser, Debug)]
@@ -39,13 +39,19 @@ async fn main() -> SdkResult<()> {
     // Set up logging
     let env_filter = EnvFilter::new(&args.log_level);
     if let Some(ref path) = args.log_file {
-        let path = path.clone();
+        // Use rolling log file (daily rotation, keep old logs)
+        use std::path::Path;
+        let log_path = Path::new(path);
+        let (dir, file_name) = match (log_path.parent(), log_path.file_name()) {
+            (Some(d), Some(f)) => (d, f),
+            _ => (Path::new("."), log_path.as_os_str()),
+        };
+        let file_appender = rolling::daily(dir, file_name);
         fmt()
             .with_env_filter(env_filter)
-            .with_writer(move || File::create(&path).expect("Failed to create log file"))
+            .with_writer(file_appender)
+            .with_ansi(false)
             .init();
-    } else {
-        fmt().with_env_filter(env_filter).init();
     }
     tracing::info!(?args, "Starting Rust MCP Server");
 

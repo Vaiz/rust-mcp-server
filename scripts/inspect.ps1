@@ -12,4 +12,4 @@ if (-not (Test-Path $tempDir)) {
 }
 
 cp $toolPath $tempDir/rustmcp-inspect.exe
-npx @modelcontextprotocol/inspector $tempDir/rustmcp-inspect.exe
+npx @modelcontextprotocol/inspector $tempDir/rustmcp-inspect.exe "--log-file", "./tmp/rustmcp-inspect.log"
