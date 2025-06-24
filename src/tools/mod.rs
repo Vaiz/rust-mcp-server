@@ -13,8 +13,8 @@ fn execute_command(mut cmd: std::process::Command) -> Result<CallToolResult, Cal
     let output = cmd.output();
     match output {
         Ok(output) => {
-            let stdout = String::from_utf8_lossy(&output.stdout.trim_ascii());
-            let stderr = String::from_utf8_lossy(&output.stderr.trim_ascii());
+            let stdout = String::from_utf8_lossy(output.stdout.trim_ascii());
+            let stderr = String::from_utf8_lossy(output.stderr.trim_ascii());
 
             let mut content = Vec::new();
             if !stdout.is_empty() {
