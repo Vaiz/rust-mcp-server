@@ -16,7 +16,6 @@ This is a Rust implementation of a Model Context Protocol (MCP) server.
 3. Implement MCP protocol methods according to the specification
 4. Use structured logging with the `tracing` crate
 5. Ensure all async operations are properly awaited
-6. Follow JSON-RPC 2.0 specification for message handling
 
 ## MCP Protocol Implementation
 - **Initialize**: Handle client initialization and capability negotiation
@@ -27,7 +26,7 @@ This is a Rust implementation of a Model Context Protocol (MCP) server.
 ## Dependencies
 - `tokio`: Async runtime
 - `serde`: Serialization/deserialization
-- `jsonrpc-core`: JSON-RPC protocol handling
+- `rust-mcp-sdk`: MCP protocol handling
 - `anyhow`: Error handling
 - `tracing`: Structured logging
 

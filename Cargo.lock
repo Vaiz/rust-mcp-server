@@ -396,6 +396,7 @@ checksum = "989e6739f80c4ad5b13e0fd7fe89531180375b18520cc8c82080e4dc4035b84f"
 name = "rustmcp"
 version = "0.1.0"
 dependencies = [
+ "async-trait",
  "rust-mcp-sdk",
  "tokio",
 ]
