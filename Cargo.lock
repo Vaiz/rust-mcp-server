@@ -327,6 +327,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "rust-mcp-macros"
+version = "0.4.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "375eba9388d9d5ffc8951e5f25296f9739be4e5700375ac7c74ad957a903b92b"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "serde",
+ "serde_json",
+ "syn",
+]
+
+[[package]]
 name = "rust-mcp-schema"
 version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -345,6 +358,7 @@ dependencies = [
  "async-trait",
  "futures",
  "hyper",
+ "rust-mcp-macros",
  "rust-mcp-schema",
  "rust-mcp-transport",
  "serde",
