@@ -10,7 +10,7 @@ use crate::tools::execute_command;
 #[mcp_tool(
     name = "cargo-generate_lockfile",
     description = "Generates or updates the Cargo.lock file for a Rust project. Usually, run without any additional arguments.",
-    openWorldHint = false,
+    openWorldHint = false
 )]
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoGenerateLockfileTool {
@@ -34,7 +34,7 @@ impl CargoGenerateLockfileTool {
 #[mcp_tool(
     name = "cargo-build",
     description = "Builds a Rust project using Cargo. Usually, run without any additional arguments.",
-    openWorldHint = false,
+    openWorldHint = false
 )]
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoBuildTool {
@@ -69,7 +69,7 @@ impl CargoBuildTool {
 #[mcp_tool(
     name = "cargo-clean",
     description = "Cleans the target directory for a Rust project using Cargo. By default, it cleans the entire workspace.",
-    openWorldHint = false,
+    openWorldHint = false
 )]
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoCleanTool {
@@ -96,7 +96,11 @@ impl CargoCleanTool {
     }
 }
 
-#[mcp_tool(name = "cargo-fmt", description = "Formats Rust code using rustfmt. Usually, run without any additional arguments.", openWorldHint = false)]
+#[mcp_tool(
+    name = "cargo-fmt",
+    description = "Formats Rust code using rustfmt. Usually, run without any additional arguments.",
+    openWorldHint = false
+)]
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoFmtTool {
     /// The name of the package(s) to format. If not specified, formats the current package.
@@ -153,7 +157,7 @@ impl CargoFmtTool {
 #[mcp_tool(
     name = "cargo-check",
     description = "Checks a Rust package and all of its dependencies for errors. Usually, run without any additional arguments.",
-    openWorldHint = false,
+    openWorldHint = false
 )]
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoCheckTool {
@@ -282,7 +286,7 @@ impl CargoCheckTool {
 #[mcp_tool(
     name = "cargo-clippy",
     description = "Checks a Rust package to catch common mistakes and improve code quality using Clippy",
-    openWorldHint = false,
+    openWorldHint = false
 )]
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoClippyTool {
@@ -437,11 +441,10 @@ impl CargoClippyTool {
     }
 }
 
-
 #[mcp_tool(
     name = "cargo-add",
     description = "Adds a dependency to a Rust project using cargo add.",
-    openWorldHint = false,
+    openWorldHint = false
 )]
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoAddTool {
@@ -483,7 +486,7 @@ impl CargoAddTool {
 #[mcp_tool(
     name = "cargo-list",
     description = "Lists installed cargo commands using 'cargo --list'.",
-    openWorldHint = false,
+    openWorldHint = false
 )]
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoListTool {}
@@ -495,4 +498,3 @@ impl CargoListTool {
         execute_command(cmd)
     }
 }
-

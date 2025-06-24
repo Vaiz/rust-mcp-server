@@ -10,7 +10,7 @@ use crate::tools::execute_command;
 #[mcp_tool(
     name = "cargo-deny-check",
     description = "Checks a project's crate graph for security advisories, license compliance, banned crates.",
-    openWorldHint = false,
+    openWorldHint = false
 )]
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoDenyCheckTool {
@@ -201,7 +201,7 @@ impl CargoDenyCheckTool {
 #[mcp_tool(
     name = "cargo-deny-init",
     description = "Creates a cargo-deny config from a template",
-    openWorldHint = false,
+    openWorldHint = false
 )]
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoDenyInitTool {
@@ -225,7 +225,7 @@ impl CargoDenyInitTool {
 #[mcp_tool(
     name = "cargo-deny-list",
     description = "Outputs a listing of all licenses and the crates that use them",
-    openWorldHint = false,
+    openWorldHint = false
 )]
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoDenyListTool {
@@ -270,7 +270,7 @@ impl CargoDenyListTool {
 #[mcp_tool(
     name = "cargo-deny-install",
     description = "Installs cargo-deny tool for dependency graph analysis and security checks",
-    openWorldHint = false,
+    openWorldHint = false
 )]
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoDenyInstallTool {}

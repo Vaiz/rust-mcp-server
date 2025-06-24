@@ -10,7 +10,7 @@ use crate::tools::execute_command;
 #[mcp_tool(
     name = "cargo-machete",
     description = "Finds unused dependencies in a fast yet imprecise way. Helps identify dependencies that are declared in Cargo.toml but not actually used in the code.",
-    openWorldHint = false,
+    openWorldHint = false
 )]
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoMacheteTool {
@@ -22,7 +22,7 @@ pub struct CargoMacheteTool {
     #[serde(default)]
     skip_target_dir: bool,
 
-    /// Rewrite the Cargo.toml files to automatically remove unused dependencies. 
+    /// Rewrite the Cargo.toml files to automatically remove unused dependencies.
     /// Note: all dependencies flagged by cargo-machete will be removed, including false positives.
     #[serde(default)]
     fix: bool,
@@ -69,7 +69,7 @@ impl CargoMacheteTool {
 #[mcp_tool(
     name = "cargo-machete-install",
     description = "Installs cargo-machete tool for finding unused dependencies",
-    openWorldHint = false,
+    openWorldHint = false
 )]
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoMacheteInstallTool {}

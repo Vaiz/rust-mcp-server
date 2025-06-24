@@ -8,9 +8,12 @@ use rust_mcp_sdk::schema::{
     schema_utils::CallToolError,
 };
 
-use cargo::{CargoBuildTool, CargoCheckTool, CargoCleanTool, CargoClippyTool, CargoFmtTool, CargoGenerateLockfileTool, CargoAddTool, CargoListTool};
-use cargo_deny::{CargoDenyCheckTool, CargoDenyInitTool, CargoDenyListTool, CargoDenyInstallTool};
-use cargo_machete::{CargoMacheteTool, CargoMacheteInstallTool};
+use cargo::{
+    CargoAddTool, CargoBuildTool, CargoCheckTool, CargoCleanTool, CargoClippyTool, CargoFmtTool,
+    CargoGenerateLockfileTool, CargoListTool,
+};
+use cargo_deny::{CargoDenyCheckTool, CargoDenyInitTool, CargoDenyInstallTool, CargoDenyListTool};
+use cargo_machete::{CargoMacheteInstallTool, CargoMacheteTool};
 use test::{SayGoodbyeTool, SayHelloTool};
 
 fn execute_command(mut cmd: std::process::Command) -> Result<CallToolResult, CallToolError> {
@@ -87,13 +90,19 @@ pub fn handle_request(request: CallToolRequest) -> Result<CallToolResult, CallTo
         AllTools::CargoFmtTool(cargo_fmt_tool) => cargo_fmt_tool.call_tool(),
         AllTools::CargoCheckTool(cargo_check_tool) => cargo_check_tool.call_tool(),
         AllTools::CargoClippyTool(cargo_clippy_tool) => cargo_clippy_tool.call_tool(),
-        AllTools::CargoGenerateLockfileTool(cargo_generate_lockfile_tool) => cargo_generate_lockfile_tool.call_tool(),
+        AllTools::CargoGenerateLockfileTool(cargo_generate_lockfile_tool) => {
+            cargo_generate_lockfile_tool.call_tool()
+        }
         AllTools::CargoMacheteTool(cargo_machete_tool) => cargo_machete_tool.call_tool(),
-        AllTools::CargoMacheteInstallTool(cargo_machete_install_tool) => cargo_machete_install_tool.call_tool(),
+        AllTools::CargoMacheteInstallTool(cargo_machete_install_tool) => {
+            cargo_machete_install_tool.call_tool()
+        }
         AllTools::CargoDenyCheckTool(cargo_deny_check_tool) => cargo_deny_check_tool.call_tool(),
         AllTools::CargoDenyInitTool(cargo_deny_init_tool) => cargo_deny_init_tool.call_tool(),
         AllTools::CargoDenyListTool(cargo_deny_list_tool) => cargo_deny_list_tool.call_tool(),
-        AllTools::CargoDenyInstallTool(cargo_deny_install_tool) => cargo_deny_install_tool.call_tool(),
+        AllTools::CargoDenyInstallTool(cargo_deny_install_tool) => {
+            cargo_deny_install_tool.call_tool()
+        }
         AllTools::CargoAddTool(cargo_add_tool) => cargo_add_tool.call_tool(),
         AllTools::CargoListTool(cargo_list_tool) => cargo_list_tool.call_tool(),
     }
