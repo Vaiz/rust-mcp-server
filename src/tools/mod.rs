@@ -17,6 +17,10 @@ use cargo_machete::{CargoMacheteInstallTool, CargoMacheteTool};
 use test::{SayGoodbyeTool, SayHelloTool};
 
 fn execute_command(mut cmd: std::process::Command) -> Result<CallToolResult, CallToolError> {
+    tracing::info!(
+        command = ?cmd,
+        "Executing command"
+    );
     let output = cmd.output();
     match output {
         Ok(output) => {

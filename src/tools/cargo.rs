@@ -301,6 +301,10 @@ pub struct CargoClippyTool {
     #[serde(default)]
     no_deps: bool,
 
+    /// Allow dirty working directory (unstaged changes)
+    #[serde(default)]
+    allow_dirty: bool,
+
     /// Automatically apply lint suggestions (implies --no-deps and --all-targets)
     #[serde(default)]
     fix: bool,
@@ -377,6 +381,10 @@ impl CargoClippyTool {
 
         if self.fix {
             cmd.arg("--fix");
+        }
+
+        if self.allow_dirty {
+            cmd.arg("--allow-dirty");
         }
 
         if self.release {
