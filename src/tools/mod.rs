@@ -6,7 +6,7 @@ use rust_mcp_sdk::schema::{
     schema_utils::CallToolError,
 };
 
-use cargo::{CargoBuildTool, CargoCleanTool};
+use cargo::{CargoBuildTool, CargoCheckTool, CargoCleanTool, CargoClippyTool, CargoFmtTool};
 use test::{SayGoodbyeTool, SayHelloTool};
 
 fn execute_command(mut cmd: std::process::Command) -> Result<CallToolResult, CallToolError> {
@@ -49,7 +49,7 @@ fn execute_command(mut cmd: std::process::Command) -> Result<CallToolResult, Cal
 
 rust_mcp_sdk::tool_box!(
     AllTools,
-    [SayHelloTool, SayGoodbyeTool, CargoBuildTool, CargoCleanTool]
+    [SayHelloTool, SayGoodbyeTool, CargoBuildTool, CargoCleanTool, CargoFmtTool, CargoCheckTool, CargoClippyTool]
 );
 
 /// Handles incoming CallToolRequest and processes it using the appropriate tool.
@@ -63,5 +63,8 @@ pub fn handle_request(request: CallToolRequest) -> Result<CallToolResult, CallTo
         AllTools::SayGoodbyeTool(say_goodbye_tool) => say_goodbye_tool.call_tool(),
         AllTools::CargoBuildTool(cargo_build_tool) => cargo_build_tool.call_tool(),
         AllTools::CargoCleanTool(cargo_clean_tool) => cargo_clean_tool.call_tool(),
+        AllTools::CargoFmtTool(cargo_fmt_tool) => cargo_fmt_tool.call_tool(),
+        AllTools::CargoCheckTool(cargo_check_tool) => cargo_check_tool.call_tool(),
+        AllTools::CargoClippyTool(cargo_clippy_tool) => cargo_clippy_tool.call_tool(),
     }
 }

@@ -68,3 +68,324 @@ impl CargoCleanTool {
         execute_command(cmd)
     }
 }
+
+#[mcp_tool(
+    name = "cargo.fmt",
+    description = "Formats Rust code using rustfmt"
+)]
+#[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
+pub struct CargoFmtTool {
+    /// The name of the package(s) to format. If not specified, formats the current package.
+    package: Option<Vec<String>>,
+
+    /// Format all packages in the workspace and their dependencies
+    #[serde(default = "default_false")]
+    all: bool,
+
+    /// Run rustfmt in check mode (don't write changes, just check if formatting is needed)
+    #[serde(default = "default_false")]
+    check: bool,
+
+    /// No output printed to stdout
+    #[serde(default = "default_false")]
+    quiet: bool,
+
+    /// Use verbose output
+    #[serde(default = "default_false")]
+    verbose: bool,
+}
+
+impl CargoFmtTool {
+    pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
+        let mut cmd = Command::new("cargo");
+        cmd.arg("fmt");
+
+        if let Some(packages) = &self.package {
+            for package in packages {
+                cmd.arg("--package").arg(package);
+            }
+        }
+
+        if self.all {
+            cmd.arg("--all");
+        }
+
+        if self.check{
+            cmd.arg("--check");
+        }
+
+        if self.quiet {
+            cmd.arg("--quiet");
+        }
+
+        if self.verbose {
+            cmd.arg("--verbose");
+        }
+
+        execute_command(cmd)
+    }
+}
+
+#[mcp_tool(
+    name = "cargo.check",
+    description = "Checks a Rust package and all of its dependencies for errors"
+)]
+#[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
+pub struct CargoCheckTool {
+    /// Package(s) to check
+    package: Option<Vec<String>>,
+
+    /// Check all packages in the workspace
+    workspace: Option<bool>,
+
+    /// Check artifacts in release mode, with optimizations
+    release: Option<bool>,
+
+    /// Check for the specified target triple
+    target: Option<String>,
+
+    /// Check all targets (lib, bins, examples, tests, benches)
+    all_targets: Option<bool>,
+
+    /// Check only this package's library
+    lib: Option<bool>,
+
+    /// Check all binaries
+    bins: Option<bool>,
+
+    /// Check all examples
+    examples: Option<bool>,
+
+    /// Check all tests
+    tests: Option<bool>,
+
+    /// Space or comma separated list of features to activate
+    features: Option<Vec<String>>,
+
+    /// Activate all available features
+    all_features: Option<bool>,
+
+    /// Do not activate the default feature
+    no_default_features: Option<bool>,
+
+    /// Use verbose output
+    verbose: Option<bool>,
+
+    /// Do not print cargo log messages
+    quiet: Option<bool>,
+}
+
+impl CargoCheckTool {
+    pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
+        let mut cmd = Command::new("cargo");
+        cmd.arg("check");
+
+        if let Some(packages) = &self.package {
+            for package in packages {
+                cmd.arg("--package").arg(package);
+            }
+        }
+
+        if self.workspace.unwrap_or(false) {
+            cmd.arg("--workspace");
+        }
+
+        if self.release.unwrap_or(false) {
+            cmd.arg("--release");
+        }
+
+        if let Some(target) = &self.target {
+            cmd.arg("--target").arg(target);
+        }
+
+        if self.all_targets.unwrap_or(false) {
+            cmd.arg("--all-targets");
+        }
+
+        if self.lib.unwrap_or(false) {
+            cmd.arg("--lib");
+        }
+
+        if self.bins.unwrap_or(false) {
+            cmd.arg("--bins");
+        }
+
+        if self.examples.unwrap_or(false) {
+            cmd.arg("--examples");
+        }
+
+        if self.tests.unwrap_or(false) {
+            cmd.arg("--tests");
+        }
+
+        if let Some(features) = &self.features {
+            cmd.arg("--features").arg(features.join(","));
+        }
+
+        if self.all_features.unwrap_or(false) {
+            cmd.arg("--all-features");
+        }
+
+        if self.no_default_features.unwrap_or(false) {
+            cmd.arg("--no-default-features");
+        }
+
+        if self.verbose.unwrap_or(false) {
+            cmd.arg("--verbose");
+        }
+
+        if self.quiet.unwrap_or(false) {
+            cmd.arg("--quiet");
+        }
+
+        execute_command(cmd)
+    }
+}
+
+#[mcp_tool(
+    name = "cargo.clippy",
+    description = "Checks a Rust package to catch common mistakes and improve code quality using Clippy"
+)]
+#[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
+pub struct CargoClippyTool {
+    /// Package(s) to check
+    package: Option<Vec<String>>,
+
+    /// Check all packages in the workspace
+    workspace: Option<bool>,
+
+    /// Run Clippy only on the given crate, without linting the dependencies
+    no_deps: Option<bool>,
+
+    /// Automatically apply lint suggestions (implies --no-deps and --all-targets)
+    fix: Option<bool>,
+
+    /// Check artifacts in release mode, with optimizations
+    release: Option<bool>,
+
+    /// Check for the specified target triple
+    target: Option<String>,
+
+    /// Check all targets (lib, bins, examples, tests, benches)
+    all_targets: Option<bool>,
+
+    /// Check only this package's library
+    lib: Option<bool>,
+
+    /// Check all binaries
+    bins: Option<bool>,
+
+    /// Check all examples
+    examples: Option<bool>,
+
+    /// Check all tests
+    tests: Option<bool>,
+
+    /// Space or comma separated list of features to activate
+    features: Option<Vec<String>>,
+
+    /// Activate all available features
+    all_features: Option<bool>,
+
+    /// Do not activate the default feature
+    no_default_features: Option<bool>,
+
+    /// Use verbose output
+    verbose: Option<bool>,
+
+    /// Do not print cargo log messages
+    quiet: Option<bool>,
+
+    /// Additional clippy arguments (e.g., lint warnings/denials)
+    clippy_args: Option<Vec<String>>,
+}
+
+impl CargoClippyTool {
+    pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
+        let mut cmd = Command::new("cargo");
+        cmd.arg("clippy");
+
+        if let Some(packages) = &self.package {
+            for package in packages {
+                cmd.arg("--package").arg(package);
+            }
+        }
+
+        if self.workspace.unwrap_or(false) {
+            cmd.arg("--workspace");
+        }
+
+        if self.no_deps.unwrap_or(false) {
+            cmd.arg("--no-deps");
+        }
+
+        if self.fix.unwrap_or(false) {
+            cmd.arg("--fix");
+        }
+
+        if self.release.unwrap_or(false) {
+            cmd.arg("--release");
+        }
+
+        if let Some(target) = &self.target {
+            cmd.arg("--target").arg(target);
+        }
+
+        if self.all_targets.unwrap_or(false) {
+            cmd.arg("--all-targets");
+        }
+
+        if self.lib.unwrap_or(false) {
+            cmd.arg("--lib");
+        }
+
+        if self.bins.unwrap_or(false) {
+            cmd.arg("--bins");
+        }
+
+        if self.examples.unwrap_or(false) {
+            cmd.arg("--examples");
+        }
+
+        if self.tests.unwrap_or(false) {
+            cmd.arg("--tests");
+        }
+
+        if let Some(features) = &self.features {
+            cmd.arg("--features").arg(features.join(","));
+        }
+
+        if self.all_features.unwrap_or(false) {
+            cmd.arg("--all-features");
+        }
+
+        if self.no_default_features.unwrap_or(false) {
+            cmd.arg("--no-default-features");
+        }
+
+        if self.verbose.unwrap_or(false) {
+            cmd.arg("--verbose");
+        }
+
+        if self.quiet.unwrap_or(false) {
+            cmd.arg("--quiet");
+        }
+
+        // Add clippy-specific arguments after --
+        if let Some(clippy_args) = &self.clippy_args {
+            if !clippy_args.is_empty() {
+                cmd.arg("--");
+                for arg in clippy_args {
+                    cmd.arg(arg);
+                }
+            }
+        }
+
+        execute_command(cmd)
+    }
+}
+
+
+const fn default_false() -> bool {
+    false
+}
