@@ -18,6 +18,9 @@ use rust_mcp_sdk::{
 use tracing_appender::rolling;
 use tracing_subscriber::{EnvFilter, fmt};
 
+const VERSION: &str = env!("CARGO_PKG_VERSION");
+const GIT_HASH: Option<&str> = option_env!("GIT_HASH");
+
 #[derive(Parser, Debug)]
 #[command(author, version, about = "Rust MCP Server", long_about = None)]
 struct Args {
@@ -75,10 +78,16 @@ async fn main() -> SdkResult<()> {
         );
     }
 
+    let version = match GIT_HASH {
+        Some(hash) => format!("{}.{}", VERSION, hash),
+        None => VERSION.to_string(),
+    };
+    tracing::info!(version, "Server version");
+
     let server_details = InitializeResult {
         server_info: Implementation {
-            name: "Rust MCP Server".to_string(),
-            version: "0.1.0".to_string(),
+            name: "Rust MCP Server".into(),
+            version,
         },
         capabilities: ServerCapabilities {
             tools: Some(ServerCapabilitiesTools { list_changed: None }),
@@ -87,7 +96,7 @@ async fn main() -> SdkResult<()> {
         },
         meta: None,
         instructions: Some(include_str!("../docs/instructions.md").into()),
-        protocol_version: LATEST_PROTOCOL_VERSION.to_string(),
+        protocol_version: LATEST_PROTOCOL_VERSION.into(),
     };
 
     let transport = StdioTransport::new(TransportOptions {
