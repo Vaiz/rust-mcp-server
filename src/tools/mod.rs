@@ -1,7 +1,6 @@
 pub mod cargo;
 pub mod cargo_deny;
 pub mod cargo_machete;
-pub mod test;
 
 use rust_mcp_sdk::schema::{
     Annotations, CallToolRequest, CallToolResult, CallToolResultContentItem, Role,
@@ -14,7 +13,6 @@ use cargo::{
 };
 use cargo_deny::{CargoDenyCheckTool, CargoDenyInitTool, CargoDenyInstallTool, CargoDenyListTool};
 use cargo_machete::{CargoMacheteInstallTool, CargoMacheteTool};
-use test::{SayGoodbyeTool, SayHelloTool};
 
 fn execute_command(mut cmd: std::process::Command) -> Result<CallToolResult, CallToolError> {
     tracing::info!(
@@ -80,8 +78,6 @@ fn execute_command(mut cmd: std::process::Command) -> Result<CallToolResult, Cal
 rust_mcp_sdk::tool_box!(
     AllTools,
     [
-        SayHelloTool,
-        SayGoodbyeTool,
         CargoBuildTool,
         CargoCleanTool,
         CargoFmtTool,
@@ -115,8 +111,6 @@ pub fn handle_request(
 
     // Match the tool variant and execute its corresponding logic
     match tool_params {
-        AllTools::SayHelloTool(say_hello_tool) => say_hello_tool.call_tool(),
-        AllTools::SayGoodbyeTool(say_goodbye_tool) => say_goodbye_tool.call_tool(),
         AllTools::CargoBuildTool(cargo_build_tool) => cargo_build_tool.call_tool(),
         AllTools::CargoCleanTool(cargo_clean_tool) => cargo_clean_tool.call_tool(),
         AllTools::CargoFmtTool(cargo_fmt_tool) => cargo_fmt_tool.call_tool(),
