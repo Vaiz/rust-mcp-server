@@ -102,7 +102,14 @@ rust_mcp_sdk::tool_box!(
 );
 
 /// Handles incoming CallToolRequest and processes it using the appropriate tool.
-pub fn handle_request(request: CallToolRequest) -> Result<CallToolResult, CallToolError> {
+pub fn handle_request(
+    request: CallToolRequest,
+    disabled_tools: &[String],
+) -> Result<CallToolResult, CallToolError> {
+    if disabled_tools.contains(&request.params.name) {
+        return Err(CallToolError::unknown_tool(request.params.name));
+    }
+
     // Attempt to convert request parameters into GreetingTools enum
     let tool_params: AllTools = AllTools::try_from(request.params).map_err(CallToolError::new)?;
 

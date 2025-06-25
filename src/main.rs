@@ -29,6 +29,10 @@ struct Args {
     /// Log file path (if not set, logs to stderr)
     #[arg(long)]
     log_file: Option<String>,
+
+    /// Disable a tool by name. Can be specified multiple times.
+    #[arg(long = "disable-tool")]
+    disabled_tools: Vec<String>,
 }
 
 #[tokio::main]
@@ -86,7 +90,10 @@ async fn main() -> SdkResult<()> {
         timeout: std::time::Duration::from_secs(args.timeout),
     })?;
 
-    let server =
-        server_runtime::create_server(server_details, transport, handler::MyServerHandler {});
+    let server = server_runtime::create_server(
+        server_details,
+        transport,
+        handler::MyServerHandler::new(args.disabled_tools),
+    );
     server.start().await
 }
