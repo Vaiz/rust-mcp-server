@@ -1,6 +1,6 @@
 # RustMCP
 
-RustMCP is a server that implements the Model Context Protocol (MCP). It acts as a bridge between a large language model (LLM) like GitHub Copilot and your local Rust development environment.
+RustMCP is a server that implements the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction). It acts as a bridge between a large language model (LLM) like GitHub Copilot and your local Rust development environment.
 
 By exposing local tools and project context to the LLM, RustMCP allows the model to perform actions on your behalf, such as building, testing, and analyzing your Rust code.
 

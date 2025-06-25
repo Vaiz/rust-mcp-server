@@ -1,9 +1,11 @@
 mod handler;
+mod prompts;
 pub(crate) mod serde_utils;
 mod tools;
 
 use clap::Parser;
 use rust_mcp_sdk::McpServer;
+use rust_mcp_sdk::schema::ServerCapabilitiesPrompts;
 use rust_mcp_sdk::{
     StdioTransport, TransportOptions,
     error::SdkResult,
@@ -80,6 +82,7 @@ async fn main() -> SdkResult<()> {
         },
         capabilities: ServerCapabilities {
             tools: Some(ServerCapabilitiesTools { list_changed: None }),
+            prompts: Some(ServerCapabilitiesPrompts { list_changed: None }),
             ..Default::default()
         },
         meta: None,
