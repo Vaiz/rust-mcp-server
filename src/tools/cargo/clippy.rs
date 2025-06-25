@@ -17,11 +17,11 @@ use rust_mcp_sdk::{
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoClippyTool {
     /// The toolchain to use, e.g., "stable" or "nightly".
-    #[serde(deserialize_with = "deserialize_string")]
+    #[serde(default, deserialize_with = "deserialize_string")]
     toolchain: Option<String>,
 
     /// Package(s) to check
-    #[serde(deserialize_with = "deserialize_string_vec")]
+    #[serde(default, deserialize_with = "deserialize_string_vec")]
     package: Option<Vec<String>>,
 
     /// Check all packages in the workspace
@@ -45,7 +45,7 @@ pub struct CargoClippyTool {
     release: bool,
 
     /// Check for the specified target triple
-    #[serde(deserialize_with = "deserialize_string")]
+    #[serde(default, deserialize_with = "deserialize_string")]
     target: Option<String>,
 
     /// Check all targets (lib, bins, examples, tests, benches)
@@ -69,7 +69,7 @@ pub struct CargoClippyTool {
     tests: bool,
 
     /// Space or comma separated list of features to activate
-    #[serde(deserialize_with = "deserialize_string_vec")]
+    #[serde(default, deserialize_with = "deserialize_string_vec")]
     features: Option<Vec<String>>,
 
     /// Activate all available features
@@ -90,9 +90,8 @@ pub struct CargoClippyTool {
 
     // temporary disabled because AI agents often pass arguments that are not valid
     // /// Additional clippy arguments (e.g., lint warnings/denials)
-    // #[serde(deserialize_with = "deserialize_string_vec")]
+    // #[serde(default, deserialize_with = "deserialize_string_vec")]
     // clippy_args: Option<Vec<String>>,
-
     /// Treat warnings as errors
     #[serde(default)]
     warnings_as_errors: bool,
@@ -192,5 +191,61 @@ impl CargoClippyTool {
         }
 
         execute_command(cmd)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;use serde_json::json;
+
+    #[test]
+    fn test_deserialize_with_missing_package_field() {
+        // Simulate a JSON input missing the `package` field (should be Option)
+        let input = json!({
+            "toolchain": null,
+            "workspace": true,
+            "no_deps": false,
+            "allow_dirty": true,
+            "fix": true,
+            "release": false,
+            "target": null,
+            "all_targets": true,
+            "lib": true,
+            "bins": true,
+            "examples": true,
+            "tests": true,
+            "features": null,
+            "all_features": true,
+            "no_default_features": false,
+            "verbose": true,
+            "quiet": false,
+            "warnings_as_errors": false
+        });
+
+        let tool: Result<CargoClippyTool, _> = serde_json::from_value(input);
+        let tool =
+            tool.expect("Deserialization should succeed even if `package` is missing (it's Option)");            
+        
+        assert_eq!(tool.package, None);
+        assert_eq!(tool.workspace, true);
+        assert_eq!(tool.all_features, true);
+        assert_eq!(tool.allow_dirty, true);
+    }
+
+    
+    #[test]
+    fn test_deserialize_with_package_field() {
+        // Simulate a JSON input missing the `package` field (should be Option)
+        let input = json!({
+            "package": ["my_package"],
+        });
+
+        let tool: Result<CargoClippyTool, _> = serde_json::from_value(input);
+        let tool = tool.expect("Deserialization should succeed");            
+        
+        assert_eq!(tool.package.unwrap(), ["my_package".to_owned()]);
+        assert_eq!(tool.workspace, false);
+        assert_eq!(tool.all_features, false);
+        assert_eq!(tool.allow_dirty, false);
     }
 }

@@ -16,15 +16,15 @@ use crate::tools::execute_command;
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoDenyCheckTool {
     /// The check(s) to perform. Options: advisories, ban, bans, license, licenses, sources, all
-    #[serde(deserialize_with = "deserialize_string_vec")]
+    #[serde(default, deserialize_with = "deserialize_string_vec")]
     which: Option<Vec<String>>,
 
     /// Path to the config to use. Defaults to <cwd>/deny.toml if not specified
-    #[serde(deserialize_with = "deserialize_string")]
+    #[serde(default, deserialize_with = "deserialize_string")]
     config: Option<String>,
 
     /// Path to graph output root directory for dotviz graph creation
-    #[serde(deserialize_with = "deserialize_string")]
+    #[serde(default, deserialize_with = "deserialize_string")]
     graph: Option<String>,
 
     /// Hides the inclusion graph when printing out info for a crate
@@ -44,30 +44,30 @@ pub struct CargoDenyCheckTool {
     show_stats: bool,
 
     /// Set lint warnings
-    #[serde(deserialize_with = "deserialize_string_vec")]
+    #[serde(default, deserialize_with = "deserialize_string_vec")]
     warn: Option<Vec<String>>,
 
     /// Set lint allowed
-    #[serde(deserialize_with = "deserialize_string_vec")]
+    #[serde(default, deserialize_with = "deserialize_string_vec")]
     allow: Option<Vec<String>>,
 
     /// Set lint denied
-    #[serde(deserialize_with = "deserialize_string_vec")]
+    #[serde(default, deserialize_with = "deserialize_string_vec")]
     deny: Option<Vec<String>>,
 
     /// Specifies the depth at which feature edges are added in inclusion graphs
     feature_depth: Option<u32>,
 
     /// The log level for messages (off, error, warn, info, debug, trace)
-    #[serde(deserialize_with = "deserialize_string")]
+    #[serde(default, deserialize_with = "deserialize_string")]
     log_level: Option<String>,
 
     /// Specify the format of cargo-deny's output (human, json)
-    #[serde(deserialize_with = "deserialize_string")]
+    #[serde(default, deserialize_with = "deserialize_string")]
     format: Option<String>,
 
     /// The path of a Cargo.toml to use as the context for the operation
-    #[serde(deserialize_with = "deserialize_string")]
+    #[serde(default, deserialize_with = "deserialize_string")]
     manifest_path: Option<String>,
 
     /// If passed, all workspace packages are used as roots for the crate graph
@@ -75,11 +75,11 @@ pub struct CargoDenyCheckTool {
     workspace: bool,
 
     /// One or more crates to exclude from the crate graph that is used
-    #[serde(deserialize_with = "deserialize_string_vec")]
+    #[serde(default, deserialize_with = "deserialize_string_vec")]
     exclude: Option<Vec<String>>,
 
     /// One or more platforms to filter crates by
-    #[serde(deserialize_with = "deserialize_string_vec")]
+    #[serde(default, deserialize_with = "deserialize_string_vec")]
     target: Option<Vec<String>>,
 
     /// Activate all available features
@@ -91,7 +91,7 @@ pub struct CargoDenyCheckTool {
     no_default_features: bool,
 
     /// Space or comma separated list of features to activate
-    #[serde(deserialize_with = "deserialize_string_vec")]
+    #[serde(default, deserialize_with = "deserialize_string_vec")]
     features: Option<Vec<String>>,
 
     /// Run without accessing the network
@@ -219,7 +219,7 @@ impl CargoDenyCheckTool {
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoDenyInitTool {
     /// The path to create. Defaults to <cwd>/deny.toml
-    #[serde(deserialize_with = "deserialize_string")]
+    #[serde(default, deserialize_with = "deserialize_string")]
     config: Option<String>,
 }
 
@@ -244,18 +244,18 @@ impl CargoDenyInitTool {
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoDenyListTool {
     /// Path to the config to use. Defaults to a deny.toml in the same folder as the manifest path
-    #[serde(deserialize_with = "deserialize_string")]
+    #[serde(default, deserialize_with = "deserialize_string")]
     config: Option<String>,
 
     /// Minimum confidence threshold for license text (0.0 - 1.0, default: 0.8)
     threshold: Option<f64>,
 
     /// The format of the output (human, json, tsv)
-    #[serde(deserialize_with = "deserialize_string")]
+    #[serde(default, deserialize_with = "deserialize_string")]
     format: Option<String>,
 
     /// The layout for the output, does not apply to TSV (crate, license)
-    #[serde(deserialize_with = "deserialize_string")]
+    #[serde(default, deserialize_with = "deserialize_string")]
     layout: Option<String>,
 }
 

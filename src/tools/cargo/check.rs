@@ -17,11 +17,11 @@ use rust_mcp_sdk::{
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoCheckTool {
     /// The toolchain to use, e.g., "stable" or "nightly".
-    #[serde(deserialize_with = "deserialize_string")]
+    #[serde(default, deserialize_with = "deserialize_string")]
     toolchain: Option<String>,
 
     /// Package(s) to check
-    #[serde(deserialize_with = "deserialize_string_vec")]
+    #[serde(default, deserialize_with = "deserialize_string_vec")]
     package: Option<Vec<String>>,
 
     /// Check all packages in the workspace
@@ -33,7 +33,7 @@ pub struct CargoCheckTool {
     release: bool,
 
     /// Check for the specified target triple
-    #[serde(deserialize_with = "deserialize_string")]
+    #[serde(default, deserialize_with = "deserialize_string")]
     target: Option<String>,
 
     /// Check all targets (lib, bins, examples, tests, benches)
@@ -57,7 +57,7 @@ pub struct CargoCheckTool {
     tests: bool,
 
     /// Space or comma separated list of features to activate
-    #[serde(deserialize_with = "deserialize_string_vec")]
+    #[serde(default, deserialize_with = "deserialize_string_vec")]
     features: Option<Vec<String>>,
 
     /// Activate all available features

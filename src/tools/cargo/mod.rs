@@ -30,7 +30,7 @@ use crate::tools::execute_command;
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoGenerateLockfileTool {
     /// The name of the package to generate lockfile for. If not specified, generates for the current package/workspace.
-    #[serde(deserialize_with = "deserialize_string")]
+    #[serde(default, deserialize_with = "deserialize_string")]
     package: Option<String>,
 }
 
@@ -55,18 +55,18 @@ impl CargoGenerateLockfileTool {
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoBuildTool {
     /// The toolchain to use, e.g., "stable" or "nightly".
-    #[serde(deserialize_with = "deserialize_string")]
+    #[serde(default, deserialize_with = "deserialize_string")]
     toolchain: Option<String>,
 
     /// The name of the package to build. If not specified, the current package/workspace is built.
-    #[serde(deserialize_with = "deserialize_string")]
+    #[serde(default, deserialize_with = "deserialize_string")]
     package: Option<String>,
 
     /// The profile to use for the build. Defaults to "dev".
     /// Default rust profiles:
     /// - `dev`: Optimized for development, with debug information.
     /// - `release`: Optimized for performance, without debug information.
-    #[serde(deserialize_with = "deserialize_string")]
+    #[serde(default, deserialize_with = "deserialize_string")]
     profile: Option<String>,
 
     /// Treat warnings as errors
@@ -107,18 +107,18 @@ impl CargoBuildTool {
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoCleanTool {
     /// The toolchain to use, e.g., "stable" or "nightly".
-    #[serde(deserialize_with = "deserialize_string")]
+    #[serde(default, deserialize_with = "deserialize_string")]
     toolchain: Option<String>,
 
     /// The name of the package to clean. If not specified, cleans the entire workspace.
-    #[serde(deserialize_with = "deserialize_string")]
+    #[serde(default, deserialize_with = "deserialize_string")]
     package: Option<String>,
 
     /// The profile to use for the build. Defaults to "dev".
     /// Default rust profiles:
     /// - `dev`: Optimized for development, with debug information.
     /// - `release`: Optimized for performance, without debug information.
-    #[serde(deserialize_with = "deserialize_string")]
+    #[serde(default, deserialize_with = "deserialize_string")]
     profile: Option<String>,
 }
 
@@ -146,11 +146,11 @@ impl CargoCleanTool {
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoFmtTool {
     /// The toolchain to use, e.g., "stable" or "nightly".
-    #[serde(deserialize_with = "deserialize_string")]
+    #[serde(default, deserialize_with = "deserialize_string")]
     toolchain: Option<String>,
 
     /// The name of the package(s) to format. If not specified, formats the current package.
-    #[serde(deserialize_with = "deserialize_string_vec")]
+    #[serde(default, deserialize_with = "deserialize_string_vec")]
     package: Option<Vec<String>>,
 
     /// Format all packages in the workspace and their dependencies
@@ -212,12 +212,12 @@ impl CargoFmtTool {
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoAddTool {
     /// The toolchain to use, e.g., "stable" or "nightly".
-    #[serde(deserialize_with = "deserialize_string")]
+    #[serde(default, deserialize_with = "deserialize_string")]
     toolchain: Option<String>,
     /// The name of the dependency to add.
     pub package: String,
     /// Optional version requirement.
-    #[serde(deserialize_with = "deserialize_string")]
+    #[serde(default, deserialize_with = "deserialize_string")]
     pub version: Option<String>,
     /// Add as a dev-dependency
     #[serde(default)]

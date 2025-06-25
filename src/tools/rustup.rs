@@ -44,15 +44,15 @@ pub struct RustupToolchainAddTool {
     pub toolchain: String,
 
     /// Profile to use for installation (minimal, default, complete)
-    #[serde(deserialize_with = "deserialize_string")]
+    #[serde(default, deserialize_with = "deserialize_string")]
     pub profile: Option<String>,
 
     /// Comma-separated list of components to be added on installation
-    #[serde(deserialize_with = "deserialize_string_vec")]
+    #[serde(default, deserialize_with = "deserialize_string_vec")]
     pub components: Option<Vec<String>>,
 
     /// Comma-separated list of targets to be added on installation  
-    #[serde(deserialize_with = "deserialize_string_vec")]
+    #[serde(default, deserialize_with = "deserialize_string_vec")]
     pub targets: Option<Vec<String>>,
 
     /// Don't perform self update when running the command
@@ -121,7 +121,7 @@ impl RustupToolchainAddTool {
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct RustupUpdateTool {
     /// Toolchain name to update, such as 'stable', 'nightly', or '1.8.0'. If not specified, updates all installed toolchains
-    #[serde(deserialize_with = "deserialize_string")]
+    #[serde(default, deserialize_with = "deserialize_string")]
     pub toolchain: Option<String>,
 
     /// Don't perform self update when running the command

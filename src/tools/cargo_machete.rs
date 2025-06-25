@@ -33,7 +33,7 @@ pub struct CargoMacheteTool {
     no_ignore: bool,
 
     /// Paths to analyze. If not specified, analyzes the current directory.
-    #[serde(deserialize_with = "deserialize_string_vec")]
+    #[serde(default, deserialize_with = "deserialize_string_vec")]
     paths: Option<Vec<String>>,
 }
 

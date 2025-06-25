@@ -20,7 +20,7 @@ pub struct CargoSearchTool {
     /// Limit the number of results (default: 10, max: 100)
     pub limit: Option<u32>,
     /// Registry to search packages in
-    #[serde(deserialize_with = "deserialize_string")]
+    #[serde(default, deserialize_with = "deserialize_string")]
     pub registry: Option<String>,
 }
 

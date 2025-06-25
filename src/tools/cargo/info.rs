@@ -18,7 +18,7 @@ pub struct CargoInfoTool {
     /// Package to inspect
     pub spec: String,
     /// Registry to search packages in
-    #[serde(deserialize_with = "deserialize_string")]
+    #[serde(default, deserialize_with = "deserialize_string")]
     pub registry: Option<String>,
 }
 

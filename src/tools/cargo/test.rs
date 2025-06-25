@@ -17,22 +17,22 @@ use rust_mcp_sdk::{
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoTestTool {
     /// The toolchain to use, e.g., "stable" or "nightly".
-    #[serde(deserialize_with = "deserialize_string")]
+    #[serde(default, deserialize_with = "deserialize_string")]
     toolchain: Option<String>,
     /// If specified, only run tests containing this string in their names
-    #[serde(deserialize_with = "deserialize_string")]
+    #[serde(default, deserialize_with = "deserialize_string")]
     testname: Option<String>,
     /// Arguments for the test binary (after --)
-    #[serde(deserialize_with = "deserialize_string_vec")]
+    #[serde(default, deserialize_with = "deserialize_string_vec")]
     test_args: Option<Vec<String>>,
     /// Package to run tests for
-    #[serde(deserialize_with = "deserialize_string")]
+    #[serde(default, deserialize_with = "deserialize_string")]
     package: Option<String>,
     /// Test all packages in the workspace
     #[serde(default)]
     workspace: bool,
     /// Exclude packages from the test
-    #[serde(deserialize_with = "deserialize_string_vec")]
+    #[serde(default, deserialize_with = "deserialize_string_vec")]
     exclude: Option<Vec<String>>,
     /// Test only this package's library
     #[serde(default)]
@@ -41,25 +41,25 @@ pub struct CargoTestTool {
     #[serde(default)]
     bins: bool,
     /// Test only the specified binary
-    #[serde(deserialize_with = "deserialize_string")]
+    #[serde(default, deserialize_with = "deserialize_string")]
     bin: Option<String>,
     /// Test all examples
     #[serde(default)]
     examples: bool,
     /// Test only the specified example
-    #[serde(deserialize_with = "deserialize_string")]
+    #[serde(default, deserialize_with = "deserialize_string")]
     example: Option<String>,
     /// Test all targets that have `test = true` set
     #[serde(default)]
     tests: bool,
     /// Test only the specified test target
-    #[serde(deserialize_with = "deserialize_string")]
+    #[serde(default, deserialize_with = "deserialize_string")]
     test: Option<String>,
     /// Test all targets that have `bench = true` set
     #[serde(default)]
     benches: bool,
     /// Test only the specified bench target
-    #[serde(deserialize_with = "deserialize_string")]
+    #[serde(default, deserialize_with = "deserialize_string")]
     bench: Option<String>,
     /// Test all targets (does not include doctests)
     #[serde(default)]
@@ -68,7 +68,7 @@ pub struct CargoTestTool {
     #[serde(default)]
     doc: bool,
     /// Space or comma separated list of features to activate
-    #[serde(deserialize_with = "deserialize_string")]
+    #[serde(default, deserialize_with = "deserialize_string")]
     features: Option<String>,
     /// Activate all available features
     #[serde(default)]
@@ -80,13 +80,13 @@ pub struct CargoTestTool {
     #[serde(default)]
     release: bool,
     /// Build artifacts with the specified profile
-    #[serde(deserialize_with = "deserialize_string")]
+    #[serde(default, deserialize_with = "deserialize_string")]
     profile: Option<String>,
     /// Build for the target triple
-    #[serde(deserialize_with = "deserialize_string")]
+    #[serde(default, deserialize_with = "deserialize_string")]
     target: Option<String>,
     /// Path to Cargo.toml
-    #[serde(deserialize_with = "deserialize_string")]
+    #[serde(default, deserialize_with = "deserialize_string")]
     manifest_path: Option<String>,
 }
 

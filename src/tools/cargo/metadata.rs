@@ -14,11 +14,11 @@ use rust_mcp_sdk::{
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoMetadataTool {
     /// The toolchain to use, e.g., "stable" or "nightly".
-    #[serde(deserialize_with = "deserialize_string")]
+    #[serde(default, deserialize_with = "deserialize_string")]
     toolchain: Option<String>,
 
     /// Only include resolve dependencies matching the given target-triple
-    #[serde(deserialize_with = "deserialize_string")]
+    #[serde(default, deserialize_with = "deserialize_string")]
     filter_platform: Option<String>,
 
     /// Output information only about the workspace members and don't fetch dependencies
@@ -34,15 +34,15 @@ pub struct CargoMetadataTool {
     quiet: bool,
 
     /// Coloring [possible values: auto, always, never]
-    #[serde(deserialize_with = "deserialize_string")]
+    #[serde(default, deserialize_with = "deserialize_string")]
     color: Option<String>,
 
     /// Override a configuration value
-    #[serde(deserialize_with = "deserialize_string")]
+    #[serde(default, deserialize_with = "deserialize_string")]
     config: Option<String>,
 
     /// Space or comma separated list of features to activate
-    #[serde(deserialize_with = "deserialize_string")]
+    #[serde(default, deserialize_with = "deserialize_string")]
     features: Option<String>,
 
     /// Activate all available features
@@ -54,11 +54,11 @@ pub struct CargoMetadataTool {
     no_default_features: bool,
 
     /// Path to Cargo.toml
-    #[serde(deserialize_with = "deserialize_string")]
+    #[serde(default, deserialize_with = "deserialize_string")]
     manifest_path: Option<String>,
 
     /// Path to Cargo.lock (unstable)
-    #[serde(deserialize_with = "deserialize_string")]
+    #[serde(default, deserialize_with = "deserialize_string")]
     lockfile_path: Option<String>,
 
     /// Run without accessing the network
