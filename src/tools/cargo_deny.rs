@@ -6,6 +6,7 @@ use rust_mcp_sdk::{
 };
 
 use crate::tools::execute_command;
+use super::deserialize_string;
 
 #[mcp_tool(
     name = "cargo-deny-check",
@@ -18,9 +19,11 @@ pub struct CargoDenyCheckTool {
     which: Option<Vec<String>>,
 
     /// Path to the config to use. Defaults to <cwd>/deny.toml if not specified
+    #[serde(deserialize_with = "deserialize_string")]
     config: Option<String>,
 
     /// Path to graph output root directory for dotviz graph creation
+    #[serde(deserialize_with = "deserialize_string")]
     graph: Option<String>,
 
     /// Hides the inclusion graph when printing out info for a crate
@@ -52,12 +55,15 @@ pub struct CargoDenyCheckTool {
     feature_depth: Option<u32>,
 
     /// The log level for messages (off, error, warn, info, debug, trace)
+    #[serde(deserialize_with = "deserialize_string")]
     log_level: Option<String>,
 
     /// Specify the format of cargo-deny's output (human, json)
+    #[serde(deserialize_with = "deserialize_string")]
     format: Option<String>,
 
     /// The path of a Cargo.toml to use as the context for the operation
+    #[serde(deserialize_with = "deserialize_string")]
     manifest_path: Option<String>,
 
     /// If passed, all workspace packages are used as roots for the crate graph
@@ -206,6 +212,7 @@ impl CargoDenyCheckTool {
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoDenyInitTool {
     /// The path to create. Defaults to <cwd>/deny.toml
+    #[serde(deserialize_with = "deserialize_string")]
     config: Option<String>,
 }
 
@@ -230,15 +237,18 @@ impl CargoDenyInitTool {
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoDenyListTool {
     /// Path to the config to use. Defaults to a deny.toml in the same folder as the manifest path
+    #[serde(deserialize_with = "deserialize_string")]
     config: Option<String>,
 
     /// Minimum confidence threshold for license text (0.0 - 1.0, default: 0.8)
     threshold: Option<f64>,
 
     /// The format of the output (human, json, tsv)
+    #[serde(deserialize_with = "deserialize_string")]
     format: Option<String>,
 
     /// The layout for the output, does not apply to TSV (crate, license)
+    #[serde(deserialize_with = "deserialize_string")]
     layout: Option<String>,
 }
 

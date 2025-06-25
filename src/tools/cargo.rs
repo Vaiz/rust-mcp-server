@@ -6,6 +6,7 @@ use rust_mcp_sdk::{
 };
 
 use crate::tools::execute_command;
+use super::deserialize_string;
 
 #[mcp_tool(
     name = "cargo-generate_lockfile",
@@ -15,6 +16,7 @@ use crate::tools::execute_command;
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoGenerateLockfileTool {
     /// The name of the package to generate lockfile for. If not specified, generates for the current package/workspace.
+    #[serde(deserialize_with = "deserialize_string")]
     package: Option<String>,
 }
 
@@ -39,15 +41,18 @@ impl CargoGenerateLockfileTool {
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoBuildTool {    
     /// The toolchain to use, e.g., "stable" or "nightly".
+    #[serde(deserialize_with = "deserialize_string")]
     toolchain: Option<String>,
 
     /// The name of the package to build. If not specified, the current package/workspace is built.
+    #[serde(deserialize_with = "deserialize_string")]
     package: Option<String>,
 
     /// The profile to use for the build. Defaults to "dev".
     /// Default rust profiles:
     /// - `dev`: Optimized for development, with debug information.
     /// - `release`: Optimized for performance, without debug information.
+    #[serde(deserialize_with = "deserialize_string")]
     profile: Option<String>,
 }
 
@@ -80,15 +85,18 @@ impl CargoBuildTool {
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoCleanTool {
     /// The toolchain to use, e.g., "stable" or "nightly".
+    #[serde(deserialize_with = "deserialize_string")]
     toolchain: Option<String>,
 
     /// The name of the package to clean. If not specified, cleans the entire workspace.
+    #[serde(deserialize_with = "deserialize_string")]
     package: Option<String>,
 
     /// The profile to use for the build. Defaults to "dev".
     /// Default rust profiles:
     /// - `dev`: Optimized for development, with debug information.
     /// - `release`: Optimized for performance, without debug information.
+    #[serde(deserialize_with = "deserialize_string")]
     profile: Option<String>,
 }
 
@@ -116,6 +124,7 @@ impl CargoCleanTool {
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoFmtTool {
     /// The toolchain to use, e.g., "stable" or "nightly".
+    #[serde(deserialize_with = "deserialize_string")]
     toolchain: Option<String>,
 
     /// The name of the package(s) to format. If not specified, formats the current package.
@@ -180,6 +189,7 @@ impl CargoFmtTool {
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoCheckTool {
     /// The toolchain to use, e.g., "stable" or "nightly".
+    #[serde(deserialize_with = "deserialize_string")]
     toolchain: Option<String>,
 
     /// Package(s) to check
@@ -194,6 +204,7 @@ pub struct CargoCheckTool {
     release: bool,
 
     /// Check for the specified target triple
+    #[serde(deserialize_with = "deserialize_string")]
     target: Option<String>,
 
     /// Check all targets (lib, bins, examples, tests, benches)
@@ -315,6 +326,7 @@ impl CargoCheckTool {
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoClippyTool {
     /// The toolchain to use, e.g., "stable" or "nightly".
+    #[serde(deserialize_with = "deserialize_string")]
     toolchain: Option<String>,
 
     /// Package(s) to check
@@ -341,6 +353,7 @@ pub struct CargoClippyTool {
     release: bool,
 
     /// Check for the specified target triple
+    #[serde(deserialize_with = "deserialize_string")]
     target: Option<String>,
 
     /// Check all targets (lib, bins, examples, tests, benches)
@@ -487,10 +500,12 @@ impl CargoClippyTool {
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoAddTool {
     /// The toolchain to use, e.g., "stable" or "nightly".
+    #[serde(deserialize_with = "deserialize_string")]
     toolchain: Option<String>,
     /// The name of the dependency to add.
     pub package: String,
     /// Optional version requirement.
+    #[serde(deserialize_with = "deserialize_string")]
     pub version: Option<String>,
     /// Add as a dev-dependency
     #[serde(default)]
@@ -552,12 +567,15 @@ impl CargoListTool {
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoTestTool {
     /// The toolchain to use, e.g., "stable" or "nightly".
+    #[serde(deserialize_with = "deserialize_string")]
     toolchain: Option<String>,
     /// If specified, only run tests containing this string in their names
+    #[serde(deserialize_with = "deserialize_string")]
     testname: Option<String>,
     /// Arguments for the test binary (after --)
     test_args: Option<Vec<String>>,
     /// Package to run tests for
+    #[serde(deserialize_with = "deserialize_string")]
     package: Option<String>,
     /// Test all packages in the workspace
     #[serde(default)]
@@ -571,21 +589,25 @@ pub struct CargoTestTool {
     #[serde(default)]
     bins: bool,
     /// Test only the specified binary
+    #[serde(deserialize_with = "deserialize_string")]
     bin: Option<String>,
     /// Test all examples
     #[serde(default)]
     examples: bool,
     /// Test only the specified example
+    #[serde(deserialize_with = "deserialize_string")]
     example: Option<String>,
     /// Test all targets that have `test = true` set
     #[serde(default)]
     tests: bool,
     /// Test only the specified test target
+    #[serde(deserialize_with = "deserialize_string")]
     test: Option<String>,
     /// Test all targets that have `bench = true` set
     #[serde(default)]
     benches: bool,
     /// Test only the specified bench target
+    #[serde(deserialize_with = "deserialize_string")]
     bench: Option<String>,
     /// Test all targets (does not include doctests)
     #[serde(default)]
@@ -594,6 +616,7 @@ pub struct CargoTestTool {
     #[serde(default)]
     doc: bool,
     /// Space or comma separated list of features to activate
+    #[serde(deserialize_with = "deserialize_string")]
     features: Option<String>,
     /// Activate all available features
     #[serde(default)]
@@ -605,10 +628,13 @@ pub struct CargoTestTool {
     #[serde(default)]
     release: bool,
     /// Build artifacts with the specified profile
+    #[serde(deserialize_with = "deserialize_string")]
     profile: Option<String>,
     /// Build for the target triple
+    #[serde(deserialize_with = "deserialize_string")]
     target: Option<String>,
     /// Path to Cargo.toml
+    #[serde(deserialize_with = "deserialize_string")]
     manifest_path: Option<String>,
 }
 
@@ -707,9 +733,11 @@ impl CargoTestTool {
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoMetadataTool {
     /// The toolchain to use, e.g., "stable" or "nightly".
+    #[serde(deserialize_with = "deserialize_string")]
     toolchain: Option<String>,
 
     /// Only include resolve dependencies matching the given target-triple
+    #[serde(deserialize_with = "deserialize_string")]
     filter_platform: Option<String>,
 
     /// Output information only about the workspace members and don't fetch dependencies
@@ -725,12 +753,15 @@ pub struct CargoMetadataTool {
     quiet: bool,
 
     /// Coloring [possible values: auto, always, never]
+    #[serde(deserialize_with = "deserialize_string")]
     color: Option<String>,
 
     /// Override a configuration value
+    #[serde(deserialize_with = "deserialize_string")]
     config: Option<String>,
 
     /// Space or comma separated list of features to activate
+    #[serde(deserialize_with = "deserialize_string")]
     features: Option<String>,
 
     /// Activate all available features
@@ -742,9 +773,11 @@ pub struct CargoMetadataTool {
     no_default_features: bool,
 
     /// Path to Cargo.toml
+    #[serde(deserialize_with = "deserialize_string")]
     manifest_path: Option<String>,
 
     /// Path to Cargo.lock (unstable)
+    #[serde(deserialize_with = "deserialize_string")]
     lockfile_path: Option<String>,
 
     /// Run without accessing the network

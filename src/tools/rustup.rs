@@ -6,6 +6,7 @@ use rust_mcp_sdk::{
 };
 
 use crate::tools::execute_command;
+use super::deserialize_string;
 
 #[mcp_tool(
     name = "rustup-show",
@@ -43,6 +44,7 @@ pub struct RustupToolchainAddTool {
     pub toolchain: String,
 
     /// Profile to use for installation (minimal, default, complete)
+    #[serde(deserialize_with = "deserialize_string")]
     pub profile: Option<String>,
 
     /// Comma-separated list of components to be added on installation
@@ -117,6 +119,7 @@ impl RustupToolchainAddTool {
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct RustupUpdateTool {
     /// Toolchain name to update, such as 'stable', 'nightly', or '1.8.0'. If not specified, updates all installed toolchains
+    #[serde(deserialize_with = "deserialize_string")]
     pub toolchain: Option<String>,
 
     /// Don't perform self update when running the command

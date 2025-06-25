@@ -145,3 +145,19 @@ pub fn handle_request(
         AllTools::RustupUpdateTool(rustup_update_tool) => rustup_update_tool.call_tool(),
     }
 }
+
+
+/// Utility function for parsing Option<String> fields in serde,
+/// returning None if the string is "null" (case-insensitive) or empty.
+pub fn deserialize_string<'de, D>(deserializer: D) -> Result<Option<String>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    use serde::Deserialize;
+
+    let opt = Option::<String>::deserialize(deserializer)?;
+    match opt.as_deref() {
+        Some("null") => Ok(None),
+        _ => Ok(opt),
+    }
+}
