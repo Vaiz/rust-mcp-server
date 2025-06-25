@@ -91,6 +91,10 @@ pub struct CargoClippyTool {
     /// Additional clippy arguments (e.g., lint warnings/denials)
     #[serde(deserialize_with = "deserialize_string_vec")]
     clippy_args: Option<Vec<String>>,
+
+    /// Treat warnings as errors
+    #[serde(default)]
+    warnings_as_errors: bool,
 }
 
 impl CargoClippyTool {
@@ -180,6 +184,10 @@ impl CargoClippyTool {
                     cmd.arg(arg);
                 }
             }
+        }
+
+        if self.warnings_as_errors {
+            cmd.env("RUSTFLAGS", "-D warnings");
         }
 
         execute_command(cmd)

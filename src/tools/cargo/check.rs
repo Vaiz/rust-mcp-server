@@ -75,6 +75,10 @@ pub struct CargoCheckTool {
     /// Do not print cargo log messages
     #[serde(default)]
     quiet: bool,
+
+    /// Treat warnings as errors
+    #[serde(default)]
+    warnings_as_errors: bool,
 }
 
 impl CargoCheckTool {
@@ -142,6 +146,10 @@ impl CargoCheckTool {
 
         if self.quiet {
             cmd.arg("--quiet");
+        }
+
+        if self.warnings_as_errors {
+            cmd.env("RUSTFLAGS", "-D warnings");
         }
 
         execute_command(cmd)

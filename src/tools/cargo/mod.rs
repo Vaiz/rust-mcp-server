@@ -64,6 +64,10 @@ pub struct CargoBuildTool {
     /// - `release`: Optimized for performance, without debug information.
     #[serde(deserialize_with = "deserialize_string")]
     profile: Option<String>,
+
+    /// Treat warnings as errors
+    #[serde(default)]
+    warnings_as_errors: bool,
 }
 
 impl CargoBuildTool {
@@ -81,6 +85,10 @@ impl CargoBuildTool {
 
         if let Some(package) = &self.package {
             cmd.arg("--package").arg(package);
+        }
+
+        if self.warnings_as_errors {
+            cmd.env("RUSTFLAGS", "-D warnings");
         }
 
         execute_command(cmd)
