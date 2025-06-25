@@ -108,13 +108,21 @@ pub fn handle_request(
     disabled_tools: &[String],
 ) -> Result<CallToolResult, CallToolError> {
     if disabled_tools.contains(&request.params.name) {
+        tracing::warn!(
+            tool_name = ?request.params.name,
+            "Tool is disabled, returning error"
+        );
         return Err(CallToolError::unknown_tool(request.params.name));
     }
 
-    // Attempt to convert request parameters into GreetingTools enum
-    let tool_params: AllTools = AllTools::try_from(request.params).map_err(CallToolError::new)?;
+    let tool_params: AllTools = AllTools::try_from(request.params).map_err(|e| {
+        tracing::error!(
+            error = ?e,
+            "Failed to parse request parameters"
+        );
+        CallToolError::new(e)
+    })?;
 
-    // Match the tool variant and execute its corresponding logic
     match tool_params {
         AllTools::CargoBuildTool(cargo_build_tool) => cargo_build_tool.call_tool(),
         AllTools::CargoCleanTool(cargo_clean_tool) => cargo_clean_tool.call_tool(),
