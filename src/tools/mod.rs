@@ -1,6 +1,7 @@
 pub mod cargo;
 pub mod cargo_deny;
 pub mod cargo_machete;
+pub mod rustup;
 
 use rust_mcp_sdk::schema::{
     Annotations, CallToolRequest, CallToolResult, CallToolResultContentItem, Role,
@@ -13,6 +14,7 @@ use cargo::{
 };
 use cargo_deny::{CargoDenyCheckTool, CargoDenyInitTool, CargoDenyInstallTool, CargoDenyListTool};
 use cargo_machete::{CargoMacheteInstallTool, CargoMacheteTool};
+use rustup::{RustupShowTool, RustupToolchainAddTool, RustupUpdateTool};
 
 fn execute_command(mut cmd: std::process::Command) -> Result<CallToolResult, CallToolError> {
     tracing::info!(
@@ -93,7 +95,10 @@ rust_mcp_sdk::tool_box!(
         CargoAddTool,
         CargoListTool,
         CargoTestTool,
-        CargoMetadataTool
+        CargoMetadataTool,
+        RustupShowTool,
+        RustupToolchainAddTool,
+        RustupUpdateTool
     ]
 );
 
@@ -133,5 +138,10 @@ pub fn handle_request(
         AllTools::CargoListTool(cargo_list_tool) => cargo_list_tool.call_tool(),
         AllTools::CargoTestTool(cargo_test_tool) => cargo_test_tool.call_tool(),
         AllTools::CargoMetadataTool(cargo_metadata_tool) => cargo_metadata_tool.call_tool(),
+        AllTools::RustupShowTool(rustup_show_tool) => rustup_show_tool.call_tool(),
+        AllTools::RustupToolchainAddTool(rustup_toolchain_add_tool) => {
+            rustup_toolchain_add_tool.call_tool()
+        }
+        AllTools::RustupUpdateTool(rustup_update_tool) => rustup_update_tool.call_tool(),
     }
 }
