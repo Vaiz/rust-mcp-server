@@ -11,6 +11,7 @@ use rust_mcp_sdk::schema::{
 use cargo::{
     CargoAddTool, CargoBuildTool, CargoCheckTool, CargoCleanTool, CargoClippyTool, CargoFmtTool,
     CargoGenerateLockfileTool, CargoListTool, CargoMetadataTool, CargoTestTool,
+    CargoSearchTool, CargoInfoTool,
 };
 use cargo_deny::{CargoDenyCheckTool, CargoDenyInitTool, CargoDenyInstallTool, CargoDenyListTool};
 use cargo_machete::{CargoMacheteInstallTool, CargoMacheteTool};
@@ -98,7 +99,9 @@ rust_mcp_sdk::tool_box!(
         CargoMetadataTool,
         RustupShowTool,
         RustupToolchainAddTool,
-        RustupUpdateTool
+        RustupUpdateTool,
+        CargoSearchTool,
+        CargoInfoTool
     ]
 );
 
@@ -124,32 +127,26 @@ pub fn handle_request(
     })?;
 
     match tool_params {
-        AllTools::CargoBuildTool(cargo_build_tool) => cargo_build_tool.call_tool(),
-        AllTools::CargoCleanTool(cargo_clean_tool) => cargo_clean_tool.call_tool(),
-        AllTools::CargoFmtTool(cargo_fmt_tool) => cargo_fmt_tool.call_tool(),
-        AllTools::CargoCheckTool(cargo_check_tool) => cargo_check_tool.call_tool(),
-        AllTools::CargoClippyTool(cargo_clippy_tool) => cargo_clippy_tool.call_tool(),
-        AllTools::CargoGenerateLockfileTool(cargo_generate_lockfile_tool) => {
-            cargo_generate_lockfile_tool.call_tool()
-        }
-        AllTools::CargoMacheteTool(cargo_machete_tool) => cargo_machete_tool.call_tool(),
-        AllTools::CargoMacheteInstallTool(cargo_machete_install_tool) => {
-            cargo_machete_install_tool.call_tool()
-        }
-        AllTools::CargoDenyCheckTool(cargo_deny_check_tool) => cargo_deny_check_tool.call_tool(),
-        AllTools::CargoDenyInitTool(cargo_deny_init_tool) => cargo_deny_init_tool.call_tool(),
-        AllTools::CargoDenyListTool(cargo_deny_list_tool) => cargo_deny_list_tool.call_tool(),
-        AllTools::CargoDenyInstallTool(cargo_deny_install_tool) => {
-            cargo_deny_install_tool.call_tool()
-        }
-        AllTools::CargoAddTool(cargo_add_tool) => cargo_add_tool.call_tool(),
-        AllTools::CargoListTool(cargo_list_tool) => cargo_list_tool.call_tool(),
-        AllTools::CargoTestTool(cargo_test_tool) => cargo_test_tool.call_tool(),
-        AllTools::CargoMetadataTool(cargo_metadata_tool) => cargo_metadata_tool.call_tool(),
-        AllTools::RustupShowTool(rustup_show_tool) => rustup_show_tool.call_tool(),
-        AllTools::RustupToolchainAddTool(rustup_toolchain_add_tool) => {
-            rustup_toolchain_add_tool.call_tool()
-        }
-        AllTools::RustupUpdateTool(rustup_update_tool) => rustup_update_tool.call_tool(),
+        AllTools::CargoBuildTool(tool) => tool.call_tool(),
+        AllTools::CargoCleanTool(tool) => tool.call_tool(),
+        AllTools::CargoFmtTool(tool) => tool.call_tool(),
+        AllTools::CargoCheckTool(tool) => tool.call_tool(),
+        AllTools::CargoClippyTool(tool) => tool.call_tool(),
+        AllTools::CargoGenerateLockfileTool(tool) => tool.call_tool(),
+        AllTools::CargoMacheteTool(tool) => tool.call_tool(),
+        AllTools::CargoMacheteInstallTool(tool) => tool.call_tool(),
+        AllTools::CargoDenyCheckTool(tool) => tool.call_tool(),
+        AllTools::CargoDenyInitTool(tool) => tool.call_tool(),
+        AllTools::CargoDenyListTool(tool) => tool.call_tool(),
+        AllTools::CargoDenyInstallTool(tool) => tool.call_tool(),
+        AllTools::CargoAddTool(tool) => tool.call_tool(),
+        AllTools::CargoListTool(tool) => tool.call_tool(),
+        AllTools::CargoTestTool(tool) => tool.call_tool(),
+        AllTools::CargoMetadataTool(tool) => tool.call_tool(),
+        AllTools::RustupShowTool(tool) => tool.call_tool(),
+        AllTools::RustupToolchainAddTool(tool) => tool.call_tool(),
+        AllTools::RustupUpdateTool(tool) => tool.call_tool(),
+        AllTools::CargoSearchTool(tool) => tool.call_tool(),
+        AllTools::CargoInfoTool(tool) => tool.call_tool(),
     }
 }

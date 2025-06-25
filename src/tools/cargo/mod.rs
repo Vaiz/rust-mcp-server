@@ -2,11 +2,15 @@ mod check;
 mod clippy;
 mod metadata;
 mod test;
+mod search;
+mod info;
 
 pub use check::CargoCheckTool;
 pub use clippy::CargoClippyTool;
 pub use metadata::CargoMetadataTool;
 pub use test::CargoTestTool;
+pub use search::CargoSearchTool;
+pub use info::CargoInfoTool;
 
 use std::process::Command;
 
