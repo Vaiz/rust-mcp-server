@@ -118,9 +118,10 @@ pub fn handle_request(
         return Err(CallToolError::unknown_tool(request.params.name));
     }
 
-    let tool_params: AllTools = AllTools::try_from(request.params).map_err(|e| {
+    let tool_params: AllTools = AllTools::try_from(request.params.clone()).map_err(|e| {
         tracing::error!(
             error = ?e,
+            request = ?request,
             "Failed to parse request parameters"
         );
         CallToolError::new(e)

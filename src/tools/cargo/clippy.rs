@@ -88,9 +88,10 @@ pub struct CargoClippyTool {
     #[serde(default)]
     quiet: bool,
 
-    /// Additional clippy arguments (e.g., lint warnings/denials)
-    #[serde(deserialize_with = "deserialize_string_vec")]
-    clippy_args: Option<Vec<String>>,
+    // temporary disabled because AI agents often pass arguments that are not valid
+    // /// Additional clippy arguments (e.g., lint warnings/denials)
+    // #[serde(deserialize_with = "deserialize_string_vec")]
+    // clippy_args: Option<Vec<String>>,
 
     /// Treat warnings as errors
     #[serde(default)]
@@ -176,15 +177,15 @@ impl CargoClippyTool {
             cmd.arg("--quiet");
         }
 
-        // Add clippy-specific arguments after --
-        if let Some(clippy_args) = &self.clippy_args {
-            if !clippy_args.is_empty() {
-                cmd.arg("--");
-                for arg in clippy_args {
-                    cmd.arg(arg);
-                }
-            }
-        }
+        // // Add clippy-specific arguments after --
+        // if let Some(clippy_args) = &self.clippy_args {
+        //     if !clippy_args.is_empty() {
+        //         cmd.arg("--");
+        //         for arg in clippy_args {
+        //             cmd.arg(arg);
+        //         }
+        //     }
+        // }
 
         if self.warnings_as_errors {
             cmd.env("RUSTFLAGS", "-D warnings");

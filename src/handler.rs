@@ -88,8 +88,6 @@ impl ServerHandler for MyServerHandler {
 
         tracing::warn!(name, "Prompt not found");
         runtime.assert_server_request_capabilities(request.method())?;
-        Err(RpcError::method_not_found().with_message(format!(
-            "Prompt not found for '{name}'."            
-        )))
+        Err(RpcError::method_not_found().with_message(format!("Prompt not found for '{name}'.")))
     }
 }
