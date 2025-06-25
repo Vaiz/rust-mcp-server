@@ -5,8 +5,8 @@ use rust_mcp_sdk::{
     schema::{CallToolResult, schema_utils::CallToolError},
 };
 
+use crate::serde_utils::{deserialize_string, deserialize_string_vec};
 use crate::tools::execute_command;
-use super::deserialize_string;
 
 #[mcp_tool(
     name = "rustup-show",
@@ -48,9 +48,11 @@ pub struct RustupToolchainAddTool {
     pub profile: Option<String>,
 
     /// Comma-separated list of components to be added on installation
+    #[serde(deserialize_with = "deserialize_string_vec")]
     pub components: Option<Vec<String>>,
 
     /// Comma-separated list of targets to be added on installation  
+    #[serde(deserialize_with = "deserialize_string_vec")]
     pub targets: Option<Vec<String>>,
 
     /// Don't perform self update when running the command

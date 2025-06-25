@@ -5,8 +5,8 @@ use rust_mcp_sdk::{
     schema::{CallToolResult, schema_utils::CallToolError},
 };
 
+use crate::serde_utils::{deserialize_string, deserialize_string_vec};
 use crate::tools::execute_command;
-use super::deserialize_string;
 
 #[mcp_tool(
     name = "cargo-generate_lockfile",
@@ -39,7 +39,7 @@ impl CargoGenerateLockfileTool {
     openWorldHint = false
 )]
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
-pub struct CargoBuildTool {    
+pub struct CargoBuildTool {
     /// The toolchain to use, e.g., "stable" or "nightly".
     #[serde(deserialize_with = "deserialize_string")]
     toolchain: Option<String>,
@@ -128,6 +128,7 @@ pub struct CargoFmtTool {
     toolchain: Option<String>,
 
     /// The name of the package(s) to format. If not specified, formats the current package.
+    #[serde(deserialize_with = "deserialize_string_vec")]
     package: Option<Vec<String>>,
 
     /// Format all packages in the workspace and their dependencies
@@ -193,6 +194,7 @@ pub struct CargoCheckTool {
     toolchain: Option<String>,
 
     /// Package(s) to check
+    #[serde(deserialize_with = "deserialize_string_vec")]
     package: Option<Vec<String>>,
 
     /// Check all packages in the workspace
@@ -228,6 +230,7 @@ pub struct CargoCheckTool {
     tests: bool,
 
     /// Space or comma separated list of features to activate
+    #[serde(deserialize_with = "deserialize_string_vec")]
     features: Option<Vec<String>>,
 
     /// Activate all available features
@@ -330,6 +333,7 @@ pub struct CargoClippyTool {
     toolchain: Option<String>,
 
     /// Package(s) to check
+    #[serde(deserialize_with = "deserialize_string_vec")]
     package: Option<Vec<String>>,
 
     /// Check all packages in the workspace
@@ -377,6 +381,7 @@ pub struct CargoClippyTool {
     tests: bool,
 
     /// Space or comma separated list of features to activate
+    #[serde(deserialize_with = "deserialize_string_vec")]
     features: Option<Vec<String>>,
 
     /// Activate all available features
@@ -396,6 +401,7 @@ pub struct CargoClippyTool {
     quiet: bool,
 
     /// Additional clippy arguments (e.g., lint warnings/denials)
+    #[serde(deserialize_with = "deserialize_string_vec")]
     clippy_args: Option<Vec<String>>,
 }
 
@@ -573,6 +579,7 @@ pub struct CargoTestTool {
     #[serde(deserialize_with = "deserialize_string")]
     testname: Option<String>,
     /// Arguments for the test binary (after --)
+    #[serde(deserialize_with = "deserialize_string_vec")]
     test_args: Option<Vec<String>>,
     /// Package to run tests for
     #[serde(deserialize_with = "deserialize_string")]
@@ -581,6 +588,7 @@ pub struct CargoTestTool {
     #[serde(default)]
     workspace: bool,
     /// Exclude packages from the test
+    #[serde(deserialize_with = "deserialize_string_vec")]
     exclude: Option<Vec<String>>,
     /// Test only this package's library
     #[serde(default)]

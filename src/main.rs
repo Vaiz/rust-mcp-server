@@ -1,4 +1,5 @@
 mod handler;
+pub(crate) mod serde_utils;
 mod tools;
 
 use clap::Parser;

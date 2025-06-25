@@ -5,6 +5,7 @@ use rust_mcp_sdk::{
     schema::{CallToolResult, schema_utils::CallToolError},
 };
 
+use crate::serde_utils::deserialize_string_vec;
 use crate::tools::execute_command;
 
 #[mcp_tool(
@@ -32,6 +33,7 @@ pub struct CargoMacheteTool {
     no_ignore: bool,
 
     /// Paths to analyze. If not specified, analyzes the current directory.
+    #[serde(deserialize_with = "deserialize_string_vec")]
     paths: Option<Vec<String>>,
 }
 

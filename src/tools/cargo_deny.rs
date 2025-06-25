@@ -5,8 +5,8 @@ use rust_mcp_sdk::{
     schema::{CallToolResult, schema_utils::CallToolError},
 };
 
+use crate::serde_utils::{deserialize_string, deserialize_string_vec};
 use crate::tools::execute_command;
-use super::deserialize_string;
 
 #[mcp_tool(
     name = "cargo-deny-check",
@@ -16,6 +16,7 @@ use super::deserialize_string;
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoDenyCheckTool {
     /// The check(s) to perform. Options: advisories, ban, bans, license, licenses, sources, all
+    #[serde(deserialize_with = "deserialize_string_vec")]
     which: Option<Vec<String>>,
 
     /// Path to the config to use. Defaults to <cwd>/deny.toml if not specified
@@ -43,12 +44,15 @@ pub struct CargoDenyCheckTool {
     show_stats: bool,
 
     /// Set lint warnings
+    #[serde(deserialize_with = "deserialize_string_vec")]
     warn: Option<Vec<String>>,
 
     /// Set lint allowed
+    #[serde(deserialize_with = "deserialize_string_vec")]
     allow: Option<Vec<String>>,
 
     /// Set lint denied
+    #[serde(deserialize_with = "deserialize_string_vec")]
     deny: Option<Vec<String>>,
 
     /// Specifies the depth at which feature edges are added in inclusion graphs
@@ -71,9 +75,11 @@ pub struct CargoDenyCheckTool {
     workspace: bool,
 
     /// One or more crates to exclude from the crate graph that is used
+    #[serde(deserialize_with = "deserialize_string_vec")]
     exclude: Option<Vec<String>>,
 
     /// One or more platforms to filter crates by
+    #[serde(deserialize_with = "deserialize_string_vec")]
     target: Option<Vec<String>>,
 
     /// Activate all available features
@@ -85,6 +91,7 @@ pub struct CargoDenyCheckTool {
     no_default_features: bool,
 
     /// Space or comma separated list of features to activate
+    #[serde(deserialize_with = "deserialize_string_vec")]
     features: Option<Vec<String>>,
 
     /// Run without accessing the network
