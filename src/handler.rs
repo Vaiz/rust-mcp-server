@@ -15,7 +15,18 @@ pub struct MyServerHandler {
 impl MyServerHandler {
     /// Create a new instance of MyServerHandler with the provided disabled tools.
     pub fn new(disabled_tools: Vec<String>) -> Self {
-        Self { disabled_tools }
+        let this = Self { disabled_tools };
+        let enabled_tools = this.enabled_tools();
+        tracing::info!(enabled_tools = ?enabled_tools, disabled_tools = ?this.disabled_tools, "Staring MCP Server");
+        this
+    }
+
+    fn enabled_tools(&self) -> Vec<String> {
+        AllTools::tools()
+            .into_iter()
+            .filter(|t| !self.disabled_tools.contains(&t.name))
+            .map(|t| t.name)
+            .collect()
     }
 }
 

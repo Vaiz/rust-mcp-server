@@ -27,7 +27,7 @@ impl CargoInfoTool {
         let mut cmd = Command::new("cargo");
         cmd.arg("info");
         cmd.arg(&self.spec);
-        
+
         if let Some(registry) = &self.registry {
             cmd.arg("--registry").arg(registry);
         }
