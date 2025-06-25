@@ -37,7 +37,10 @@ impl CargoGenerateLockfileTool {
     openWorldHint = false
 )]
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
-pub struct CargoBuildTool {
+pub struct CargoBuildTool {    
+    /// The toolchain to use, e.g., "stable" or "nightly".
+    toolchain: Option<String>,
+
     /// The name of the package to build. If not specified, the current package/workspace is built.
     package: Option<String>,
 
@@ -51,6 +54,9 @@ pub struct CargoBuildTool {
 impl CargoBuildTool {
     pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
         let mut cmd = Command::new("cargo");
+        if let Some(toolchain) = &self.toolchain {
+            cmd.arg(format!("+{}", toolchain));
+        }
         cmd.arg("build");
         cmd.arg("--locked");
 
@@ -73,6 +79,9 @@ impl CargoBuildTool {
 )]
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoCleanTool {
+    /// The toolchain to use, e.g., "stable" or "nightly".
+    toolchain: Option<String>,
+
     /// The name of the package to clean. If not specified, cleans the entire workspace.
     package: Option<String>,
 
@@ -86,6 +95,9 @@ pub struct CargoCleanTool {
 impl CargoCleanTool {
     pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
         let mut cmd = Command::new("cargo");
+        if let Some(toolchain) = &self.toolchain {
+            cmd.arg(format!("+{}", toolchain));
+        }
         cmd.arg("clean");
 
         if let Some(package) = &self.package {
@@ -103,6 +115,9 @@ impl CargoCleanTool {
 )]
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoFmtTool {
+    /// The toolchain to use, e.g., "stable" or "nightly".
+    toolchain: Option<String>,
+
     /// The name of the package(s) to format. If not specified, formats the current package.
     package: Option<Vec<String>>,
 
@@ -126,6 +141,9 @@ pub struct CargoFmtTool {
 impl CargoFmtTool {
     pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
         let mut cmd = Command::new("cargo");
+        if let Some(toolchain) = &self.toolchain {
+            cmd.arg(format!("+{}", toolchain));
+        }
         cmd.arg("fmt");
 
         if let Some(packages) = &self.package {
@@ -161,6 +179,9 @@ impl CargoFmtTool {
 )]
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoCheckTool {
+    /// The toolchain to use, e.g., "stable" or "nightly".
+    toolchain: Option<String>,
+
     /// Package(s) to check
     package: Option<Vec<String>>,
 
@@ -218,6 +239,9 @@ pub struct CargoCheckTool {
 impl CargoCheckTool {
     pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
         let mut cmd = Command::new("cargo");
+        if let Some(toolchain) = &self.toolchain {
+            cmd.arg(format!("+{}", toolchain));
+        }
         cmd.arg("check");
         cmd.arg("--locked");
 
@@ -290,6 +314,9 @@ impl CargoCheckTool {
 )]
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoClippyTool {
+    /// The toolchain to use, e.g., "stable" or "nightly".
+    toolchain: Option<String>,
+
     /// Package(s) to check
     package: Option<Vec<String>>,
 
@@ -362,6 +389,9 @@ pub struct CargoClippyTool {
 impl CargoClippyTool {
     pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
         let mut cmd = Command::new("cargo");
+        if let Some(toolchain) = &self.toolchain {
+            cmd.arg(format!("+{}", toolchain));
+        }
         cmd.arg("clippy");
         cmd.arg("--locked");
 
@@ -456,6 +486,8 @@ impl CargoClippyTool {
 )]
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoAddTool {
+    /// The toolchain to use, e.g., "stable" or "nightly".
+    toolchain: Option<String>,
     /// The name of the dependency to add.
     pub package: String,
     /// Optional version requirement.
@@ -474,6 +506,9 @@ pub struct CargoAddTool {
 impl CargoAddTool {
     pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
         let mut cmd = Command::new("cargo");
+        if let Some(toolchain) = &self.toolchain {
+            cmd.arg(format!("+{}", toolchain));
+        }
         cmd.arg("add");
         if let Some(version) = &self.version {
             cmd.arg(format!("{}@{version}", self.package));
@@ -516,6 +551,8 @@ impl CargoListTool {
 )]
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoTestTool {
+    /// The toolchain to use, e.g., "stable" or "nightly".
+    toolchain: Option<String>,
     /// If specified, only run tests containing this string in their names
     testname: Option<String>,
     /// Arguments for the test binary (after --)
@@ -578,6 +615,9 @@ pub struct CargoTestTool {
 impl CargoTestTool {
     pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
         let mut cmd = Command::new("cargo");
+        if let Some(toolchain) = &self.toolchain {
+            cmd.arg(format!("+{}", toolchain));
+        }
         cmd.arg("test");
         cmd.arg("--locked");
         if let Some(testname) = &self.testname {
@@ -666,6 +706,9 @@ impl CargoTestTool {
 )]
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoMetadataTool {
+    /// The toolchain to use, e.g., "stable" or "nightly".
+    toolchain: Option<String>,
+
     /// Only include resolve dependencies matching the given target-triple
     filter_platform: Option<String>,
 
@@ -716,10 +759,16 @@ pub struct CargoMetadataTool {
 impl CargoMetadataTool {
     pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
         let mut cmd = Command::new("cargo");
+        if let Some(toolchain) = &self.toolchain {
+            cmd.arg(format!("+{}", toolchain));
+        }
         cmd.arg("metadata");
         cmd.arg("--locked");
         cmd.arg("--format-version").arg("1");
 
+        if let Some(manifest_path) = &self.manifest_path {
+            cmd.arg("--manifest-path").arg(manifest_path);
+        }
         if let Some(ref triple) = self.filter_platform {
             cmd.arg("--filter-platform").arg(triple);
         }
@@ -746,9 +795,6 @@ impl CargoMetadataTool {
         }
         if self.no_default_features {
             cmd.arg("--no-default-features");
-        }
-        if let Some(ref manifest_path) = self.manifest_path {
-            cmd.arg("--manifest-path").arg(manifest_path);
         }
         if let Some(ref lockfile_path) = self.lockfile_path {
             cmd.arg("--lockfile-path").arg(lockfile_path);
