@@ -32,7 +32,7 @@ pub struct CargoClippyTool {
     #[serde(default)]
     no_deps: bool,
 
-    /// Allow dirty working directory (unstaged changes)
+    /// Allow dirty working directory (unstaged changes). Works only with `fix`.
     #[serde(default)]
     allow_dirty: bool,
 
@@ -124,7 +124,7 @@ impl CargoClippyTool {
             cmd.arg("--fix");
         }
 
-        if self.allow_dirty {
+        if self.allow_dirty && self.fix {
             cmd.arg("--allow-dirty");
         }
 
@@ -196,7 +196,8 @@ impl CargoClippyTool {
 
 #[cfg(test)]
 mod tests {
-    use super::*;use serde_json::json;
+    use super::*;
+    use serde_json::json;
 
     #[test]
     fn test_deserialize_with_missing_package_field() {
@@ -223,16 +224,15 @@ mod tests {
         });
 
         let tool: Result<CargoClippyTool, _> = serde_json::from_value(input);
-        let tool =
-            tool.expect("Deserialization should succeed even if `package` is missing (it's Option)");            
-        
+        let tool = tool
+            .expect("Deserialization should succeed even if `package` is missing (it's Option)");
+
         assert_eq!(tool.package, None);
-        assert_eq!(tool.workspace, true);
-        assert_eq!(tool.all_features, true);
-        assert_eq!(tool.allow_dirty, true);
+        assert!(tool.workspace);
+        assert!(tool.all_features);
+        assert!(tool.allow_dirty);
     }
 
-    
     #[test]
     fn test_deserialize_with_package_field() {
         // Simulate a JSON input missing the `package` field (should be Option)
@@ -241,11 +241,11 @@ mod tests {
         });
 
         let tool: Result<CargoClippyTool, _> = serde_json::from_value(input);
-        let tool = tool.expect("Deserialization should succeed");            
-        
+        let tool = tool.expect("Deserialization should succeed");
+
         assert_eq!(tool.package.unwrap(), ["my_package".to_owned()]);
-        assert_eq!(tool.workspace, false);
-        assert_eq!(tool.all_features, false);
-        assert_eq!(tool.allow_dirty, false);
+        assert!(!tool.workspace);
+        assert!(!tool.all_features);
+        assert!(!tool.allow_dirty);
     }
 }
