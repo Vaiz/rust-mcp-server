@@ -1,0 +1,417 @@
+## Rust MCP Server 0.1.0
+| 🟢 Tools (24) | 🟢 Prompts (1) | <span style="opacity:0.6">🔴 Resources</span> | <span style="opacity:0.6">🔴 Logging</span> | <span style="opacity:0.6">🔴 Experimental</span> |
+| --- | --- | --- | --- | --- |
+## 🛠️ Tools (24)
+
+
+- **cargo-add**
+  - Adds a dependency to a Rust project using cargo add.
+  - **Inputs:**
+      - <code>branch</code> : string<br />
+      - <code>build</code> : boolean<br />
+      - <code>default_features</code> : boolean<br />
+      - <code>dev</code> : boolean<br />
+      - <code>dry_run</code> : boolean<br />
+      - <code>features</code> : string [ ]<br />
+      - <code>frozen</code> : boolean<br />
+      - <code>git</code> : string<br />
+      - <code>ignore_rust_version</code> : boolean<br />
+      - <code>locked</code> : boolean<br />
+      - <code>lockfile_path</code> : string<br />
+      - <code>manifest_path</code> : string<br />
+      - <code>no_default_features</code> : boolean<br />
+      - <code>offline</code> : boolean<br />
+      - <code>optional</code> : boolean<br />
+      - <code>package</code> : string<br />
+      - <code>path</code> : string<br />
+      - <code>quiet</code> : boolean<br />
+      - <code>registry</code> : string<br />
+      - <code>rename</code> : string<br />
+      - <code>rev</code> : string<br />
+      - <code>tag</code> : string<br />
+      - <code>target</code> : string<br />
+      - <code>target_package</code> : string<br />
+      - <code>toolchain</code> : string<br />
+      - <code>verbose</code> : boolean<br />
+      - <code>version</code> : string<br />
+
+- **cargo-build**
+  - Builds a Rust project using Cargo. Usually, run without any additional arguments.
+  - **Inputs:**
+      - <code>all_features</code> : boolean<br />
+      - <code>all_targets</code> : boolean<br />
+      - <code>bench</code> : string<br />
+      - <code>benches</code> : boolean<br />
+      - <code>bin</code> : string<br />
+      - <code>bins</code> : boolean<br />
+      - <code>example</code> : string<br />
+      - <code>examples</code> : boolean<br />
+      - <code>exclude</code> : string [ ]<br />
+      - <code>features</code> : string [ ]<br />
+      - <code>frozen</code> : boolean<br />
+      - <code>ignore_rust_version</code> : boolean<br />
+      - <code>jobs</code> : number<br />
+      - <code>keep_going</code> : boolean<br />
+      - <code>lib</code> : boolean<br />
+      - <code>locked</code> : boolean<br />
+      - <code>lockfile_path</code> : string<br />
+      - <code>manifest_path</code> : string<br />
+      - <code>no_default_features</code> : boolean<br />
+      - <code>offline</code> : boolean<br />
+      - <code>package</code> : string [ ]<br />
+      - <code>profile</code> : string<br />
+      - <code>quiet</code> : boolean<br />
+      - <code>release</code> : boolean<br />
+      - <code>target</code> : string<br />
+      - <code>target_dir</code> : string<br />
+      - <code>test</code> : string<br />
+      - <code>tests</code> : boolean<br />
+      - <code>toolchain</code> : string<br />
+      - <code>verbose</code> : boolean<br />
+      - <code>warnings_as_errors</code> : boolean<br />
+      - <code>workspace</code> : boolean<br />
+
+- **cargo-check**
+  - Checks a Rust package and all of its dependencies for errors. Usually, run without any additional arguments.
+  - **Inputs:**
+      - <code>all_features</code> : boolean<br />
+      - <code>all_targets</code> : boolean<br />
+      - <code>bench</code> : string<br />
+      - <code>benches</code> : boolean<br />
+      - <code>bin</code> : string<br />
+      - <code>bins</code> : boolean<br />
+      - <code>example</code> : string<br />
+      - <code>examples</code> : boolean<br />
+      - <code>exclude</code> : string [ ]<br />
+      - <code>features</code> : string [ ]<br />
+      - <code>frozen</code> : boolean<br />
+      - <code>ignore_rust_version</code> : boolean<br />
+      - <code>jobs</code> : number<br />
+      - <code>keep_going</code> : boolean<br />
+      - <code>lib</code> : boolean<br />
+      - <code>locked</code> : boolean<br />
+      - <code>lockfile_path</code> : string<br />
+      - <code>manifest_path</code> : string<br />
+      - <code>no_default_features</code> : boolean<br />
+      - <code>offline</code> : boolean<br />
+      - <code>package</code> : string [ ]<br />
+      - <code>profile</code> : string<br />
+      - <code>quiet</code> : boolean<br />
+      - <code>release</code> : boolean<br />
+      - <code>target</code> : string<br />
+      - <code>target_dir</code> : string<br />
+      - <code>test</code> : string<br />
+      - <code>tests</code> : boolean<br />
+      - <code>toolchain</code> : string<br />
+      - <code>verbose</code> : boolean<br />
+      - <code>warnings_as_errors</code> : boolean<br />
+      - <code>workspace</code> : boolean<br />
+
+- **cargo-clean**
+  - Cleans the target directory for a Rust project using Cargo. By default, it cleans the entire workspace.
+  - **Inputs:**
+      - <code>doc</code> : boolean<br />
+      - <code>dry_run</code> : boolean<br />
+      - <code>frozen</code> : boolean<br />
+      - <code>locked</code> : boolean<br />
+      - <code>lockfile_path</code> : string<br />
+      - <code>manifest_path</code> : string<br />
+      - <code>offline</code> : boolean<br />
+      - <code>package</code> : string<br />
+      - <code>profile</code> : string<br />
+      - <code>quiet</code> : boolean<br />
+      - <code>release</code> : boolean<br />
+      - <code>target</code> : string<br />
+      - <code>target_dir</code> : string<br />
+      - <code>toolchain</code> : string<br />
+      - <code>verbose</code> : boolean<br />
+
+- **cargo-clippy**
+  - Checks a Rust package to catch common mistakes and improve code quality using Clippy
+  - **Inputs:**
+      - <code>all_features</code> : boolean<br />
+      - <code>all_targets</code> : boolean<br />
+      - <code>allow_dirty</code> : boolean<br />
+      - <code>bench</code> : string<br />
+      - <code>benches</code> : boolean<br />
+      - <code>bin</code> : string<br />
+      - <code>bins</code> : boolean<br />
+      - <code>example</code> : string<br />
+      - <code>examples</code> : boolean<br />
+      - <code>exclude</code> : string [ ]<br />
+      - <code>features</code> : string [ ]<br />
+      - <code>fix</code> : boolean<br />
+      - <code>frozen</code> : boolean<br />
+      - <code>ignore_rust_version</code> : boolean<br />
+      - <code>lib</code> : boolean<br />
+      - <code>locked</code> : boolean<br />
+      - <code>manifest_path</code> : string<br />
+      - <code>no_default_features</code> : boolean<br />
+      - <code>no_deps</code> : boolean<br />
+      - <code>offline</code> : boolean<br />
+      - <code>package</code> : string [ ]<br />
+      - <code>profile</code> : string<br />
+      - <code>quiet</code> : boolean<br />
+      - <code>release</code> : boolean<br />
+      - <code>target</code> : string<br />
+      - <code>target_dir</code> : string<br />
+      - <code>test</code> : string<br />
+      - <code>tests</code> : boolean<br />
+      - <code>toolchain</code> : string<br />
+      - <code>verbose</code> : boolean<br />
+      - <code>warnings_as_errors</code> : boolean<br />
+      - <code>workspace</code> : boolean<br />
+
+- **cargo-deny-check**
+  - Checks a project's crate graph for security advisories, license compliance, banned crates.
+  - **Inputs:**
+      - <code>all_features</code> : boolean<br />
+      - <code>allow</code> : string [ ]<br />
+      - <code>config</code> : string<br />
+      - <code>deny</code> : string [ ]<br />
+      - <code>disable_fetch</code> : boolean<br />
+      - <code>exclude</code> : string [ ]<br />
+      - <code>exclude_dev</code> : boolean<br />
+      - <code>feature_depth</code> : number<br />
+      - <code>features</code> : string [ ]<br />
+      - <code>format</code> : string<br />
+      - <code>graph</code> : string<br />
+      - <code>hide_inclusion_graph</code> : boolean<br />
+      - <code>locked</code> : boolean<br />
+      - <code>log_level</code> : string<br />
+      - <code>manifest_path</code> : string<br />
+      - <code>no_default_features</code> : boolean<br />
+      - <code>offline</code> : boolean<br />
+      - <code>show_stats</code> : boolean<br />
+      - <code>target</code> : string [ ]<br />
+      - <code>warn</code> : string [ ]<br />
+      - <code>which</code> : string [ ]<br />
+      - <code>workspace</code> : boolean<br />
+
+- **cargo-deny-init**
+  - Creates a cargo-deny config from a template
+  - **Inputs:**
+      - <code>config</code> : string<br />
+
+- **cargo-deny-install**
+  - Installs cargo-deny tool for dependency graph analysis and security checks
+
+- **cargo-deny-list**
+  - Outputs a listing of all licenses and the crates that use them
+  - **Inputs:**
+      - <code>config</code> : string<br />
+      - <code>format</code> : string<br />
+      - <code>layout</code> : string<br />
+      - <code>threshold</code> : number<br />
+
+- **cargo-fmt**
+  - Formats Rust code using rustfmt. Usually, run without any additional arguments.
+  - **Inputs:**
+      - <code>all</code> : boolean<br />
+      - <code>check</code> : boolean<br />
+      - <code>manifest_path</code> : string<br />
+      - <code>message_format</code> : string<br />
+      - <code>package</code> : string [ ]<br />
+      - <code>quiet</code> : boolean<br />
+      - <code>toolchain</code> : string<br />
+      - <code>verbose</code> : boolean<br />
+
+- **cargo-generate_lockfile**
+  - Generates or updates the Cargo.lock file for a Rust project. Usually, run without any additional arguments.
+  - **Inputs:**
+      - <code>frozen</code> : boolean<br />
+      - <code>ignore_rust_version</code> : boolean<br />
+      - <code>locked</code> : boolean<br />
+      - <code>lockfile_path</code> : string<br />
+      - <code>manifest_path</code> : string<br />
+      - <code>offline</code> : boolean<br />
+      - <code>package</code> : string<br />
+      - <code>quiet</code> : boolean<br />
+      - <code>verbose</code> : boolean<br />
+
+- **cargo-info**
+  - Display information about a package. Information includes package description, list of available features, etc. Equivalent to 'cargo info <SPEC>'.
+  - **Inputs:**
+      - <code>config</code> : string<br />
+      - <code>frozen</code> : boolean<br />
+      - <code>index</code> : string<br />
+      - <code>locked</code> : boolean<br />
+      - <code>offline</code> : boolean<br />
+      - <code>quiet</code> : boolean<br />
+      - <code>registry</code> : string<br />
+      - <code>spec</code> : string<br />
+      - <code>verbose</code> : boolean<br />
+      - <code>version</code> : string<br />
+
+- **cargo-list**
+  - Lists installed cargo commands using 'cargo --list'.
+
+- **cargo-machete**
+  - Finds unused dependencies in a fast yet imprecise way. Helps identify dependencies that are declared in Cargo.toml but not actually used in the code.
+  - **Inputs:**
+      - <code>fix</code> : boolean<br />
+      - <code>no_ignore</code> : boolean<br />
+      - <code>paths</code> : string [ ]<br />
+      - <code>skip_target_dir</code> : boolean<br />
+      - <code>with_metadata</code> : boolean<br />
+
+- **cargo-machete-install**
+  - Installs cargo-machete tool for finding unused dependencies
+
+- **cargo-metadata**
+  - Outputs a listing of a project's resolved dependencies and metadata in machine-readable format (JSON).
+  - **Inputs:**
+      - <code>all_features</code> : boolean<br />
+      - <code>config</code> : string<br />
+      - <code>features</code> : string<br />
+      - <code>filter_platform</code> : string<br />
+      - <code>frozen</code> : boolean<br />
+      - <code>locked</code> : boolean<br />
+      - <code>lockfile_path</code> : string<br />
+      - <code>manifest_path</code> : string<br />
+      - <code>no_default_features</code> : boolean<br />
+      - <code>no_deps</code> : boolean<br />
+      - <code>offline</code> : boolean<br />
+      - <code>quiet</code> : boolean<br />
+      - <code>toolchain</code> : string<br />
+      - <code>verbose</code> : boolean<br />
+
+- **cargo-new**
+  - Create a new cargo package at <path>. Creates a new Rust project with the specified name and template.
+  - **Inputs:**
+      - <code>bin</code> : boolean<br />
+      - <code>edition</code> : string<br />
+      - <code>frozen</code> : boolean<br />
+      - <code>lib</code> : boolean<br />
+      - <code>locked</code> : boolean<br />
+      - <code>name</code> : string<br />
+      - <code>offline</code> : boolean<br />
+      - <code>path</code> : string<br />
+      - <code>quiet</code> : boolean<br />
+      - <code>registry</code> : string<br />
+      - <code>toolchain</code> : string<br />
+      - <code>vcs</code> : string<br />
+      - <code>verbose</code> : boolean<br />
+
+- **cargo-remove**
+  - Remove dependencies from a Cargo.toml manifest file.
+  - **Inputs:**
+      - <code>build</code> : boolean<br />
+      - <code>dep_id</code> : string [ ]<br />
+      - <code>dev</code> : boolean<br />
+      - <code>dry_run</code> : boolean<br />
+      - <code>frozen</code> : boolean<br />
+      - <code>locked</code> : boolean<br />
+      - <code>lockfile_path</code> : string<br />
+      - <code>manifest_path</code> : string<br />
+      - <code>offline</code> : boolean<br />
+      - <code>package</code> : string<br />
+      - <code>quiet</code> : boolean<br />
+      - <code>target</code> : string<br />
+      - <code>toolchain</code> : string<br />
+      - <code>verbose</code> : boolean<br />
+
+- **cargo-search**
+  - Search packages in the registry. Default registry is crates.io. Equivalent to 'cargo search <code>QUERY</code>'.
+  - **Inputs:**
+      - <code>limit</code> : number<br />
+      - <code>query</code> : string<br />
+      - <code>quiet</code> : boolean<br />
+      - <code>registry</code> : string<br />
+
+- **cargo-test**
+  - Run `cargo test` to execute Rust tests in the current project.
+  - **Inputs:**
+      - <code>all_features</code> : boolean<br />
+      - <code>all_targets</code> : boolean<br />
+      - <code>bench</code> : string<br />
+      - <code>benches</code> : boolean<br />
+      - <code>bin</code> : string<br />
+      - <code>bins</code> : boolean<br />
+      - <code>doc</code> : boolean<br />
+      - <code>example</code> : string<br />
+      - <code>examples</code> : boolean<br />
+      - <code>exclude</code> : string [ ]<br />
+      - <code>features</code> : string<br />
+      - <code>frozen</code> : boolean<br />
+      - <code>ignore_rust_version</code> : boolean<br />
+      - <code>jobs</code> : number<br />
+      - <code>lib</code> : boolean<br />
+      - <code>locked</code> : boolean<br />
+      - <code>lockfile_path</code> : string<br />
+      - <code>manifest_path</code> : string<br />
+      - <code>no_default_features</code> : boolean<br />
+      - <code>no_fail_fast</code> : boolean<br />
+      - <code>no_run</code> : boolean<br />
+      - <code>offline</code> : boolean<br />
+      - <code>package</code> : string<br />
+      - <code>profile</code> : string<br />
+      - <code>quiet</code> : boolean<br />
+      - <code>release</code> : boolean<br />
+      - <code>target</code> : string<br />
+      - <code>target_dir</code> : string<br />
+      - <code>test</code> : string<br />
+      - <code>test_args</code> : string [ ]<br />
+      - <code>testname</code> : string<br />
+      - <code>tests</code> : boolean<br />
+      - <code>toolchain</code> : string<br />
+      - <code>verbose</code> : boolean<br />
+      - <code>workspace</code> : boolean<br />
+
+- **cargo-update**
+  - Update dependencies as recorded in the local lock file. Updates the dependencies in Cargo.lock to their latest compatible versions.
+  - **Inputs:**
+      - <code>breaking</code> : boolean<br />
+      - <code>color</code> : string<br />
+      - <code>config</code> : string<br />
+      - <code>dry_run</code> : boolean<br />
+      - <code>frozen</code> : boolean<br />
+      - <code>ignore_rust_version</code> : boolean<br />
+      - <code>locked</code> : boolean<br />
+      - <code>lockfile_path</code> : string<br />
+      - <code>manifest_path</code> : string<br />
+      - <code>offline</code> : boolean<br />
+      - <code>precise</code> : string<br />
+      - <code>quiet</code> : boolean<br />
+      - <code>recursive</code> : boolean<br />
+      - <code>spec</code> : string [ ]<br />
+      - <code>toolchain</code> : string<br />
+      - <code>unstable_flags</code> : string [ ]<br />
+      - <code>verbose</code> : boolean<br />
+      - <code>workspace</code> : boolean<br />
+
+- **rustup-show**
+  - Show the active and installed toolchains or profiles. Shows the name of the active toolchain and the version of rustc. If the active toolchain has installed support for additional compilation targets, then they are listed as well.
+  - **Inputs:**
+      - <code>verbose</code> : boolean<br />
+
+- **rustup-toolchain-add**
+  - Install or update the given toolchains, or by default the active toolchain. Toolchain name can be <code>stable</code>, <code>nightly</code>, or a specific version like '1.8.0'.
+  - **Inputs:**
+      - <code>allow_downgrade</code> : boolean<br />
+      - <code>components</code> : string [ ]<br />
+      - <code>force</code> : boolean<br />
+      - <code>force_non_host</code> : boolean<br />
+      - <code>no_self_update</code> : boolean<br />
+      - <code>profile</code> : string<br />
+      - <code>targets</code> : string [ ]<br />
+      - <code>toolchain</code> : string<br />
+
+- **rustup-update**
+  - Update Rust toolchains and rustup. With no toolchain specified, updates each of the installed toolchains from the official release channels, then updates rustup itself. If given a toolchain argument then updates that toolchain.
+  - **Inputs:**
+      - <code>force</code> : boolean<br />
+      - <code>force_non_host</code> : boolean<br />
+      - <code>no_self_update</code> : boolean<br />
+      - <code>toolchain</code> : string<br />
+
+
+## 📝 Prompts (1)
+
+
+- **rustup-update-toolset**
+  - Provides instruction on how to update Rust toolset
+
+
+
+<sup>◾ generated by [mcp-discovery](https://github.com/rust-mcp-stack/mcp-discovery)</sup>

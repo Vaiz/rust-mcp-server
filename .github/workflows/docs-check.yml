@@ -1,0 +1,58 @@
+name: Check Documentation
+
+on:
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - 'tools.md'
+  push:
+    branches: [ main ]
+
+jobs:
+  check-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Cargo dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: Install mcp-discovery
+        run: cargo install mcp-discovery
+
+      - name: Build project
+        run: cargo build --release
+
+      - name: Generate tools.md
+        run: ./scripts/generate-docs.sh tools.md.generated
+
+      - name: Check if tools.md is up to date
+        run: |
+          if ! diff -u tools.md tools.md.generated; then
+            echo "❌ tools.md is not up to date!"
+            echo "Please run the following command to update it:"
+            echo "  ./scripts/generate-docs.sh"
+            echo ""
+            echo "Or on Windows:"
+            echo "  .\\scripts\\generate-docs.ps1"
+            exit 1
+          else
+            echo "✅ tools.md is up to date!"
+          fi
+
+      - name: Clean up
+        run: rm -f tools.md.generated
