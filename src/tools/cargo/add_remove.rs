@@ -21,22 +21,22 @@ pub struct CargoAddTool {
     /// The toolchain to use, e.g., "stable" or "nightly".
     #[serde(default, deserialize_with = "deserialize_string")]
     toolchain: Option<String>,
-    
+
     /// The name of the dependency to add.
     pub package: String,
-    
+
     /// Optional version requirement.
     #[serde(default, deserialize_with = "deserialize_string")]
     pub version: Option<String>,
-    
+
     /// Add as a dev-dependency
     #[serde(default)]
     pub dev: bool,
-    
+
     /// Add as a build-dependency
     #[serde(default)]
     pub build: bool,
-    
+
     /// Add as an optional dependency
     #[serde(default)]
     pub optional: bool,
@@ -133,7 +133,7 @@ impl CargoAddTool {
             cmd.arg(format!("+{}", toolchain));
         }
         cmd.arg("add");
-        
+
         if let Some(version) = &self.version {
             cmd.arg(format!("{}@{version}", self.package));
         } else {
@@ -248,58 +248,58 @@ pub struct CargoRemoveTool {
     /// The toolchain to use, e.g., "stable" or "nightly".
     #[serde(default, deserialize_with = "deserialize_string")]
     toolchain: Option<String>,
-    
-    /// Dependencies to be removed. 
-    /// Examples: 
+
+    /// Dependencies to be removed.
+    /// Examples:
     /// - Single dependency: ["regex"]
-    /// - Multiple dependencies: ["tokio", "clap", "serde"] 
+    /// - Multiple dependencies: ["tokio", "clap", "serde"]
     /// - Can be simple crate names as they appear in Cargo.toml
     pub dep_id: Vec<String>,
-    
+
     /// Remove from dev-dependencies
     #[serde(default)]
     pub dev: bool,
-    
+
     /// Remove from build-dependencies
     #[serde(default)]
     pub build: bool,
-    
+
     /// Remove from target-dependencies
     #[serde(default, deserialize_with = "deserialize_string")]
     pub target: Option<String>,
-    
+
     /// Package to remove from
     #[serde(default, deserialize_with = "deserialize_string")]
     pub package: Option<String>,
-    
+
     /// Don't actually write the manifest
     #[serde(default)]
     pub dry_run: bool,
-    
+
     /// Path to Cargo.toml
     #[serde(default, deserialize_with = "deserialize_string")]
     pub manifest_path: Option<String>,
-    
+
     /// Path to Cargo.lock (unstable)
     #[serde(default, deserialize_with = "deserialize_string")]
     pub lockfile_path: Option<String>,
-    
+
     /// Assert that `Cargo.lock` will remain unchanged.
     #[serde(default)]
     pub locked: bool,
-    
+
     /// Run without accessing the network
     #[serde(default)]
     pub offline: bool,
-    
+
     /// Equivalent to specifying both --locked and --offline
     #[serde(default)]
     pub frozen: bool,
-    
+
     /// Use verbose output
     #[serde(default)]
     pub verbose: bool,
-    
+
     /// Do not print cargo log messages. By default is `true`.
     #[serde(default = "default_true")]
     pub quiet: bool,
@@ -312,12 +312,12 @@ impl CargoRemoveTool {
             cmd.arg(format!("+{}", toolchain));
         }
         cmd.arg("remove");
-        
+
         // Add dependency names
         for dep in &self.dep_id {
             cmd.arg(dep);
         }
-        
+
         // Section options
         if self.dev {
             cmd.arg("--dev");
@@ -328,17 +328,17 @@ impl CargoRemoveTool {
         if let Some(target) = &self.target {
             cmd.arg("--target").arg(target);
         }
-        
+
         // Package selection
         if let Some(package) = &self.package {
             cmd.arg("--package").arg(package);
         }
-        
+
         // Other options
         if self.dry_run {
             cmd.arg("--dry-run");
         }
-        
+
         // Manifest options
         if let Some(manifest_path) = &self.manifest_path {
             cmd.arg("--manifest-path").arg(manifest_path);
@@ -355,7 +355,7 @@ impl CargoRemoveTool {
         if self.frozen {
             cmd.arg("--frozen");
         }
-        
+
         // Output options
         if self.verbose {
             cmd.arg("--verbose");
@@ -363,7 +363,7 @@ impl CargoRemoveTool {
         if self.quiet && !self.verbose {
             cmd.arg("--quiet");
         }
-        
+
         execute_command(cmd)
     }
 }

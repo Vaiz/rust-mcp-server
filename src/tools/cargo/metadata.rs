@@ -81,7 +81,6 @@ impl CargoMetadataTool {
         }
         cmd.arg("metadata");
         cmd.arg("--format-version").arg("1");
-        
 
         // Package/dependency filtering
         if let Some(triple) = &self.filter_platform {

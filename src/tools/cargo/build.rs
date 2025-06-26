@@ -9,7 +9,6 @@ use rust_mcp_sdk::{
     schema::{CallToolResult, schema_utils::CallToolError},
 };
 
-
 #[mcp_tool(
     name = "cargo-build",
     description = "Builds a Rust project using Cargo. Usually, run without any additional arguments.",
@@ -27,7 +26,7 @@ pub struct CargoBuildTool {
 
     /// Build all packages in the workspace
     #[serde(default)]
-    workspace: bool,  
+    workspace: bool,
 
     /// Exclude packages from the build
     #[serde(default, deserialize_with = "deserialize_string_vec")]
