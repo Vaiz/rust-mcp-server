@@ -858,6 +858,138 @@ impl CargoAddTool {
     }
 }
 
+/// MCP defaults differ from cargo defaults: `quiet` and `locked` are `true` by default
+/// for better integration with automated tooling and to avoid blocking on missing lockfiles.
+#[mcp_tool(
+    name = "cargo-remove",
+    description = "Remove dependencies from a Cargo.toml manifest file.",
+    openWorldHint = false
+)]
+#[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
+pub struct CargoRemoveTool {
+    /// The toolchain to use, e.g., "stable" or "nightly".
+    #[serde(default, deserialize_with = "deserialize_string")]
+    toolchain: Option<String>,
+    
+    /// Dependencies to be removed. 
+    /// Examples: 
+    /// - Single dependency: ["regex"]
+    /// - Multiple dependencies: ["tokio", "clap", "serde"] 
+    /// - Can be simple crate names as they appear in Cargo.toml
+    pub dep_id: Vec<String>,
+    
+    /// Remove from dev-dependencies
+    #[serde(default)]
+    pub dev: bool,
+    
+    /// Remove from build-dependencies
+    #[serde(default)]
+    pub build: bool,
+    
+    /// Remove from target-dependencies
+    #[serde(default, deserialize_with = "deserialize_string")]
+    pub target: Option<String>,
+    
+    /// Package to remove from
+    #[serde(default, deserialize_with = "deserialize_string")]
+    pub package: Option<String>,
+    
+    /// Don't actually write the manifest
+    #[serde(default)]
+    pub dry_run: bool,
+    
+    /// Path to Cargo.toml
+    #[serde(default, deserialize_with = "deserialize_string")]
+    pub manifest_path: Option<String>,
+    
+    /// Path to Cargo.lock (unstable)
+    #[serde(default, deserialize_with = "deserialize_string")]
+    pub lockfile_path: Option<String>,
+    
+    /// Assert that `Cargo.lock` will remain unchanged. By default is `true`.
+    #[serde(default = "default_true")]
+    pub locked: bool,
+    
+    /// Run without accessing the network
+    #[serde(default)]
+    pub offline: bool,
+    
+    /// Equivalent to specifying both --locked and --offline
+    #[serde(default)]
+    pub frozen: bool,
+    
+    /// Use verbose output
+    #[serde(default)]
+    pub verbose: bool,
+    
+    /// Do not print cargo log messages. By default is `true`.
+    #[serde(default = "default_true")]
+    pub quiet: bool,
+}
+
+impl CargoRemoveTool {
+    pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
+        let mut cmd = Command::new("cargo");
+        if let Some(toolchain) = &self.toolchain {
+            cmd.arg(format!("+{}", toolchain));
+        }
+        cmd.arg("remove");
+        
+        // Add dependency names
+        for dep in &self.dep_id {
+            cmd.arg(dep);
+        }
+        
+        // Section options
+        if self.dev {
+            cmd.arg("--dev");
+        }
+        if self.build {
+            cmd.arg("--build");
+        }
+        if let Some(target) = &self.target {
+            cmd.arg("--target").arg(target);
+        }
+        
+        // Package selection
+        if let Some(package) = &self.package {
+            cmd.arg("--package").arg(package);
+        }
+        
+        // Other options
+        if self.dry_run {
+            cmd.arg("--dry-run");
+        }
+        
+        // Manifest options
+        if let Some(manifest_path) = &self.manifest_path {
+            cmd.arg("--manifest-path").arg(manifest_path);
+        }
+        if let Some(lockfile_path) = &self.lockfile_path {
+            cmd.arg("--lockfile-path").arg(lockfile_path);
+        }
+        if self.locked {
+            cmd.arg("--locked");
+        }
+        if self.offline {
+            cmd.arg("--offline");
+        }
+        if self.frozen {
+            cmd.arg("--frozen");
+        }
+        
+        // Output options
+        if self.verbose {
+            cmd.arg("--verbose");
+        }
+        if self.quiet {
+            cmd.arg("--quiet");
+        }
+        
+        execute_command(cmd)
+    }
+}
+
 #[mcp_tool(
     name = "cargo-list",
     description = "Lists installed cargo commands using 'cargo --list'.",
