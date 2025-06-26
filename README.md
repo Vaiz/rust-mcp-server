@@ -91,3 +91,42 @@ To make GitHub Copilot in VS Code use this MCP server, you need to update your V
    ![mcp.json](docs/mcp.json.png)
 
 More information you can find by this [link](https://code.visualstudio.com/docs/copilot/chat/mcp-servers).
+
+## Documentation Generation
+
+This project uses [mcp-discovery](https://rust-mcp-stack.github.io/mcp-discovery) to automatically generate comprehensive documentation of all available MCP tools and capabilities.
+
+### Prerequisites
+
+Install mcp-discovery:
+```bash
+cargo install mcp-discovery
+```
+
+### Generating Documentation
+
+Run the documentation generation script:
+
+**Linux/macOS:**
+```bash
+./scripts/generate-docs.sh
+```
+
+**Windows:**
+```powershell
+.\scripts\generate-docs.ps1
+```
+
+This will generate multiple documentation formats in the `docs/` directory:
+- `mcp-capabilities.md` - Markdown with HTML styling
+- `mcp-capabilities-plain.md` - Plain Markdown
+- `mcp-capabilities.html` - HTML format
+- `mcp-capabilities.txt` - Plain text format
+
+The documentation includes:
+- Complete list of all 24+ available tools
+- Detailed descriptions for each tool
+- Input parameters and their types
+- Available prompts and their descriptions
+
+> **Note:** Generated documentation files are automatically excluded from git to avoid conflicts. Run the generation script to create fresh documentation whenever tools are added or modified.

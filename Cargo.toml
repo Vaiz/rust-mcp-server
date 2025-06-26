@@ -9,6 +9,14 @@ license = "Unlicense"
 [package.metadata.cargo-machete]
 ignored = ["serde_json"]
 
+[package.metadata.docs.rs]
+# Enable documentation generation features
+all-features = true
+
+[[bin]]
+name = "rustmcp"
+path = "src/main.rs"
+
 [dependencies]
 async-trait = "0.1.88"
 clap = { version = "4.5.40", features = ["derive"] }
@@ -19,3 +27,6 @@ tokio = { version = "1.45.1", default-features = false, features = [] }
 tracing = "0.1.41"
 tracing-appender = "0.2.3"
 tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
+
+[dev-dependencies]
+mcp-discovery = "0.1.12"
