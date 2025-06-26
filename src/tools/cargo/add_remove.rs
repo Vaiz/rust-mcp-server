@@ -228,7 +228,7 @@ impl CargoAddTool {
         if self.verbose {
             cmd.arg("--verbose");
         }
-        if self.quiet {
+        if self.quiet && !self.verbose {
             cmd.arg("--quiet");
         }
 
@@ -360,7 +360,7 @@ impl CargoRemoveTool {
         if self.verbose {
             cmd.arg("--verbose");
         }
-        if self.quiet {
+        if self.quiet && !self.verbose {
             cmd.arg("--quiet");
         }
         

@@ -114,7 +114,7 @@ impl CargoGenerateLockfileTool {
             cmd.arg("--verbose");
         }
 
-        if self.quiet {
+        if self.quiet && !self.verbose {
             cmd.arg("--quiet");
         }
 
@@ -259,7 +259,7 @@ impl CargoCleanTool {
             cmd.arg("--verbose");
         }
 
-        if self.quiet {
+        if self.quiet && !self.verbose {
             cmd.arg("--quiet");
         }
 
@@ -347,7 +347,7 @@ impl CargoFmtTool {
             cmd.arg("--verbose");
         }
 
-        if self.quiet {
+        if self.quiet && !self.verbose {
             cmd.arg("--quiet");
         }
 
@@ -468,7 +468,7 @@ impl CargoNewTool {
         if self.verbose {
             cmd.arg("--verbose");
         }
-        if self.quiet {
+        if self.quiet && !self.verbose {
             cmd.arg("--quiet");
         }
         

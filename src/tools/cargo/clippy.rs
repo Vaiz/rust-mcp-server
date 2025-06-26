@@ -282,7 +282,7 @@ impl CargoClippyTool {
             cmd.arg("--verbose");
         }
 
-        if self.quiet {
+        if self.quiet && !self.verbose {
             cmd.arg("--quiet");
         }
 

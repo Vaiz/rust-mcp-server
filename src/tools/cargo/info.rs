@@ -32,7 +32,7 @@ pub struct CargoInfoTool {
     #[serde(default, deserialize_with = "deserialize_string")]
     pub registry: Option<String>,
 
-    /// Use verbose output
+    /// Use verbose output that includes crate dependencies.
     #[serde(default)]
     pub verbose: bool,
 
@@ -98,7 +98,7 @@ impl CargoInfoTool {
             cmd.arg("--verbose");
         }
 
-        if self.quiet {
+        if self.quiet && !self.verbose {
             cmd.arg("--quiet");
         }
 
