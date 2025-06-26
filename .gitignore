@@ -20,8 +20,3 @@ Thumbs.db
 
 # Temporary files
 /tmp
-
-# Generated documentation (regenerate using scripts/generate-docs.sh)
-/docs/mcp-capabilities*.md
-/docs/mcp-capabilities*.html
-/docs/mcp-capabilities*.txt
