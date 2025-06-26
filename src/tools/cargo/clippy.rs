@@ -9,6 +9,8 @@ use rust_mcp_sdk::{
     schema::{CallToolResult, schema_utils::CallToolError},
 };
 
+/// MCP defaults differ from cargo defaults: `quiet` and `locked` are `true` by default
+/// for better integration with automated tooling and to avoid blocking on missing lockfiles.
 #[mcp_tool(
     name = "cargo-clippy",
     description = "Checks a Rust package to catch common mistakes and improve code quality using Clippy",
@@ -28,6 +30,10 @@ pub struct CargoClippyTool {
     #[serde(default)]
     workspace: bool,
 
+    /// Exclude packages from the check
+    #[serde(default, deserialize_with = "deserialize_string_vec")]
+    exclude: Option<Vec<String>>,
+
     /// Run Clippy only on the given crate, without linting the dependencies
     #[serde(default)]
     no_deps: bool,
@@ -44,10 +50,6 @@ pub struct CargoClippyTool {
     #[serde(default)]
     release: bool,
 
-    /// Check for the specified target triple
-    #[serde(default, deserialize_with = "deserialize_string")]
-    target: Option<String>,
-
     /// Check all targets (lib, bins, examples, tests, benches)
     #[serde(default)]
     all_targets: bool,
@@ -60,13 +62,33 @@ pub struct CargoClippyTool {
     #[serde(default)]
     bins: bool,
 
+    /// Check only the specified binary
+    #[serde(default, deserialize_with = "deserialize_string")]
+    bin: Option<String>,
+
     /// Check all examples
     #[serde(default)]
     examples: bool,
 
+    /// Check only the specified example
+    #[serde(default, deserialize_with = "deserialize_string")]
+    example: Option<String>,
+
     /// Check all tests
     #[serde(default)]
     tests: bool,
+
+    /// Check only the specified test target
+    #[serde(default, deserialize_with = "deserialize_string")]
+    test: Option<String>,
+
+    /// Check all targets that have `bench = true` set
+    #[serde(default)]
+    benches: bool,
+
+    /// Check only the specified bench target
+    #[serde(default, deserialize_with = "deserialize_string")]
+    bench: Option<String>,
 
     /// Space or comma separated list of features to activate
     #[serde(default, deserialize_with = "deserialize_string_vec")]
@@ -80,6 +102,38 @@ pub struct CargoClippyTool {
     #[serde(default)]
     no_default_features: bool,
 
+    /// Check artifacts with the specified profile
+    #[serde(default, deserialize_with = "deserialize_string")]
+    profile: Option<String>,
+
+    /// Check for the specified target triple
+    #[serde(default, deserialize_with = "deserialize_string")]
+    target: Option<String>,
+
+    /// Directory for all generated artifacts
+    #[serde(default, deserialize_with = "deserialize_string")]
+    target_dir: Option<String>,
+
+    /// Path to Cargo.toml
+    #[serde(default, deserialize_with = "deserialize_string")]
+    manifest_path: Option<String>,
+
+    /// Ignore `rust-version` specification in packages
+    #[serde(default)]
+    ignore_rust_version: bool,
+
+    /// Assert that `Cargo.lock` will remain unchanged. By default is `true`.
+    #[serde(default = "default_true")]
+    locked: bool,
+
+    /// Run without accessing the network
+    #[serde(default)]
+    offline: bool,
+
+    /// Equivalent to specifying both --locked and --offline
+    #[serde(default)]
+    frozen: bool,
+
     /// Use verbose output
     #[serde(default)]
     verbose: bool,
@@ -88,10 +142,6 @@ pub struct CargoClippyTool {
     #[serde(default = "default_true")]
     quiet: bool,
 
-    // temporary disabled because AI agents often pass arguments that are not valid
-    // /// Additional clippy arguments (e.g., lint warnings/denials)
-    // #[serde(default, deserialize_with = "deserialize_string_vec")]
-    // clippy_args: Option<Vec<String>>,
     /// Treat warnings as errors
     #[serde(default)]
     warnings_as_errors: bool,
@@ -104,8 +154,8 @@ impl CargoClippyTool {
             cmd.arg(format!("+{}", toolchain));
         }
         cmd.arg("clippy");
-        cmd.arg("--locked");
 
+        // Package selection
         if let Some(packages) = &self.package {
             for package in packages {
                 cmd.arg("--package").arg(package);
@@ -116,6 +166,13 @@ impl CargoClippyTool {
             cmd.arg("--workspace");
         }
 
+        if let Some(excludes) = &self.exclude {
+            for exclude in excludes {
+                cmd.arg("--exclude").arg(exclude);
+            }
+        }
+
+        // Clippy-specific options
         if self.no_deps {
             cmd.arg("--no-deps");
         }
@@ -128,14 +185,24 @@ impl CargoClippyTool {
             cmd.arg("--allow-dirty");
         }
 
+        // Compilation options
         if self.release {
             cmd.arg("--release");
+        }
+
+        if let Some(profile) = &self.profile {
+            cmd.arg("--profile").arg(profile);
         }
 
         if let Some(target) = &self.target {
             cmd.arg("--target").arg(target);
         }
 
+        if let Some(target_dir) = &self.target_dir {
+            cmd.arg("--target-dir").arg(target_dir);
+        }
+
+        // Target selection
         if self.all_targets {
             cmd.arg("--all-targets");
         }
@@ -148,14 +215,35 @@ impl CargoClippyTool {
             cmd.arg("--bins");
         }
 
+        if let Some(bin) = &self.bin {
+            cmd.arg("--bin").arg(bin);
+        }
+
         if self.examples {
             cmd.arg("--examples");
+        }
+
+        if let Some(example) = &self.example {
+            cmd.arg("--example").arg(example);
         }
 
         if self.tests {
             cmd.arg("--tests");
         }
 
+        if let Some(test) = &self.test {
+            cmd.arg("--test").arg(test);
+        }
+
+        if self.benches {
+            cmd.arg("--benches");
+        }
+
+        if let Some(bench) = &self.bench {
+            cmd.arg("--bench").arg(bench);
+        }
+
+        // Feature selection
         if let Some(features) = &self.features {
             cmd.arg("--features").arg(features.join(","));
         }
@@ -168,6 +256,28 @@ impl CargoClippyTool {
             cmd.arg("--no-default-features");
         }
 
+        // Manifest options
+        if let Some(manifest_path) = &self.manifest_path {
+            cmd.arg("--manifest-path").arg(manifest_path);
+        }
+
+        if self.ignore_rust_version {
+            cmd.arg("--ignore-rust-version");
+        }
+
+        if self.locked {
+            cmd.arg("--locked");
+        }
+
+        if self.offline {
+            cmd.arg("--offline");
+        }
+
+        if self.frozen {
+            cmd.arg("--frozen");
+        }
+
+        // Output options
         if self.verbose {
             cmd.arg("--verbose");
         }
@@ -175,16 +285,6 @@ impl CargoClippyTool {
         if self.quiet {
             cmd.arg("--quiet");
         }
-
-        // // Add clippy-specific arguments after --
-        // if let Some(clippy_args) = &self.clippy_args {
-        //     if !clippy_args.is_empty() {
-        //         cmd.arg("--");
-        //         for arg in clippy_args {
-        //             cmd.arg(arg);
-        //         }
-        //     }
-        // }
 
         if self.warnings_as_errors {
             cmd.env("RUSTFLAGS", "-D warnings");

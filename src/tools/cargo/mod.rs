@@ -22,6 +22,8 @@ use rust_mcp_sdk::{
 use crate::serde_utils::{default_true, deserialize_string, deserialize_string_vec};
 use crate::tools::execute_command;
 
+/// MCP defaults differ from cargo defaults: `quiet` and `locked` are `true` by default
+/// for better integration with automated tooling and to avoid blocking on missing lockfiles.
 #[mcp_tool(
     name = "cargo-generate_lockfile",
     description = "Generates or updates the Cargo.lock file for a Rust project. Usually, run without any additional arguments.",
@@ -33,6 +35,34 @@ pub struct CargoGenerateLockfileTool {
     #[serde(default, deserialize_with = "deserialize_string")]
     package: Option<String>,
 
+    /// Path to Cargo.toml
+    #[serde(default, deserialize_with = "deserialize_string")]
+    manifest_path: Option<String>,
+
+    /// Path to Cargo.lock (unstable)
+    #[serde(default, deserialize_with = "deserialize_string")]
+    lockfile_path: Option<String>,
+
+    /// Ignore `rust-version` specification in packages
+    #[serde(default)]
+    ignore_rust_version: bool,
+
+    /// Assert that `Cargo.lock` will remain unchanged. By default is `true`.
+    #[serde(default = "default_true")]
+    locked: bool,
+
+    /// Run without accessing the network
+    #[serde(default)]
+    offline: bool,
+
+    /// Equivalent to specifying both --locked and --offline
+    #[serde(default)]
+    frozen: bool,
+
+    /// Use verbose output
+    #[serde(default)]
+    verbose: bool,
+
     /// No output printed to stdout. By default is `true`.
     #[serde(default = "default_true")]
     quiet: bool,
@@ -43,8 +73,39 @@ impl CargoGenerateLockfileTool {
         let mut cmd = Command::new("cargo");
         cmd.arg("generate-lockfile");
 
+        // Package selection
         if let Some(package) = &self.package {
             cmd.arg("--package").arg(package);
+        }
+
+        // Manifest options
+        if let Some(manifest_path) = &self.manifest_path {
+            cmd.arg("--manifest-path").arg(manifest_path);
+        }
+
+        if let Some(lockfile_path) = &self.lockfile_path {
+            cmd.arg("--lockfile-path").arg(lockfile_path);
+        }
+
+        if self.ignore_rust_version {
+            cmd.arg("--ignore-rust-version");
+        }
+
+        if self.locked {
+            cmd.arg("--locked");
+        }
+
+        if self.offline {
+            cmd.arg("--offline");
+        }
+
+        if self.frozen {
+            cmd.arg("--frozen");
+        }
+
+        // Output options
+        if self.verbose {
+            cmd.arg("--verbose");
         }
 
         if self.quiet {
@@ -337,6 +398,8 @@ impl CargoBuildTool {
     }
 }
 
+/// MCP defaults differ from cargo defaults: `quiet` and `locked` are `true` by default
+/// for better integration with automated tooling and to avoid blocking on missing lockfiles.
 #[mcp_tool(
     name = "cargo-clean",
     description = "Cleans the target directory for a Rust project using Cargo. By default, it cleans the entire workspace.",
@@ -352,12 +415,56 @@ pub struct CargoCleanTool {
     #[serde(default, deserialize_with = "deserialize_string")]
     package: Option<String>,
 
-    /// lean artifacts of the specified profile. If not specified, cleans everything.
+    /// Clean artifacts of the specified profile. If not specified, cleans everything.
     /// Default rust profiles:
     /// - `dev`: Optimized for development, with debug information.
     /// - `release`: Optimized for performance, without debug information.
     #[serde(default, deserialize_with = "deserialize_string")]
     profile: Option<String>,
+
+    /// Whether or not to clean just the documentation directory
+    #[serde(default)]
+    doc: bool,
+
+    /// Display what would be deleted without deleting anything
+    #[serde(default)]
+    dry_run: bool,
+
+    /// Whether or not to clean release artifacts
+    #[serde(default)]
+    release: bool,
+
+    /// Target triple to clean output for
+    #[serde(default, deserialize_with = "deserialize_string")]
+    target: Option<String>,
+
+    /// Directory for all generated artifacts
+    #[serde(default, deserialize_with = "deserialize_string")]
+    target_dir: Option<String>,
+
+    /// Path to Cargo.toml
+    #[serde(default, deserialize_with = "deserialize_string")]
+    manifest_path: Option<String>,
+
+    /// Path to Cargo.lock (unstable)
+    #[serde(default, deserialize_with = "deserialize_string")]
+    lockfile_path: Option<String>,
+
+    /// Assert that `Cargo.lock` will remain unchanged. By default is `true`.
+    #[serde(default = "default_true")]
+    locked: bool,
+
+    /// Run without accessing the network
+    #[serde(default)]
+    offline: bool,
+
+    /// Equivalent to specifying both --locked and --offline
+    #[serde(default)]
+    frozen: bool,
+
+    /// Use verbose output
+    #[serde(default)]
+    verbose: bool,
 
     /// No output printed to stdout. By default is `true`.
     #[serde(default = "default_true")]
@@ -372,12 +479,60 @@ impl CargoCleanTool {
         }
         cmd.arg("clean");
 
+        // Package selection
         if let Some(package) = &self.package {
             cmd.arg("--package").arg(package);
         }
 
+        // Compilation options
         if let Some(profile) = &self.profile {
             cmd.arg("--profile").arg(profile);
+        }
+
+        if self.doc {
+            cmd.arg("--doc");
+        }
+
+        if self.dry_run {
+            cmd.arg("--dry-run");
+        }
+
+        if self.release {
+            cmd.arg("--release");
+        }
+
+        if let Some(target) = &self.target {
+            cmd.arg("--target").arg(target);
+        }
+
+        if let Some(target_dir) = &self.target_dir {
+            cmd.arg("--target-dir").arg(target_dir);
+        }
+
+        // Manifest options
+        if let Some(manifest_path) = &self.manifest_path {
+            cmd.arg("--manifest-path").arg(manifest_path);
+        }
+
+        if let Some(lockfile_path) = &self.lockfile_path {
+            cmd.arg("--lockfile-path").arg(lockfile_path);
+        }
+
+        if self.locked {
+            cmd.arg("--locked");
+        }
+
+        if self.offline {
+            cmd.arg("--offline");
+        }
+
+        if self.frozen {
+            cmd.arg("--frozen");
+        }
+
+        // Output options
+        if self.verbose {
+            cmd.arg("--verbose");
         }
 
         if self.quiet {
@@ -388,6 +543,8 @@ impl CargoCleanTool {
     }
 }
 
+/// MCP defaults differ from cargo defaults: `quiet` is `true` by default
+/// for better integration with automated tooling.
 #[mcp_tool(
     name = "cargo-fmt",
     description = "Formats Rust code using rustfmt. Usually, run without any additional arguments.",
@@ -403,7 +560,7 @@ pub struct CargoFmtTool {
     #[serde(default, deserialize_with = "deserialize_string_vec")]
     package: Option<Vec<String>>,
 
-    /// Format all packages in the workspace and their dependencies
+    /// Format all packages, and also their local path-based dependencies
     #[serde(default)]
     all: bool,
 
@@ -411,13 +568,21 @@ pub struct CargoFmtTool {
     #[serde(default)]
     check: bool,
 
-    /// No output printed to stdout. By default is `true`.
-    #[serde(default = "default_true")]
-    quiet: bool,
+    /// Specify path to Cargo.toml
+    #[serde(default, deserialize_with = "deserialize_string")]
+    manifest_path: Option<String>,
+
+    /// Specify message-format: short|json|human
+    #[serde(default, deserialize_with = "deserialize_string")]
+    message_format: Option<String>,
 
     /// Use verbose output
     #[serde(default)]
     verbose: bool,
+
+    /// No output printed to stdout. By default is `true`.
+    #[serde(default = "default_true")]
+    quiet: bool,
 }
 
 impl CargoFmtTool {
@@ -428,6 +593,7 @@ impl CargoFmtTool {
         }
         cmd.arg("fmt");
 
+        // Package selection
         if let Some(packages) = &self.package {
             for package in packages {
                 cmd.arg("--package").arg(package);
@@ -438,16 +604,27 @@ impl CargoFmtTool {
             cmd.arg("--all");
         }
 
+        // Formatting options
         if self.check {
             cmd.arg("--check");
         }
 
-        if self.quiet {
-            cmd.arg("--quiet");
+        // Manifest options
+        if let Some(manifest_path) = &self.manifest_path {
+            cmd.arg("--manifest-path").arg(manifest_path);
         }
 
+        if let Some(message_format) = &self.message_format {
+            cmd.arg("--message-format").arg(message_format);
+        }
+
+        // Output options
         if self.verbose {
             cmd.arg("--verbose");
+        }
+
+        if self.quiet {
+            cmd.arg("--quiet");
         }
 
         execute_command(cmd)

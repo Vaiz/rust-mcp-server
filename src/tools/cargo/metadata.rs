@@ -7,6 +7,8 @@ use rust_mcp_sdk::{
     schema::{CallToolResult, schema_utils::CallToolError},
 };
 
+/// MCP defaults differ from cargo defaults: `quiet` and `locked` are `true` by default
+/// for better integration with automated tooling and to avoid blocking on missing lockfiles.
 #[mcp_tool(
     name = "cargo-metadata",
     description = "Outputs a listing of a project's resolved dependencies and metadata in machine-readable format (JSON).",
@@ -34,10 +36,6 @@ pub struct CargoMetadataTool {
     #[serde(default = "default_true")]
     quiet: bool,
 
-    /// Coloring [possible values: auto, always, never]
-    #[serde(default, deserialize_with = "deserialize_string")]
-    color: Option<String>,
-
     /// Override a configuration value
     #[serde(default, deserialize_with = "deserialize_string")]
     config: Option<String>,
@@ -62,6 +60,10 @@ pub struct CargoMetadataTool {
     #[serde(default, deserialize_with = "deserialize_string")]
     lockfile_path: Option<String>,
 
+    /// Assert that `Cargo.lock` will remain unchanged. By default is `true`.
+    #[serde(default = "default_true")]
+    locked: bool,
+
     /// Run without accessing the network
     #[serde(default)]
     offline: bool,
@@ -78,45 +80,61 @@ impl CargoMetadataTool {
             cmd.arg(format!("+{}", toolchain));
         }
         cmd.arg("metadata");
-        cmd.arg("--locked");
         cmd.arg("--format-version").arg("1");
+        
 
-        if let Some(manifest_path) = &self.manifest_path {
-            cmd.arg("--manifest-path").arg(manifest_path);
-        }
-        if let Some(ref triple) = self.filter_platform {
+        // Package/dependency filtering
+        if let Some(triple) = &self.filter_platform {
             cmd.arg("--filter-platform").arg(triple);
         }
+
         if self.no_deps {
             cmd.arg("--no-deps");
         }
+
+        // Output options
         if self.verbose {
             cmd.arg("--verbose");
         }
+
         if self.quiet {
             cmd.arg("--quiet");
         }
-        if let Some(ref color) = self.color {
-            cmd.arg("--color").arg(color);
-        }
-        if let Some(ref config) = self.config {
+
+        if let Some(config) = &self.config {
             cmd.arg("--config").arg(config);
         }
-        if let Some(ref features) = self.features {
+
+        // Feature selection
+        if let Some(features) = &self.features {
             cmd.arg("--features").arg(features);
         }
+
         if self.all_features {
             cmd.arg("--all-features");
         }
+
         if self.no_default_features {
             cmd.arg("--no-default-features");
         }
-        if let Some(ref lockfile_path) = self.lockfile_path {
+
+        // Manifest options
+        if let Some(manifest_path) = &self.manifest_path {
+            cmd.arg("--manifest-path").arg(manifest_path);
+        }
+
+        if let Some(lockfile_path) = &self.lockfile_path {
             cmd.arg("--lockfile-path").arg(lockfile_path);
         }
+
+        if self.locked {
+            cmd.arg("--locked");
+        }
+
         if self.offline {
             cmd.arg("--offline");
         }
+
         if self.frozen {
             cmd.arg("--frozen");
         }
