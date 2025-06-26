@@ -199,7 +199,7 @@ impl CargoCleanTool {
     pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
         let mut cmd = Command::new("cargo");
         if let Some(toolchain) = &self.toolchain {
-            cmd.arg(format!("+{}", toolchain));
+            cmd.arg(format!("+{toolchain}"));
         }
         cmd.arg("clean");
 
@@ -313,7 +313,7 @@ impl CargoFmtTool {
     pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
         let mut cmd = Command::new("cargo");
         if let Some(toolchain) = &self.toolchain {
-            cmd.arg(format!("+{}", toolchain));
+            cmd.arg(format!("+{toolchain}"));
         }
         cmd.arg("fmt");
 
@@ -422,7 +422,7 @@ impl CargoNewTool {
     pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
         let mut cmd = Command::new("cargo");
         if let Some(toolchain) = &self.toolchain {
-            cmd.arg(format!("+{}", toolchain));
+            cmd.arg(format!("+{toolchain}"));
         }
         cmd.arg("new");
 

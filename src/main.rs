@@ -79,7 +79,7 @@ async fn main() -> SdkResult<()> {
     }
 
     let version = match GIT_HASH {
-        Some(hash) => format!("{}.{}", VERSION, hash),
+        Some(hash) => format!("{VERSION}.{hash}"),
         None => VERSION.to_string(),
     };
     tracing::info!(version, "Server version");
