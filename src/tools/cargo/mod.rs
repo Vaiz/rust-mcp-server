@@ -727,8 +727,8 @@ pub struct CargoAddTool {
     #[serde(default)]
     pub ignore_rust_version: bool,
 
-    /// Assert that `Cargo.lock` will remain unchanged. By default is `true`.
-    #[serde(default = "default_true")]
+    /// Assert that `Cargo.lock` will remain unchanged.
+    #[serde(default)]
     pub locked: bool,
 
     /// Run without accessing the network
@@ -906,8 +906,8 @@ pub struct CargoRemoveTool {
     #[serde(default, deserialize_with = "deserialize_string")]
     pub lockfile_path: Option<String>,
     
-    /// Assert that `Cargo.lock` will remain unchanged. By default is `true`.
-    #[serde(default = "default_true")]
+    /// Assert that `Cargo.lock` will remain unchanged.
+    #[serde(default)]
     pub locked: bool,
     
     /// Run without accessing the network
