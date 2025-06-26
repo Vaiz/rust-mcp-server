@@ -1,7 +1,7 @@
 use std::process::Command;
 
 use crate::{
-    serde_utils::{deserialize_string, deserialize_string_vec},
+    serde_utils::{default_true, deserialize_string, deserialize_string_vec},
     tools::execute_command,
 };
 use rust_mcp_sdk::{
@@ -72,8 +72,8 @@ pub struct CargoCheckTool {
     #[serde(default)]
     verbose: bool,
 
-    /// Do not print cargo log messages
-    #[serde(default)]
+    /// Do not print cargo log messages. By default is `true`.
+    #[serde(default = "default_true")]
     quiet: bool,
 
     /// Treat warnings as errors

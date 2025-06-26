@@ -88,6 +88,9 @@ pub struct CargoTestTool {
     /// Path to Cargo.toml
     #[serde(default, deserialize_with = "deserialize_string")]
     manifest_path: Option<String>,
+    /// Display one character per test instead of one line
+    #[serde(default)]
+    quiet: bool,
 }
 
 impl CargoTestTool {
@@ -165,6 +168,9 @@ impl CargoTestTool {
         }
         if let Some(manifest_path) = &self.manifest_path {
             cmd.arg("--manifest-path").arg(manifest_path);
+        }
+        if self.quiet {
+            cmd.arg("--quiet");
         }
         // Pass test binary args after --
         if let Some(test_args) = &self.test_args {

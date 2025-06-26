@@ -19,7 +19,7 @@ use rust_mcp_sdk::{
     schema::{CallToolResult, schema_utils::CallToolError},
 };
 
-use crate::serde_utils::{deserialize_string, deserialize_string_vec};
+use crate::serde_utils::{default_true, deserialize_string, deserialize_string_vec};
 use crate::tools::execute_command;
 
 #[mcp_tool(
@@ -32,6 +32,10 @@ pub struct CargoGenerateLockfileTool {
     /// The name of the package to generate lockfile for. If not specified, generates for the current package/workspace.
     #[serde(default, deserialize_with = "deserialize_string")]
     package: Option<String>,
+
+    /// No output printed to stdout. By default is `true`.
+    #[serde(default = "default_true")]
+    quiet: bool,
 }
 
 impl CargoGenerateLockfileTool {
@@ -41,6 +45,10 @@ impl CargoGenerateLockfileTool {
 
         if let Some(package) = &self.package {
             cmd.arg("--package").arg(package);
+        }
+
+        if self.quiet {
+            cmd.arg("--quiet");
         }
 
         execute_command(cmd)
@@ -72,6 +80,10 @@ pub struct CargoBuildTool {
     /// Treat warnings as errors
     #[serde(default)]
     warnings_as_errors: bool,
+
+    /// No output printed to stdout. By default is `true`.
+    #[serde(default = "default_true")]
+    quiet: bool,
 }
 
 impl CargoBuildTool {
@@ -89,6 +101,10 @@ impl CargoBuildTool {
 
         if let Some(package) = &self.package {
             cmd.arg("--package").arg(package);
+        }
+
+        if self.quiet {
+            cmd.arg("--quiet");
         }
 
         if self.warnings_as_errors {
@@ -114,12 +130,16 @@ pub struct CargoCleanTool {
     #[serde(default, deserialize_with = "deserialize_string")]
     package: Option<String>,
 
-    /// The profile to use for the build. Defaults to "dev".
+    /// lean artifacts of the specified profile. If not specified, cleans everything.
     /// Default rust profiles:
     /// - `dev`: Optimized for development, with debug information.
     /// - `release`: Optimized for performance, without debug information.
     #[serde(default, deserialize_with = "deserialize_string")]
     profile: Option<String>,
+
+    /// No output printed to stdout. By default is `true`.
+    #[serde(default = "default_true")]
+    quiet: bool,
 }
 
 impl CargoCleanTool {
@@ -132,6 +152,14 @@ impl CargoCleanTool {
 
         if let Some(package) = &self.package {
             cmd.arg("--package").arg(package);
+        }
+
+        if let Some(profile) = &self.profile {
+            cmd.arg("--profile").arg(profile);
+        }
+
+        if self.quiet {
+            cmd.arg("--quiet");
         }
 
         execute_command(cmd)
@@ -161,8 +189,8 @@ pub struct CargoFmtTool {
     #[serde(default)]
     check: bool,
 
-    /// No output printed to stdout
-    #[serde(default)]
+    /// No output printed to stdout. By default is `true`.
+    #[serde(default = "default_true")]
     quiet: bool,
 
     /// Use verbose output

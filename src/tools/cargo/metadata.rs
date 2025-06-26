@@ -1,5 +1,6 @@
 use std::process::Command;
 
+use crate::serde_utils::default_true;
 use crate::{serde_utils::deserialize_string, tools::execute_command};
 use rust_mcp_sdk::{
     macros::{JsonSchema, mcp_tool},
@@ -29,8 +30,8 @@ pub struct CargoMetadataTool {
     #[serde(default)]
     verbose: bool,
 
-    /// Do not print cargo log messages
-    #[serde(default)]
+    /// Do not print cargo log messages. By default is `true`.
+    #[serde(default = "default_true")]
     quiet: bool,
 
     /// Coloring [possible values: auto, always, never]

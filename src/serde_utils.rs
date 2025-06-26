@@ -41,7 +41,7 @@ where
 }
 
 pub const fn default_true() -> bool {
-     true
+    true
 }
 
 #[cfg(test)]

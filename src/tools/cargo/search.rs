@@ -5,7 +5,7 @@ use rust_mcp_sdk::{
     schema::{CallToolResult, schema_utils::CallToolError},
 };
 
-use crate::serde_utils::deserialize_string;
+use crate::serde_utils::{default_true, deserialize_string};
 use crate::tools::execute_command;
 
 #[mcp_tool(
@@ -22,6 +22,9 @@ pub struct CargoSearchTool {
     /// Registry to search packages in
     #[serde(default, deserialize_with = "deserialize_string")]
     pub registry: Option<String>,
+    /// Do not print cargo log messages. By default is `true`.
+    #[serde(default = "default_true")]
+    quiet: bool,
 }
 
 impl CargoSearchTool {
@@ -34,6 +37,9 @@ impl CargoSearchTool {
         }
         if let Some(registry) = &self.registry {
             cmd.arg("--registry").arg(registry);
+        }
+        if self.quiet {
+            cmd.arg("--quiet");
         }
         execute_command(cmd)
     }
