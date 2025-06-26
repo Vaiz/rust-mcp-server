@@ -22,7 +22,7 @@ mcp-discovery create --template md-plain --filename "$PROJECT_ROOT/tools.md" -- 
 
 # Post-process to remove git hash from version for CI stability
 echo "   - Removing git hash from version string for CI stability..."
-sed -i '1s/## Rust MCP Server 0\.1\.0\.[a-f0-9]\+/## Rust MCP Server 0.1.0/' "$PROJECT_ROOT/tools.md"
+sed -i '1s/## Rust MCP Server \([0-9]\+\.[0-9]\+\.[0-9]\+\)\.[a-f0-9]\+/## Rust MCP Server \1/' "$PROJECT_ROOT/tools.md"
 
 echo "✅ Documentation generated successfully!"
 echo "   - tools.md (Complete MCP tools and capabilities documentation)"
