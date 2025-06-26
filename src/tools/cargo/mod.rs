@@ -6,6 +6,7 @@ mod info;
 mod metadata;
 mod search;
 mod test;
+mod update;
 
 pub use add_remove::{CargoAddTool, CargoRemoveTool};
 pub use build::CargoBuildTool;
@@ -15,6 +16,7 @@ pub use info::CargoInfoTool;
 pub use metadata::CargoMetadataTool;
 pub use search::CargoSearchTool;
 pub use test::CargoTestTool;
+pub use update::CargoUpdateTool;
 
 use std::process::Command;
 
