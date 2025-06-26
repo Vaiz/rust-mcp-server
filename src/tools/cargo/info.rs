@@ -61,7 +61,7 @@ impl CargoInfoTool {
     pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
         let mut cmd = Command::new("cargo");
         cmd.arg("info");
-        
+
         if let Some(version) = self.version.as_ref() {
             cmd.arg(format!("{}@{version}", self.spec));
         } else {

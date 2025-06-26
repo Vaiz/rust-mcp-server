@@ -199,7 +199,7 @@ impl CargoCleanTool {
     pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
         let mut cmd = Command::new("cargo");
         if let Some(toolchain) = &self.toolchain {
-            cmd.arg(format!("+{}", toolchain));
+            cmd.arg(format!("+{toolchain}"));
         }
         cmd.arg("clean");
 
@@ -313,7 +313,7 @@ impl CargoFmtTool {
     pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
         let mut cmd = Command::new("cargo");
         if let Some(toolchain) = &self.toolchain {
-            cmd.arg(format!("+{}", toolchain));
+            cmd.arg(format!("+{toolchain}"));
         }
         cmd.arg("fmt");
 
@@ -367,52 +367,52 @@ pub struct CargoNewTool {
     /// The toolchain to use, e.g., "stable" or "nightly".
     #[serde(default, deserialize_with = "deserialize_string")]
     toolchain: Option<String>,
-    
+
     /// Path where the new cargo package will be created.
     /// Examples: "my-project", "path/to/my-lib", "../new-crate"
     pub path: String,
-    
+
     /// Set the resulting package name, defaults to the directory name
     #[serde(default, deserialize_with = "deserialize_string")]
     pub name: Option<String>,
-    
+
     /// Use a binary (application) template [default]
     #[serde(default)]
     pub bin: bool,
-    
+
     /// Use a library template
     #[serde(default)]
     pub lib: bool,
-    
+
     /// Edition to set for the crate generated. Possible values: 2015, 2018, 2021, 2024
     #[serde(default, deserialize_with = "deserialize_string")]
     pub edition: Option<String>,
-    
+
     /// Initialize a new repository for the given version control system, overriding a global configuration.
     /// Possible values: git, hg, pijul, fossil, none
     #[serde(default, deserialize_with = "deserialize_string")]
     pub vcs: Option<String>,
-    
+
     /// Registry to use
     #[serde(default, deserialize_with = "deserialize_string")]
     pub registry: Option<String>,
-    
+
     /// Assert that `Cargo.lock` will remain unchanged. By default is `false` for new projects.
     #[serde(default)]
     pub locked: bool,
-    
+
     /// Run without accessing the network
     #[serde(default)]
     pub offline: bool,
-    
+
     /// Equivalent to specifying both --locked and --offline
     #[serde(default)]
     pub frozen: bool,
-    
+
     /// Use verbose output
     #[serde(default)]
     pub verbose: bool,
-    
+
     /// Do not print cargo log messages. By default is `true`.
     #[serde(default = "default_true")]
     pub quiet: bool,
@@ -422,13 +422,13 @@ impl CargoNewTool {
     pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
         let mut cmd = Command::new("cargo");
         if let Some(toolchain) = &self.toolchain {
-            cmd.arg(format!("+{}", toolchain));
+            cmd.arg(format!("+{toolchain}"));
         }
         cmd.arg("new");
-        
+
         // Add the path argument (required)
         cmd.arg(&self.path);
-        
+
         // Template options
         if self.bin {
             cmd.arg("--bin");
@@ -436,7 +436,7 @@ impl CargoNewTool {
         if self.lib {
             cmd.arg("--lib");
         }
-        
+
         // Package options
         if let Some(name) = &self.name {
             cmd.arg("--name").arg(name);
@@ -447,12 +447,12 @@ impl CargoNewTool {
         if let Some(registry) = &self.registry {
             cmd.arg("--registry").arg(registry);
         }
-        
+
         // VCS options
         if let Some(vcs) = &self.vcs {
             cmd.arg("--vcs").arg(vcs);
         }
-        
+
         // Manifest options
         if self.locked {
             cmd.arg("--locked");
@@ -463,7 +463,7 @@ impl CargoNewTool {
         if self.frozen {
             cmd.arg("--frozen");
         }
-        
+
         // Output options
         if self.verbose {
             cmd.arg("--verbose");
@@ -471,7 +471,7 @@ impl CargoNewTool {
         if self.quiet && !self.verbose {
             cmd.arg("--quiet");
         }
-        
+
         execute_command(cmd)
     }
 }
