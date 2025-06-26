@@ -16,17 +16,41 @@ Essentially, it turns your AI assistant into an active participant in your devel
 
 ## Features
 
-RustMCP exposes several `cargo` commands as tools to the LLM:
+RustMCP exposes a comprehensive set of Rust development tools to the LLM:
 
-*   `cargo build`: Compile your package.
-*   `cargo check`: Analyze the current package and report errors, but don't build it.
-*   `cargo test`: Run the tests.
-*   `cargo fmt`: Format the code according to the project's style.
-*   `cargo add`: Add dependencies to your `Cargo.toml`.
-*   `cargo-deny`: Check for security advisories, license compatibility, and banned crates.
-*   `cargo-machete`: Find unused dependencies.
+### Core Cargo Commands
+*   **`cargo-build`**: Compile your package
+*   **`cargo-check`**: Analyze the current package and report errors, but don't build it
+*   **`cargo-test`**: Run the tests
+*   **`cargo-fmt`**: Format the code according to the project's style
+*   **`cargo-clippy`**: Check for common mistakes and improve code quality using Clippy
+*   **`cargo-clean`**: Clean the target directory
 
-and others.
+### Project Management
+*   **`cargo-new`**: Create a new cargo package
+*   **`cargo-generate_lockfile`**: Generate or update the Cargo.lock file
+*   **`cargo-list`**: List installed cargo commands
+
+### Dependency Management
+*   **`cargo-add`**: Add dependencies to your `Cargo.toml`
+*   **`cargo-remove`**: Remove dependencies from your `Cargo.toml`
+*   **`cargo-update`**: Update dependencies to newer versions
+*   **`cargo-metadata`**: Output project metadata in machine-readable format (JSON)
+*   **`cargo-search`**: Search for packages in the registry
+*   **`cargo-info`**: Display information about a package
+
+### Code Quality & Security
+*   **`cargo-deny-check`**: Check for security advisories, license compliance, and banned crates
+*   **`cargo-deny-init`**: Create a cargo-deny config from a template
+*   **`cargo-deny-list`**: List all licenses and the crates that use them
+*   **`cargo-deny-install`**: Install cargo-deny tool
+*   **`cargo-machete`**: Find unused dependencies
+*   **`cargo-machete-install`**: Install cargo-machete tool
+
+### Rust Toolchain Management
+*   **`rustup-show`**: Show the active and installed toolchains
+*   **`rustup-toolchain-add`**: Install or update toolchains
+*   **`rustup-update`**: Update Rust toolchains and rustup
 
 ## Getting Started
 
