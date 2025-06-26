@@ -38,10 +38,7 @@ jobs:
         run: cargo build --release
 
       - name: Generate tools.md
-        run: |
-          mcp-discovery create --template md-plain --filename tools.md.generated -- target/release/rustmcp
-          # Post-process to remove git hash from version for CI stability
-          sed -i '1s/## Rust MCP Server \([0-9]\+\.[0-9]\+\.[0-9]\+\)\.[a-f0-9]\+/## Rust MCP Server \1/' tools.md.generated
+        run: ./scripts/generate-docs.sh tools.md.generated
 
       - name: Check if tools.md is up to date
         run: |
