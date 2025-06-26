@@ -28,17 +28,9 @@ pub struct CargoCheckTool {
     #[serde(default)]
     workspace: bool,
 
-    /// Check artifacts in release mode, with optimizations
-    #[serde(default)]
-    release: bool,
-
-    /// Check for the specified target triple
-    #[serde(default, deserialize_with = "deserialize_string")]
-    target: Option<String>,
-
-    /// Check all targets (lib, bins, examples, tests, benches)
-    #[serde(default)]
-    all_targets: bool,
+    /// Exclude packages from the check
+    #[serde(default, deserialize_with = "deserialize_string_vec")]
+    exclude: Option<Vec<String>>,
 
     /// Check only this package's library
     #[serde(default)]
@@ -48,13 +40,37 @@ pub struct CargoCheckTool {
     #[serde(default)]
     bins: bool,
 
+    /// Check only the specified binary
+    #[serde(default, deserialize_with = "deserialize_string")]
+    bin: Option<String>,
+
     /// Check all examples
     #[serde(default)]
     examples: bool,
 
+    /// Check only the specified example
+    #[serde(default, deserialize_with = "deserialize_string")]
+    example: Option<String>,
+
     /// Check all tests
     #[serde(default)]
     tests: bool,
+
+    /// Check only the specified test target
+    #[serde(default, deserialize_with = "deserialize_string")]
+    test: Option<String>,
+
+    /// Check all targets that have `bench = true` set
+    #[serde(default)]
+    benches: bool,
+
+    /// Check only the specified bench target
+    #[serde(default, deserialize_with = "deserialize_string")]
+    bench: Option<String>,
+
+    /// Check all targets (lib, bins, examples, tests, benches)
+    #[serde(default)]
+    all_targets: bool,
 
     /// Space or comma separated list of features to activate
     #[serde(default, deserialize_with = "deserialize_string_vec")]
@@ -67,6 +83,54 @@ pub struct CargoCheckTool {
     /// Do not activate the default feature
     #[serde(default)]
     no_default_features: bool,
+
+    /// Number of parallel jobs, defaults to # of CPUs
+    #[serde(default)]
+    jobs: Option<u32>,
+
+    /// Do not abort the build as soon as there is an error
+    #[serde(default)]
+    keep_going: bool,
+
+    /// Check artifacts in release mode, with optimizations
+    #[serde(default)]
+    release: bool,
+
+    /// Check artifacts with the specified profile
+    #[serde(default, deserialize_with = "deserialize_string")]
+    profile: Option<String>,
+
+    /// Check for the specified target triple
+    #[serde(default, deserialize_with = "deserialize_string")]
+    target: Option<String>,
+
+    /// Directory for all generated artifacts
+    #[serde(default, deserialize_with = "deserialize_string")]
+    target_dir: Option<String>,
+
+    /// Path to Cargo.toml
+    #[serde(default, deserialize_with = "deserialize_string")]
+    manifest_path: Option<String>,
+
+    /// Path to Cargo.lock (unstable)
+    #[serde(default, deserialize_with = "deserialize_string")]
+    lockfile_path: Option<String>,
+
+    /// Ignore `rust-version` specification in packages
+    #[serde(default)]
+    ignore_rust_version: bool,
+
+    /// Assert that `Cargo.lock` will remain unchanged. By default is `true`.
+    #[serde(default = "default_true")]
+    locked: bool,
+
+    /// Run without accessing the network
+    #[serde(default)]
+    offline: bool,
+
+    /// Equivalent to specifying both --locked and --offline
+    #[serde(default)]
+    frozen: bool,
 
     /// Use verbose output
     #[serde(default)]
@@ -88,8 +152,8 @@ impl CargoCheckTool {
             cmd.arg(format!("+{}", toolchain));
         }
         cmd.arg("check");
-        cmd.arg("--locked");
 
+        // Package selection
         if let Some(packages) = &self.package {
             for package in packages {
                 cmd.arg("--package").arg(package);
@@ -100,18 +164,13 @@ impl CargoCheckTool {
             cmd.arg("--workspace");
         }
 
-        if self.release {
-            cmd.arg("--release");
+        if let Some(excludes) = &self.exclude {
+            for exclude in excludes {
+                cmd.arg("--exclude").arg(exclude);
+            }
         }
 
-        if let Some(target) = &self.target {
-            cmd.arg("--target").arg(target);
-        }
-
-        if self.all_targets {
-            cmd.arg("--all-targets");
-        }
-
+        // Target selection
         if self.lib {
             cmd.arg("--lib");
         }
@@ -120,14 +179,39 @@ impl CargoCheckTool {
             cmd.arg("--bins");
         }
 
+        if let Some(bin) = &self.bin {
+            cmd.arg("--bin").arg(bin);
+        }
+
         if self.examples {
             cmd.arg("--examples");
+        }
+
+        if let Some(example) = &self.example {
+            cmd.arg("--example").arg(example);
         }
 
         if self.tests {
             cmd.arg("--tests");
         }
 
+        if let Some(test) = &self.test {
+            cmd.arg("--test").arg(test);
+        }
+
+        if self.benches {
+            cmd.arg("--benches");
+        }
+
+        if let Some(bench) = &self.bench {
+            cmd.arg("--bench").arg(bench);
+        }
+
+        if self.all_targets {
+            cmd.arg("--all-targets");
+        }
+
+        // Feature selection
         if let Some(features) = &self.features {
             cmd.arg("--features").arg(features.join(","));
         }
@@ -140,6 +224,57 @@ impl CargoCheckTool {
             cmd.arg("--no-default-features");
         }
 
+        // Compilation options
+        if let Some(jobs) = self.jobs {
+            cmd.arg("--jobs").arg(jobs.to_string());
+        }
+
+        if self.keep_going {
+            cmd.arg("--keep-going");
+        }
+
+        if self.release {
+            cmd.arg("--release");
+        }
+
+        if let Some(profile) = &self.profile {
+            cmd.arg("--profile").arg(profile);
+        }
+
+        if let Some(target) = &self.target {
+            cmd.arg("--target").arg(target);
+        }
+
+        if let Some(target_dir) = &self.target_dir {
+            cmd.arg("--target-dir").arg(target_dir);
+        }
+
+        // Manifest options
+        if let Some(manifest_path) = &self.manifest_path {
+            cmd.arg("--manifest-path").arg(manifest_path);
+        }
+
+        if let Some(lockfile_path) = &self.lockfile_path {
+            cmd.arg("--lockfile-path").arg(lockfile_path);
+        }
+
+        if self.ignore_rust_version {
+            cmd.arg("--ignore-rust-version");
+        }
+
+        if self.locked {
+            cmd.arg("--locked");
+        }
+
+        if self.offline {
+            cmd.arg("--offline");
+        }
+
+        if self.frozen {
+            cmd.arg("--frozen");
+        }
+
+        // Output options
         if self.verbose {
             cmd.arg("--verbose");
         }
