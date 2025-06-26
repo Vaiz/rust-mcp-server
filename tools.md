@@ -1,4 +1,4 @@
-## Rust MCP Server 0.1.0.c6226eb
+## Rust MCP Server 0.1.0
 | 🟢 Tools (24) | 🟢 Prompts (1) | <span style="opacity:0.6">🔴 Resources</span> | <span style="opacity:0.6">🔴 Logging</span> | <span style="opacity:0.6">🔴 Experimental</span> |
 | --- | --- | --- | --- | --- |
 ## 🛠️ Tools (24)

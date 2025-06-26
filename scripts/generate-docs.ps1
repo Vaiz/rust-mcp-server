@@ -18,5 +18,12 @@ Write-Host "📝 Generating documentation using mcp-discovery..." -ForegroundCol
 Write-Host "   - Creating tools.md documentation..." -ForegroundColor Gray
 mcp-discovery create --template md-plain --filename "$projectRoot\tools.md" -- $serverBinary
 
+# Post-process to remove git hash from version for CI stability
+Write-Host "   - Removing git hash from version string for CI stability..." -ForegroundColor Gray
+$toolsPath = Join-Path $projectRoot "tools.md"
+$content = Get-Content $toolsPath -Raw
+$content = $content -replace '^## Rust MCP Server 0\.1\.0\.[a-f0-9]+', '## Rust MCP Server 0.1.0'
+Set-Content $toolsPath $content -NoNewline
+
 Write-Host "✅ Documentation generated successfully!" -ForegroundColor Green
 Write-Host "   - tools.md (Complete MCP tools and capabilities documentation)" -ForegroundColor Gray
