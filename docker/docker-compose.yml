@@ -5,7 +5,7 @@ services:
     build:
       context: ..
       dockerfile: docker/Dockerfile
-    image: vaiz/rust-mcp-server:latest
+    image: vaiz2/rust-mcp-server:latest
 
     volumes:
       - ./logs:/var/log/rust-mcp-server  # host ./logs -> container log folder
