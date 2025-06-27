@@ -71,7 +71,7 @@ rust-mcp-server exposes a comprehensive set of Rust development tools to the LLM
 *   **`rustup-toolchain-add`**: Install or update toolchains
 *   **`rustup-update`**: Update Rust toolchains and rustup
 
-This MCP server provides 24+ Rust development tools and capabilities. For a complete list with detailed descriptions and parameters, see [tools.md](tools.md).
+For a complete list with detailed descriptions and parameters, see [tools.md](tools.md).
 
 ## Getting Started
 
