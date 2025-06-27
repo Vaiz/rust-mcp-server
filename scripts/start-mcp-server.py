@@ -8,11 +8,11 @@ import tempfile
 import re
 from pathlib import Path
 
-def run_command(cmd, cwd=None, capture_output=True):
+def run_command(cmd, cwd=None, capture_output=True, env=None):
     """Run a command and return the result."""
     try:
         result = subprocess.run(cmd, shell=True, cwd=cwd, capture_output=capture_output, 
-                              text=True, check=False)
+                              text=True, check=False, env=env)
         return result.returncode == 0, result.stdout.strip() if capture_output else ""
     except Exception as e:
         print(f"Error running command '{cmd}': {e}")
@@ -37,6 +37,15 @@ def get_binary_version(binary_path):
     success, output = run_command(f'"{binary_path}" --version')
     return output if success else None
 
+def remove_dir(path):
+    if not path.exists():
+        return
+    if os.name == 'nt':
+        # Use command line to remove directory on Windows
+        run_command(f'rmdir /s /q "{path}"')
+    else:
+        shutil.rmtree(path, ignore_errors=False)
+
 def main():
     parser = argparse.ArgumentParser(description='Install and start rust-mcp-server')
     parser.add_argument('--install-folder', default='./rust-mcp-server', 
@@ -45,6 +54,8 @@ def main():
                        help='Git tag to checkout (default: stable)')
     parser.add_argument('--keep-temp', action='store_true',
                        help='Keep temp directory for faster subsequent builds')
+    parser.add_argument('--force', action='store_true',
+                       help='Force rebuild by cleaning temp directory and ignoring version checks')
     parser.add_argument('server_args', nargs='*', 
                        help='Arguments to pass to the server')
     
@@ -52,40 +63,41 @@ def main():
     
     repo_url = "https://github.com/Vaiz/rust-mcp-server.git"
     install_folder = Path(args.install_folder).resolve()
-    
-    # Platform-specific executable name
+
     exe_name = "rust-mcp-server.exe" if os.name == 'nt' else "rust-mcp-server"
     binary_path = install_folder / exe_name
-    
-    # Use platform-specific temp directory
+
     temp_base = Path(tempfile.gettempdir()) / "rust-mcp-server-build"
-    print(f"Using temp directory: {temp_base}")
-    
-    # Check if rebuild is needed
-    remote_commit = get_remote_commit(repo_url, args.tag)
-    print(f"Remote commit for tag '{args.tag}': {remote_commit}")
-    
-    existing_version = get_binary_version(binary_path)
-    print(f"Existing binary version: {existing_version}")
+    print(f"Using temp directory: {temp_base}")    
     
     needs_build = True
-    
-    if existing_version and remote_commit:
-        # Extract commit hash from version string (format: "rust-mcp-server 0.1.0.d7c5bac")
-        match = re.search(r'\.([a-f0-9]+)$', existing_version)
-        if match:
-            existing_commit = match.group(1)
-            if existing_commit == remote_commit:
-                print(f"Binary up-to-date (commit: {remote_commit})")
-                needs_build = False
-            else:
-                print(f"Binary outdated ({existing_commit} → {remote_commit})")
+
+    remote_commit = get_remote_commit(repo_url, args.tag)
+    print(f"Remote commit for tag '{args.tag}': {remote_commit}")    
+
+    if args.force and temp_base.exists():
+        print("Force flag set, cleaning temp directory...")
+        remove_dir(temp_base)
+    else:
+        existing_version = get_binary_version(binary_path)
+        print(f"Existing binary version: {existing_version}")
+
+        if existing_version and remote_commit:
+            # Extract commit hash from version string (format: "rust-mcp-server 0.1.0.d7c5bac")
+            match = re.search(r'\.([a-f0-9]+)$', existing_version)
+            if match:
+                existing_commit = match.group(1)
+                if existing_commit == remote_commit:
+                    print(f"Binary up-to-date (commit: {remote_commit})")
+                    needs_build = False
+                else:
+                    print(f"Binary outdated ({existing_commit} → {remote_commit})")
     
     # Clone/update and build if needed
     if needs_build:
         install_folder.mkdir(parents=True, exist_ok=True)
 
-        if temp_base.exists():
+        if temp_base.exists() and (temp_base / ".git").is_dir():
             print("Updating existing temp directory...")
             success, _ = run_command("git fetch --all --tags", cwd=temp_base)
             if success:
@@ -103,18 +115,19 @@ def main():
             sys.exit(1)
         
         print("Building...")
+        env = os.environ.copy()
+        env['GIT_HASH'] = remote_commit        
         cargo_cmd = f'cargo build --release --manifest-path "{temp_base / "Cargo.toml"}"'
-        success, _ = run_command(cargo_cmd, capture_output=False)
+        success, _ = run_command(cargo_cmd, capture_output=False, env=env)
         if not success:
             print("Build failed")
             sys.exit(1)
         
         src_binary = temp_base / "target" / "release" / exe_name
         shutil.copy2(src_binary, binary_path)
-        
-        # Clean up temp directory unless keeping it
+
         if not args.keep_temp:
-            shutil.rmtree(temp_base, ignore_errors=True)
+            remove_dir(temp_base)
         
         print(f"Installed to: {binary_path}")
     
