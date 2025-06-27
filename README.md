@@ -4,6 +4,25 @@
 
 By exposing local tools and project context to the LLM, rust-mcp-server allows the model to perform actions on your behalf, such as building, testing, and analyzing your Rust code.
 
+## Table of Contents
+
+- [Why use `rust-mcp-server`?](#why-use-rust-mcp-server)
+- [Features](#features)
+  - [Core Cargo Commands](#core-cargo-commands)
+  - [Project Management](#project-management)
+  - [Dependency Management](#dependency-management)
+  - [Code Quality & Security](#code-quality--security)
+  - [Rust Toolchain Management](#rust-toolchain-management)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Building the Server](#building-the-server)
+  - [Command Line Arguments](#command-line-arguments)
+  - [Configuring with VS Code](#configuring-with-vs-code)
+
+- [Documentation Generation](#documentation-generation)
+  - [Prerequisites](#prerequisites-1)
+  - [Generating Documentation](#generating-documentation)
+
 ## Why use `rust-mcp-server`?
 
 Integrating an LLM with your local development environment via rust-mcp-server can significantly enhance your productivity. The LLM can:
@@ -52,6 +71,8 @@ rust-mcp-server exposes a comprehensive set of Rust development tools to the LLM
 *   **`rustup-toolchain-add`**: Install or update toolchains
 *   **`rustup-update`**: Update Rust toolchains and rustup
 
+For a complete list with detailed descriptions and parameters, see [tools.md](tools.md).
+
 ## Getting Started
 
 ### Prerequisites
@@ -68,6 +89,60 @@ rust-mcp-server exposes a comprehensive set of Rust development tools to the LLM
     cargo build --release
     ```
     The executable will be located at `target/release/rust-mcp-server.exe`.
+
+### Command Line Arguments
+
+The rust-mcp-server supports several command line arguments to customize its behavior:
+
+#### `--timeout <TIMEOUT>`
+- **Description**: Sets the timeout for processing a request in seconds
+- **Type**: Integer
+- **Default**: 600 (10 minutes)
+- **Example**: `--timeout 300` (5 minutes)
+
+#### `--log-level <LOG_LEVEL>`
+- **Description**: Sets the logging level for the server
+- **Type**: String
+- **Options**: `error`, `warn`, `info`, `debug`, `trace`
+- **Default**: `info`
+- **Example**: `--log-level debug`
+
+#### `--log-file <LOG_FILE>`
+- **Description**: Specifies a file path for logging output. If not provided, logs are written to stderr
+- **Type**: String (file path)
+- **Default**: None (logs to stderr)
+- **Example**: `--log-file /var/log/rust-mcp-server.log`
+
+#### `--disable-tool <TOOL_NAME>`
+- **Description**: Disables a specific tool by name. Can be specified multiple times to disable multiple tools
+- **Type**: String (tool name)
+- **Default**: None (all tools enabled)
+- **Example**: `--disable-tool cargo-test --disable-tool cargo-clippy`
+
+#### `-h, --help`
+- **Description**: Displays help information about available command line arguments
+- **Example**: `rust-mcp-server --help`
+
+#### `-V, --version`
+- **Description**: Displays the version information of the server
+- **Example**: `rust-mcp-server --version`
+
+#### Usage Examples
+
+Basic usage with default settings:
+```sh
+rust-mcp-server
+```
+
+With custom timeout and debug logging:
+```sh
+rust-mcp-server --timeout 300 --log-level debug
+```
+
+With file logging and disabled tools:
+```sh
+rust-mcp-server --log-file /tmp/mcp-server.log --disable-tool cargo-test
+```
 
 ### Configuring with VS Code
 
@@ -92,9 +167,6 @@ To make GitHub Copilot in VS Code use this MCP server, you need to update your V
 
 More information you can find by this [link](https://code.visualstudio.com/docs/copilot/chat/mcp-servers).
 
-## Tools and Capabilities
-
-This MCP server provides 24+ Rust development tools and capabilities. For a complete list with detailed descriptions and parameters, see [tools.md](tools.md).
 
 ## Documentation Generation
 
