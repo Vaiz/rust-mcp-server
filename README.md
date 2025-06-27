@@ -18,7 +18,7 @@ By exposing local tools and project context to the LLM, rust-mcp-server allows t
   - [Building the Server](#building-the-server)
   - [Command Line Arguments](#command-line-arguments)
   - [Configuring with VS Code](#configuring-with-vs-code)
-- [Tools and Capabilities](#tools-and-capabilities)
+
 - [Documentation Generation](#documentation-generation)
   - [Prerequisites](#prerequisites-1)
   - [Generating Documentation](#generating-documentation)
@@ -70,6 +70,8 @@ rust-mcp-server exposes a comprehensive set of Rust development tools to the LLM
 *   **`rustup-show`**: Show the active and installed toolchains
 *   **`rustup-toolchain-add`**: Install or update toolchains
 *   **`rustup-update`**: Update Rust toolchains and rustup
+
+This MCP server provides 24+ Rust development tools and capabilities. For a complete list with detailed descriptions and parameters, see [tools.md](tools.md).
 
 ## Getting Started
 
@@ -165,9 +167,6 @@ To make GitHub Copilot in VS Code use this MCP server, you need to update your V
 
 More information you can find by this [link](https://code.visualstudio.com/docs/copilot/chat/mcp-servers).
 
-## Tools and Capabilities
-
-This MCP server provides 24+ Rust development tools and capabilities. For a complete list with detailed descriptions and parameters, see [tools.md](tools.md).
 
 ## Documentation Generation
 
