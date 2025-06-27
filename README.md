@@ -111,14 +111,8 @@ cargo install mcp-discovery
 
 Run the documentation generation script to update the tools documentation:
 
-**Linux/macOS:**
 ```bash
-./scripts/generate-docs.sh
-```
-
-**Windows:**
-```powershell
-.\scripts\generate-docs.ps1
+python scripts/generate-docs.py
 ```
 
 This will regenerate `tools.md` with the latest tool descriptions and capabilities.
