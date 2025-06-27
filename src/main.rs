@@ -106,7 +106,7 @@ async fn main() -> SdkResult<()> {
     let server = server_runtime::create_server(
         server_details,
         transport,
-        handler::MyServerHandler::new(args.disabled_tools),
+        handler::McpServerHandler::new(args.disabled_tools),
     );
     server.start().await
 }

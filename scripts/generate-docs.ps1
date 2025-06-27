@@ -12,7 +12,7 @@ $ErrorActionPreference = "Stop"
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $projectRoot = Split-Path -Parent $scriptDir
 $targetDir = Join-Path $projectRoot "target"
-$serverBinary = Join-Path $targetDir "release\rustmcp.exe"
+$serverBinary = Join-Path $targetDir "release\rust-mcp-server.exe"
 $outputFile = Join-Path $projectRoot $Filename
 
 Write-Host "🔧 Building MCP server..." -ForegroundColor Blue

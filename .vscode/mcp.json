@@ -1,9 +1,9 @@
 {
     "servers": {
-        "RustMcp": {
+        "rust-mcp-server": {
             "type": "stdio",
-            "command": "./tmp/rustmcp.exe",
-            "args": ["--log-file", "./tmp/rustmcp.log"],
+            "command": "./tmp/rust-mcp-server.exe",
+            "args": ["--log-file", "./tmp/rust-mcp-server.log"],
         }
     }
 }
