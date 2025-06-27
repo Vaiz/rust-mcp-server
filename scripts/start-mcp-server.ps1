@@ -2,6 +2,7 @@
 param(
     [string]$InstallFolder = "./rust-mcp-server",
     [string]$Tag = "stable",
+    [switch]$KeepTemp,
     [string[]]$ServerArgs = @()
 )
 
@@ -45,14 +46,16 @@ if ($existingVersion -and $remoteCommit -and $existingVersion -match "\.([a-f0-9
 
 # Clone/update and build if needed
 if ($needsBuild) {
-    # Ensure install directory exists
     if (-not (Test-Path $InstallFolder)) { New-Item -ItemType Directory -Path $InstallFolder -Force | Out-Null }
     
-    # Build in temp directory
-    if (Test-Path $TempPath) { Remove-Item $TempPath -Recurse -Force }
-    
-    Write-Host "Cloning to temp directory..."
-    git clone $RepoUrl $TempPath
+    if (Test-Path $TempPath) {
+        Write-Host "Updating existing temp directory..."
+        git -C $TempPath fetch --all --tags
+        git -C $TempPath reset --hard HEAD
+    } else {
+        Write-Host "Cloning to temp directory..."
+        git clone $RepoUrl $TempPath
+    }
     
     git -C $TempPath checkout $Tag
     
@@ -61,8 +64,10 @@ if ($needsBuild) {
     
     Copy-Item "$TempPath/target/release/rust-mcp-server.exe" $BinaryPath -Force
     
-    # Clean up temp directory
-    Remove-Item $TempPath -Recurse -Force
+    # Clean up temp directory unless keeping it
+    if (-not $KeepTemp) {
+        Remove-Item $TempPath -Recurse -Force
+    } 
     Write-Host "Installed to: $BinaryPath"
 }
 
