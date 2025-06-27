@@ -9,12 +9,12 @@ use rust_mcp_sdk::{McpServer, mcp_server::ServerHandler};
 use crate::tools::AllTools;
 
 // Custom Handler to handle MCP Messages
-pub struct MyServerHandler {
+pub struct McpServerHandler {
     disabled_tools: Vec<String>,
     prompt_handler: crate::prompts::PromptHandler,
 }
 
-impl MyServerHandler {
+impl McpServerHandler {
     /// Create a new instance of MyServerHandler with the provided disabled tools.
     pub fn new(disabled_tools: Vec<String>) -> Self {
         let this = Self {
@@ -38,7 +38,7 @@ impl MyServerHandler {
 // To check out a list of all the methods in the trait that you can override, take a look at
 // https://github.com/rust-mcp-stack/rust-mcp-sdk/blob/main/crates/rust-mcp-sdk/src/mcp_handlers/mcp_server_handler.rs
 #[async_trait]
-impl ServerHandler for MyServerHandler {
+impl ServerHandler for McpServerHandler {
     async fn handle_list_tools_request(
         &self,
         _request: ListToolsRequest,
