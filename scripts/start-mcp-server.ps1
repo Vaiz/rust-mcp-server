@@ -53,16 +53,13 @@ if ($needsBuild) {
     
     Write-Host "Cloning to temp directory..."
     git clone $RepoUrl $TempPath
-    Push-Location $TempPath
     
-    git checkout $Tag
+    git -C $TempPath checkout $Tag
     
     Write-Host "Building..."
-    cargo build --release
+    cargo build --release --manifest-path "$TempPath/Cargo.toml"
     
-    # Copy executable to install path
-    Copy-Item "target/release/rust-mcp-server.exe" $BinaryPath -Force
-    Pop-Location
+    Copy-Item "$TempPath/target/release/rust-mcp-server.exe" $BinaryPath -Force
     
     # Clean up temp directory
     Remove-Item $TempPath -Recurse -Force
