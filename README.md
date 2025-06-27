@@ -69,6 +69,60 @@ rust-mcp-server exposes a comprehensive set of Rust development tools to the LLM
     ```
     The executable will be located at `target/release/rust-mcp-server.exe`.
 
+### Command Line Arguments
+
+The rust-mcp-server supports several command line arguments to customize its behavior:
+
+#### `--timeout <TIMEOUT>`
+- **Description**: Sets the timeout for processing a request in seconds
+- **Type**: Integer
+- **Default**: 600 (10 minutes)
+- **Example**: `--timeout 300` (5 minutes)
+
+#### `--log-level <LOG_LEVEL>`
+- **Description**: Sets the logging level for the server
+- **Type**: String
+- **Options**: `error`, `warn`, `info`, `debug`, `trace`
+- **Default**: `info`
+- **Example**: `--log-level debug`
+
+#### `--log-file <LOG_FILE>`
+- **Description**: Specifies a file path for logging output. If not provided, logs are written to stderr
+- **Type**: String (file path)
+- **Default**: None (logs to stderr)
+- **Example**: `--log-file /var/log/rust-mcp-server.log`
+
+#### `--disable-tool <TOOL_NAME>`
+- **Description**: Disables a specific tool by name. Can be specified multiple times to disable multiple tools
+- **Type**: String (tool name)
+- **Default**: None (all tools enabled)
+- **Example**: `--disable-tool cargo-test --disable-tool cargo-clippy`
+
+#### `-h, --help`
+- **Description**: Displays help information about available command line arguments
+- **Example**: `rust-mcp-server --help`
+
+#### `-V, --version`
+- **Description**: Displays the version information of the server
+- **Example**: `rust-mcp-server --version`
+
+#### Usage Examples
+
+Basic usage with default settings:
+```sh
+rust-mcp-server
+```
+
+With custom timeout and debug logging:
+```sh
+rust-mcp-server --timeout 300 --log-level debug
+```
+
+With file logging and disabled tools:
+```sh
+rust-mcp-server --log-file /tmp/mcp-server.log --disable-tool cargo-test
+```
+
 ### Configuring with VS Code
 
 To make GitHub Copilot in VS Code use this MCP server, you need to update your VS Code settings.
