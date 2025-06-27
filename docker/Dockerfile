@@ -2,6 +2,7 @@
 
 FROM rust:latest AS builder
 
+RUN apt update && apt install -y musl-tools musl-dev
 RUN rustup target add x86_64-unknown-linux-musl
 
 WORKDIR /app
