@@ -17,9 +17,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Set up QEMU (for ARM builds)
-      uses: docker/setup-qemu-action@v3
-
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
@@ -36,4 +33,4 @@ jobs:
         file: docker/Dockerfile
         push: true
         tags: vaiz2/rust-mcp-server:latest
-        platforms: linux/amd64,linux/arm64
+        platforms: linux/amd64
