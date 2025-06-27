@@ -1,6 +1,6 @@
-# Adding New Tools to RustMCP
+# Adding New Tools to rust-mcp-server
 
-This guide provides concise instructions for adding new tools to the RustMCP server.
+This guide provides concise instructions for adding new tools to the rust-mcp-server.
 
 ## Prerequisites 
 
@@ -8,7 +8,7 @@ Research the CLI tool thoroughly: run `--help`, understand all arguments, flags,
 
 ## Project Structure Overview
 
-The RustMCP project follows a modular structure for organizing tools:
+The rust-mcp-server project follows a modular structure for organizing tools:
 
 ```
 src/
@@ -159,7 +159,7 @@ match tool_params {
 
 ### 5. Build and Test
 
-1. **Build the project using RustMCP tools**:
+1. **Build the project using rust-mcp-server tools**:
    - Use the `#cargo-build` tool via MCP protocol to compile the project
 
 2. **Check for compilation errors**:

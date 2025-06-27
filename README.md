@@ -1,12 +1,12 @@
-# RustMCP
+# Rust MCP Server
 
-RustMCP is a server that implements the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction). It acts as a bridge between a large language model (LLM) like GitHub Copilot and your local Rust development environment.
+`rust-mcp-server` is a server that implements the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction). It acts as a bridge between a large language model (LLM) like GitHub Copilot and your local Rust development environment.
 
-By exposing local tools and project context to the LLM, RustMCP allows the model to perform actions on your behalf, such as building, testing, and analyzing your Rust code.
+By exposing local tools and project context to the LLM, rust-mcp-server allows the model to perform actions on your behalf, such as building, testing, and analyzing your Rust code.
 
-## Why use RustMCP?
+## Why use `rust-mcp-server`?
 
-Integrating an LLM with your local development environment via RustMCP can significantly enhance your productivity. The LLM can:
+Integrating an LLM with your local development environment via rust-mcp-server can significantly enhance your productivity. The LLM can:
 
 *   **Automate common tasks**: Run `cargo check`, `cargo build`, `cargo test`, and `cargo fmt` directly.
 *   **Manage dependencies**: Add new dependencies with `cargo add`, find unused dependencies with `cargo-machete`
@@ -16,7 +16,7 @@ Essentially, it turns your AI assistant into an active participant in your devel
 
 ## Features
 
-RustMCP exposes a comprehensive set of Rust development tools to the LLM:
+rust-mcp-server exposes a comprehensive set of Rust development tools to the LLM:
 
 ### Core Cargo Commands
 *   **`cargo-build`**: Compile your package
@@ -67,7 +67,7 @@ RustMCP exposes a comprehensive set of Rust development tools to the LLM:
     ```sh
     cargo build --release
     ```
-    The executable will be located at `target/release/rustmcp.exe`.
+    The executable will be located at `target/release/rust-mcp-server.exe`.
 
 ### Configuring with VS Code
 
@@ -79,10 +79,10 @@ To make GitHub Copilot in VS Code use this MCP server, you need to update your V
     ```json
     {
         "servers": {
-            "RustMcp": {
+            "rust-mcp-server": {
                 "type": "stdio",
-                "command": "C:/path/to/your/rustmcp.exe",
-                "args": ["--log-file", "log/folder/rustmcp.log"],
+                "command": "C:/path/to/your/rust-mcp-server.exe",
+                "args": ["--log-file", "log/folder/rust-mcp-server.log"],
             }
         }
     }

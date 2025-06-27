@@ -10,7 +10,7 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 TARGET_DIR="$PROJECT_ROOT/target"
-SERVER_BINARY="$TARGET_DIR/release/rustmcp"
+SERVER_BINARY="$TARGET_DIR/release/rust-mcp-server"
 
 # Use provided filename or default to tools.md
 FILENAME="${1:-tools.md}"
