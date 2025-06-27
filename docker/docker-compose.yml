@@ -1,0 +1,22 @@
+version: "3.8"
+
+services:
+  mcp:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: vaiz2/rust-mcp-server:latest
+
+    volumes:
+      - ./logs:/var/log/rust-mcp-server  # host ./logs -> container log folder
+
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+
+    command:
+      - "--timeout=600"
+      - "--log-level=info"
+      - "--log-file=/var/log/rust-mcp-server/server.log"
+      # example: disable cargo-test tool
+      # - "--disable-tool=cargo-test"
