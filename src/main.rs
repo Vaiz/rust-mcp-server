@@ -21,8 +21,25 @@ use tracing_subscriber::{EnvFilter, fmt};
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 const GIT_HASH: Option<&str> = option_env!("GIT_HASH");
 
+struct AppVersion;
+
+impl AppVersion {
+    fn version() -> String {
+        match GIT_HASH {
+            Some(hash) => format!("{VERSION}.{hash}"),
+            None => VERSION.into(),
+        }
+    }
+}
+
+impl From<AppVersion> for clap::builder::Str {
+    fn from(_: AppVersion) -> Self {
+        AppVersion::version().into()
+    }
+}
+
 #[derive(Parser, Debug)]
-#[command(author, version, about = "Rust MCP Server", long_about = None)]
+#[command(author, version = AppVersion, about = "Rust MCP Server", long_about = None)]
 struct Args {
     /// Timeout for processing a request (seconds)
     #[arg(long, default_value_t = 600)]
@@ -78,16 +95,12 @@ async fn main() -> SdkResult<()> {
         );
     }
 
-    let version = match GIT_HASH {
-        Some(hash) => format!("{VERSION}.{hash}"),
-        None => VERSION.to_string(),
-    };
-    tracing::info!(version, "Server version");
+    tracing::info!(version = AppVersion::version(), "Server version");
 
     let server_details = InitializeResult {
         server_info: Implementation {
             name: "Rust MCP Server".into(),
-            version,
+            version: AppVersion::version(),
         },
         capabilities: ServerCapabilities {
             tools: Some(ServerCapabilitiesTools { list_changed: None }),

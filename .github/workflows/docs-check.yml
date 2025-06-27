@@ -35,17 +35,14 @@ jobs:
         run: cargo build --release
 
       - name: Generate tools.md
-        run: ./scripts/generate-docs.sh tools.md.generated
+        run: python scripts/generate-docs.py tools.md.generated
 
       - name: Check if tools.md is up to date
         run: |
           if ! diff -u tools.md tools.md.generated; then
             echo "❌ tools.md is not up to date!"
             echo "Please run the following command to update it:"
-            echo "  ./scripts/generate-docs.sh"
-            echo ""
-            echo "Or on Windows:"
-            echo "  .\\scripts\\generate-docs.ps1"
+            echo "  python scripts/generate-docs.py"
             exit 1
           else
             echo "✅ tools.md is up to date!"
