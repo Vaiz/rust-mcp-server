@@ -4,6 +4,25 @@
 
 By exposing local tools and project context to the LLM, rust-mcp-server allows the model to perform actions on your behalf, such as building, testing, and analyzing your Rust code.
 
+## Table of Contents
+
+- [Why use `rust-mcp-server`?](#why-use-rust-mcp-server)
+- [Features](#features)
+  - [Core Cargo Commands](#core-cargo-commands)
+  - [Project Management](#project-management)
+  - [Dependency Management](#dependency-management)
+  - [Code Quality & Security](#code-quality--security)
+  - [Rust Toolchain Management](#rust-toolchain-management)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Building the Server](#building-the-server)
+  - [Command Line Arguments](#command-line-arguments)
+  - [Configuring with VS Code](#configuring-with-vs-code)
+- [Tools and Capabilities](#tools-and-capabilities)
+- [Documentation Generation](#documentation-generation)
+  - [Prerequisites](#prerequisites-1)
+  - [Generating Documentation](#generating-documentation)
+
 ## Why use `rust-mcp-server`?
 
 Integrating an LLM with your local development environment via rust-mcp-server can significantly enhance your productivity. The LLM can:
