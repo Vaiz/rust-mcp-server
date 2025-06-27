@@ -32,9 +32,9 @@ impl AppVersion {
     }
 }
 
-impl Into<clap::builder::Str> for AppVersion {
-    fn into(self) -> clap::builder::Str {
-        Self::version().into()
+impl From<AppVersion> for clap::builder::Str {
+    fn from(_: AppVersion) -> Self {
+        AppVersion::version().into()
     }
 }
 
