@@ -5,6 +5,10 @@ edition = "2024"
 description = "An MCP server for Rust development"
 authors = ["Vaiz"]
 license = "Unlicense"
+repository = "https://github.com/Vaiz/rust-mcp-server"
+homepage = "https://github.com/Vaiz/rust-mcp-server"
+readme = "README.md"
+keywords = ["mcp", "cli"]
 
 [dependencies]
 async-trait = "0.1.88"
