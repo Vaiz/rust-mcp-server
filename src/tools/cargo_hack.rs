@@ -12,14 +12,18 @@ fn default_check() -> String {
     "check".to_string()
 }
 
+fn default_locked() -> bool {
+    true
+}
+
 #[mcp_tool(
     name = "cargo-hack",
-    description = "Cargo subcommand to provide various options useful for testing and continuous integration, including feature testing and multi-version compatibility. Recommend using the 'check' command for fast validation. Example: cargo hack --feature-powerset --depth 3 --keep-going check",
+    description = "Cargo subcommand to provide various options useful for testing and continuous integration, including feature testing and multi-version compatibility. Available commands: check, test, build, clippy. Recommend using 'check' for fast validation. Example: cargo hack --feature-powerset --depth 3 --keep-going check",
     openWorldHint = false
 )]
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoHackTool {
-    /// The cargo command to run (e.g., check, test, build, clippy)
+    /// The cargo command to run (check, test, build, clippy)
     #[serde(default = "default_check")]
     command: String,
 
@@ -40,7 +44,7 @@ pub struct CargoHackTool {
     manifest_path: Option<String>,
 
     /// Require Cargo.lock is up to date
-    #[serde(default)]
+    #[serde(default = "default_locked")]
     locked: bool,
 
     /// Space or comma separated list of features to activate
@@ -156,6 +160,19 @@ pub struct CargoHackTool {
 
 impl CargoHackTool {
     pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
+        // Validate command
+        let allowed_commands = ["check", "test", "build", "clippy"];
+        if !allowed_commands.contains(&self.command.as_str()) {
+            let error_msg = format!("Invalid command '{}'. Allowed commands: {}", 
+                self.command, allowed_commands.join(", "));
+            return Err(CallToolError::new(
+                Box::new(std::io::Error::new(
+                    std::io::ErrorKind::InvalidInput, 
+                    error_msg
+                ))
+            ));
+        }
+
         let mut cmd = Command::new("cargo");
         cmd.arg("hack");
 
