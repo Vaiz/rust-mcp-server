@@ -17,11 +17,12 @@ use cargo_deny::{CargoDenyCheckTool, CargoDenyInitTool, CargoDenyInstallTool, Ca
 use cargo_machete::{CargoMacheteInstallTool, CargoMacheteTool};
 use rustup::{RustupShowTool, RustupToolchainAddTool, RustupUpdateTool};
 
-
 static WORKSPACE_ROOT: std::sync::OnceLock<String> = std::sync::OnceLock::new();
 
 pub fn set_workspace_root(root: String) {
-    WORKSPACE_ROOT.set(root).expect("Workspace root can only be set once");
+    WORKSPACE_ROOT
+        .set(root)
+        .expect("Workspace root can only be set once");
 }
 
 fn apply_workspace_root(cmd: &mut std::process::Command) {
@@ -30,13 +31,12 @@ fn apply_workspace_root(cmd: &mut std::process::Command) {
     }
 }
 
-
 fn execute_command(mut cmd: std::process::Command) -> Result<CallToolResult, CallToolError> {
     apply_workspace_root(&mut cmd);
     tracing::info!(
         command = ?cmd,
         "Executing command"
-    );    
+    );
     let output = cmd.output();
 
     match output {

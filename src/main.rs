@@ -106,7 +106,7 @@ async fn main() -> SdkResult<()> {
         tracing::info!(workspace = %workspace, "Workspace root has been overridden");
         tools::set_workspace_root(workspace);
     } else {
-        tracing::info!("No workspace root specified, using current directory");        
+        tracing::info!("No workspace root specified, using current directory");
     }
 
     let server_details = InitializeResult {
