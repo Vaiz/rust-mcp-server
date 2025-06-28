@@ -119,6 +119,12 @@ The rust-mcp-server supports several command line arguments to customize its beh
 - **Default**: None (all tools enabled)
 - **Example**: `--disable-tool cargo-test --disable-tool cargo-clippy`
 
+#### `--workspace <WORKSPACE>`
+- **Description**: Specifies the Rust project workspace path for the server to operate in
+- **Type**: String (directory path)
+- **Default**: Current directory
+- **Example**: `--workspace /path/to/rust/project`
+
 #### `-h, --help`
 - **Description**: Displays help information about available command line arguments
 - **Example**: `rust-mcp-server --help`
@@ -142,6 +148,11 @@ rust-mcp-server --timeout 300 --log-level debug
 With file logging and disabled tools:
 ```sh
 rust-mcp-server --log-file /tmp/mcp-server.log --disable-tool cargo-test
+```
+
+With custom workspace directory:
+```sh
+rust-mcp-server --workspace /path/to/rust/project
 ```
 
 ### Configuring with VS Code
