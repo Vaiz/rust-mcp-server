@@ -50,18 +50,19 @@ jobs:
       run: |
         $name = "rust-mcp-server"
         $target = "${{ matrix.target }}"
-        $ext = "tar.gz"
+        $targetDir = "target/$target/release"
+        if ($target -eq "x86_64-pc-windows-msvc") {
+            $targetName = "$name.exe"
+        } else {
+            $targetName = $name
+        }
         $distDir = "dist"
-        $outName = "$name-$target.$ext"
+        $outName = "$name-$target.tar.gz"        
         New-Item -ItemType Directory -Force -Path $distDir | Out-Null
 
-        if ($target -eq "x86_64-pc-windows-msvc") {
-            $binaryPath = "target/release/$name.exe"
-        } else {
-            $binaryPath = "target/$target/release/$name"
-        }
         $outputPath = "$distDir/$outName"
-        tar -czf $outputPath -C (Split-Path $binaryPath) (Split-Path $binaryPath -Leaf)
+        Write-Host "Creating archive: tar -czf $outputPath -C $targetDir $targetName"
+        tar -czf $outputPath -C $targetDir $targetName
 
     - name: Upload release asset
       uses: softprops/action-gh-release@v2
