@@ -56,6 +56,10 @@ struct Args {
     /// Disable a tool by name. Can be specified multiple times.
     #[arg(long = "disable-tool")]
     disabled_tools: Vec<String>,
+
+    /// Rust project workspace path. By default, uses the current directory.
+    #[arg(long)]
+    workspace: Option<String>,
 }
 
 #[tokio::main]
@@ -96,6 +100,13 @@ async fn main() -> SdkResult<()> {
     }
 
     tracing::info!(version = AppVersion::version(), "Server version");
+
+    if let Some(workspace) = args.workspace {
+        tracing::info!(workspace = %workspace, "Workspace root has been overridden");
+        tools::set_workspace_root(workspace);
+    } else {
+        tracing::info!("No workspace root specified, using current directory");
+    }
 
     let server_details = InitializeResult {
         server_info: Implementation {
