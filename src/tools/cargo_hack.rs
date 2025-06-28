@@ -5,15 +5,11 @@ use rust_mcp_sdk::{
     schema::{CallToolResult, schema_utils::CallToolError},
 };
 
-use crate::serde_utils::{deserialize_string, deserialize_string_vec};
+use crate::serde_utils::{default_true, deserialize_string, deserialize_string_vec};
 use crate::tools::execute_command;
 
 fn default_check() -> String {
     "check".to_string()
-}
-
-fn default_locked() -> bool {
-    true
 }
 
 #[mcp_tool(
@@ -44,7 +40,7 @@ pub struct CargoHackTool {
     manifest_path: Option<String>,
 
     /// Require Cargo.lock is up to date
-    #[serde(default = "default_locked")]
+    #[serde(default = "default_true")]
     locked: bool,
 
     /// Space or comma separated list of features to activate
@@ -163,14 +159,15 @@ impl CargoHackTool {
         // Validate command
         let allowed_commands = ["check", "test", "build", "clippy"];
         if !allowed_commands.contains(&self.command.as_str()) {
-            let error_msg = format!("Invalid command '{}'. Allowed commands: {}", 
-                self.command, allowed_commands.join(", "));
-            return Err(CallToolError::new(
-                Box::new(std::io::Error::new(
-                    std::io::ErrorKind::InvalidInput, 
-                    error_msg
-                ))
-            ));
+            let error_msg = format!(
+                "Invalid command '{}'. Allowed commands: {}",
+                self.command,
+                allowed_commands.join(", ")
+            );
+            return Err(CallToolError::new(Box::new(std::io::Error::new(
+                std::io::ErrorKind::InvalidInput,
+                error_msg,
+            ))));
         }
 
         let mut cmd = Command::new("cargo");
