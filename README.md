@@ -65,6 +65,8 @@ rust-mcp-server exposes a comprehensive set of Rust development tools to the LLM
 *   **`cargo-deny-install`**: Install cargo-deny tool
 *   **`cargo-machete`**: Find unused dependencies
 *   **`cargo-machete-install`**: Install cargo-machete tool
+*   **`cargo-hack`**: Advanced testing and feature validation with powerset testing, version compatibility checks, and CI optimization
+*   **`cargo-hack-install`**: Install cargo-hack tool
 
 ### Rust Toolchain Management
 *   **`rustup-show`**: Show the active and installed toolchains

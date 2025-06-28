@@ -51,7 +51,7 @@ pub struct RustupToolchainAddTool {
     #[serde(default, deserialize_with = "deserialize_string_vec")]
     pub components: Option<Vec<String>>,
 
-    /// Comma-separated list of targets to be added on installation  
+    /// Comma-separated list of targets to be added on installation
     #[serde(default, deserialize_with = "deserialize_string_vec")]
     pub targets: Option<Vec<String>>,
 

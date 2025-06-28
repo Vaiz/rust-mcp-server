@@ -1,5 +1,6 @@
 pub mod cargo;
 pub mod cargo_deny;
+pub mod cargo_hack;
 pub mod cargo_machete;
 pub mod rustup;
 
@@ -14,6 +15,7 @@ use cargo::{
     CargoRemoveTool, CargoSearchTool, CargoTestTool, CargoUpdateTool,
 };
 use cargo_deny::{CargoDenyCheckTool, CargoDenyInitTool, CargoDenyInstallTool, CargoDenyListTool};
+use cargo_hack::{CargoHackInstallTool, CargoHackTool};
 use cargo_machete::{CargoMacheteInstallTool, CargoMacheteTool};
 use rustup::{RustupShowTool, RustupToolchainAddTool, RustupUpdateTool};
 
@@ -126,6 +128,8 @@ rust_mcp_sdk::tool_box!(
         CargoCheckTool,
         CargoClippyTool,
         CargoGenerateLockfileTool,
+        CargoHackTool,
+        CargoHackInstallTool,
         CargoMacheteTool,
         CargoMacheteInstallTool,
         CargoDenyCheckTool,
@@ -176,6 +180,8 @@ pub fn handle_request(
         AllTools::CargoCheckTool(tool) => tool.call_tool(),
         AllTools::CargoClippyTool(tool) => tool.call_tool(),
         AllTools::CargoGenerateLockfileTool(tool) => tool.call_tool(),
+        AllTools::CargoHackTool(tool) => tool.call_tool(),
+        AllTools::CargoHackInstallTool(tool) => tool.call_tool(),
         AllTools::CargoMacheteTool(tool) => tool.call_tool(),
         AllTools::CargoMacheteInstallTool(tool) => tool.call_tool(),
         AllTools::CargoDenyCheckTool(tool) => tool.call_tool(),

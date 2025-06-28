@@ -1,7 +1,7 @@
 ## Rust MCP Server 0.1.0
-| 🟢 Tools (24) | 🟢 Prompts (1) | <span style="opacity:0.6">🔴 Resources</span> | <span style="opacity:0.6">🔴 Logging</span> | <span style="opacity:0.6">🔴 Experimental</span> |
+| 🟢 Tools (26) | 🟢 Prompts (1) | <span style="opacity:0.6">🔴 Resources</span> | <span style="opacity:0.6">🔴 Logging</span> | <span style="opacity:0.6">🔴 Experimental</span> |
 | --- | --- | --- | --- | --- |
-## 🛠️ Tools (24)
+## 🛠️ Tools (26)
 
 
 - **cargo-add**
@@ -228,6 +228,47 @@
       - <code>package</code> : string<br />
       - <code>quiet</code> : boolean<br />
       - <code>verbose</code> : boolean<br />
+
+- **cargo-hack**
+  - Cargo subcommand to provide various options useful for testing and continuous integration, including feature testing and multi-version compatibility. Available commands: check, test, build, clippy. Recommend using <code>check</code> for fast validation. Example: cargo-hack with "feature_powerset": true, "depth": 3, "keep_going": true
+  - **Inputs:**
+      - <code>clean_per_run</code> : boolean<br />
+      - <code>clean_per_version</code> : boolean<br />
+      - <code>command</code> : string<br />
+      - <code>depth</code> : number<br />
+      - <code>each_feature</code> : boolean<br />
+      - <code>exclude</code> : string [ ]<br />
+      - <code>exclude_all_features</code> : boolean<br />
+      - <code>exclude_features</code> : string [ ]<br />
+      - <code>exclude_no_default_features</code> : boolean<br />
+      - <code>feature_powerset</code> : boolean<br />
+      - <code>features</code> : string [ ]<br />
+      - <code>group_features</code> : string [ ]<br />
+      - <code>ignore_private</code> : boolean<br />
+      - <code>ignore_unknown_features</code> : boolean<br />
+      - <code>include_features</code> : string [ ]<br />
+      - <code>keep_going</code> : boolean<br />
+      - <code>locked</code> : boolean<br />
+      - <code>log_group</code> : string<br />
+      - <code>manifest_path</code> : string<br />
+      - <code>mutually_exclusive_features</code> : string [ ]<br />
+      - <code>no_dev_deps</code> : boolean<br />
+      - <code>no_manifest_path</code> : boolean<br />
+      - <code>no_private</code> : boolean<br />
+      - <code>optional_deps</code> : string [ ]<br />
+      - <code>package</code> : string [ ]<br />
+      - <code>partition</code> : string<br />
+      - <code>print_command_list</code> : boolean<br />
+      - <code>remove_dev_deps</code> : boolean<br />
+      - <code>rust_version</code> : boolean<br />
+      - <code>target</code> : string [ ]<br />
+      - <code>verbose</code> : boolean<br />
+      - <code>version_range</code> : string<br />
+      - <code>version_step</code> : number<br />
+      - <code>workspace</code> : boolean<br />
+
+- **cargo-hack-install**
+  - Installs cargo-hack tool for feature testing and continuous integration
 
 - **cargo-info**
   - Display information about a package. Information includes package description, list of available features, etc. Equivalent to 'cargo info <SPEC>'.
