@@ -53,8 +53,7 @@ jobs:
 ### 2. MCP Server Configuration
 
 Navigate to **Settings** → **Copilot** → **Coding Agent** and add the following configuration. 
-
-> **Note**: You'll need to determine the correct path where your repository is checked out, as this varies between repositories.
+> **Note**: You'll need to determine the correct path where your repository is checked out, as this varies between repositories. Usually, the location is `/home/runner/work/{repo_name}/{repo_name}/` (note that `{repo_name}` is repeated twice).
 
 ```json
 {
