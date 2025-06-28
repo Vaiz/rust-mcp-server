@@ -29,25 +29,32 @@ jobs:
     environment: copilot
     
     steps:
-      - name: Install nightly rustfmt
-        run: rustup component add --toolchain nightly rustfmt
-        
-      - name: Cache Cargo dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-          key: copilot-cargo
+    - name: Install nightly rustfmt
+      run: rustup component add --toolchain nightly rustfmt
+      
+    - name: Cache Cargo dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+        key: copilot-cargo
           
-      - name: Install Rust MCP Server
-        run: cargo install --git https://github.com/Vaiz/rust-mcp-server.git --tag stable
-        
-      - name: Install cargo-machete
-        run: cargo install cargo-machete
-        
-      - name: Install cargo-deny
-        run: cargo install cargo-deny
+    - name: Install cargo-quickinstall
+      run: cargo install cargo-quickinstall    
+    
+    - name: Install Rust MCP Server
+      run: cargo install --git https://github.com/Vaiz/rust-mcp-server.git --tag stable
+      
+    - name: Install cargo-machete
+      run: cargo quickinstall cargo-machete
+      
+    - name: Install cargo-deny
+      run: cargo quickinstall cargo-deny
+
+    - name: Install cargo-hack
+      run: cargo quickinstall cargo-hack
+
 ```
 
 ### 2. MCP Server Configuration
