@@ -1,8 +1,9 @@
-name: Build and Upload Release Binaries
+name: Build & Upload Release Binaries
 
 on:
-  release:
-    types: [published]
+  push:
+    tags:
+    - "v*.*.*"
   workflow_dispatch:
 
 permissions:
@@ -57,5 +58,3 @@ jobs:
       uses: softprops/action-gh-release@v2
       with:
         files: dist/*
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
