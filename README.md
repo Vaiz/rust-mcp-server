@@ -18,7 +18,7 @@ By exposing local tools and project context to the LLM, rust-mcp-server allows t
   - [Building the Server](#building-the-server)
   - [Command Line Arguments](#command-line-arguments)
   - [Configuring with VS Code](#configuring-with-vs-code)
-
+- [GitHub Copilot Coding Agent Integration](#github-copilot-coding-agent-integration)
 - [Documentation Generation](#documentation-generation)
   - [Prerequisites](#prerequisites-1)
   - [Generating Documentation](#generating-documentation)
@@ -166,6 +166,10 @@ To make GitHub Copilot in VS Code use this MCP server, you need to update your V
    ![mcp.json](docs/mcp.json.png)
 
 More information you can find by this [link](https://code.visualstudio.com/docs/copilot/chat/mcp-servers).
+
+## GitHub Copilot Coding Agent Integration
+
+The Rust MCP Server can be integrated with GitHub Copilot's coding agent to create a powerful autonomous development workflow. For detailed setup instructions for using the Rust MCP Server with GitHub Copilot's coding agent, see [copilot-coding-agent.md](docs/copilot-coding-agent.md).
 
 
 ## Documentation Generation
