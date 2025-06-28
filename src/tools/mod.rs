@@ -77,11 +77,10 @@ fn execute_command(mut cmd: std::process::Command) -> Result<CallToolResult, Cal
                 audience: vec![Role::User, Role::Assistant],
                 priority: Some(1.),
             });
+            let program = cmd.get_program().to_string_lossy();
             let item = CallToolResultContentItem::text_content(
                 format!(
-                    "The command `{}` could not be found. You can try to call full command manually: `{} {}`",
-                    cmd.get_program().to_string_lossy(),
-                    cmd.get_program().to_string_lossy(),
+                    "The command `{program}` was not found, please ensure it is installed and accessible. You can try running the following command yourself to verify: `{program} {}`",
                     cmd.get_args()
                         .map(|arg| arg.to_string_lossy())
                         .collect::<Vec<_>>()
@@ -205,6 +204,6 @@ mod tests {
 
         assert_eq!(result.is_error, Some(true));
         assert!(!result.content.is_empty());
-        assert!(text.contains("The command `this_tool_does_not_exist` could not be found"));
+        assert!(text.contains("The command `this_tool_does_not_exist` was not found"));
     }
 }
