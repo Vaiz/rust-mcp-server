@@ -47,7 +47,7 @@ jobs:
         $target = "${{ matrix.target }}"
         $ext = "tar.gz"
         $distDir = "dist"
-        $outName = "release-$name-$target.$ext"
+        $outName = "$name-$target.$ext"
         New-Item -ItemType Directory -Force -Path $distDir | Out-Null
 
         $binaryPath = "target/$target/release/$name"
