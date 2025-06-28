@@ -18,7 +18,7 @@ fn default_locked() -> bool {
 
 #[mcp_tool(
     name = "cargo-hack",
-    description = "Cargo subcommand to provide various options useful for testing and continuous integration, including feature testing and multi-version compatibility. Available commands: check, test, build, clippy. Recommend using 'check' for fast validation. Example: cargo hack --feature-powerset --depth 3 --keep-going check",
+    description = "Cargo subcommand to provide various options useful for testing and continuous integration, including feature testing and multi-version compatibility. Available commands: check, test, build, clippy. Recommend using 'check' for fast validation. Example: cargo-hack with \"feature_powerset\": true, \"depth\": 3, \"keep_going\": true",
     openWorldHint = false
 )]
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
