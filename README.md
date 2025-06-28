@@ -169,7 +169,7 @@ More information you can find by this [link](https://code.visualstudio.com/docs/
 
 ## GitHub Copilot Coding Agent Integration
 
-The Rust MCP Server can be integrated with GitHub Copilot's coding agent to create a powerful autonomous development workflow. For detailed setup instructions for using the Rust MCP Server with GitHub Copilot's coding agent, see [docs/copilot-codding-agent.md](docs/copilot-codding-agent.md).
+The Rust MCP Server can be integrated with GitHub Copilot's coding agent to create a powerful autonomous development workflow. For detailed setup instructions for using the Rust MCP Server with GitHub Copilot's coding agent, see [copilot-coding-agent.md](docs/copilot-coding-agent.md).
 
 
 ## Documentation Generation
