@@ -102,7 +102,6 @@ async fn main() -> SdkResult<()> {
     tracing::info!(version = AppVersion::version(), "Server version");
 
     if let Some(workspace) = args.workspace {
-        // Set the workspace root for tools
         tracing::info!(workspace = %workspace, "Workspace root has been overridden");
         tools::set_workspace_root(workspace);
     } else {
