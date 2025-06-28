@@ -1,9 +1,11 @@
 name: Build & Publish Docker Image
 
 on:
-  push:
-    branches: [ master ]
-  workflow_dispatch:
+  workflow_dispatch: # Only allow manual trigger (disables automatic triggers)
+    inputs:
+      note:
+        description: 'This workflow is disabled for automatic runs'
+        required: false
 
 jobs:
   build-and-push:
