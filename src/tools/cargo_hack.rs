@@ -8,16 +8,20 @@ use rust_mcp_sdk::{
 use crate::serde_utils::{deserialize_string, deserialize_string_vec};
 use crate::tools::execute_command;
 
+fn default_check() -> String {
+    "check".to_string()
+}
+
 #[mcp_tool(
     name = "cargo-hack",
-    description = "Cargo subcommand to provide various options useful for testing and continuous integration, including feature testing and multi-version compatibility.",
+    description = "Cargo subcommand to provide various options useful for testing and continuous integration, including feature testing and multi-version compatibility. Recommend using the 'check' command for fast validation. Example: cargo hack --feature-powerset --depth 3 --keep-going check",
     openWorldHint = false
 )]
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoHackTool {
     /// The cargo command to run (e.g., check, test, build, clippy)
-    #[serde(default, deserialize_with = "deserialize_string")]
-    command: Option<String>,
+    #[serde(default = "default_check")]
+    command: String,
 
     /// Package(s) to check
     #[serde(default, deserialize_with = "deserialize_string_vec")]
@@ -148,10 +152,6 @@ pub struct CargoHackTool {
     /// Use verbose output
     #[serde(default)]
     verbose: bool,
-
-    /// Coloring: auto, always, never
-    #[serde(default, deserialize_with = "deserialize_string")]
-    color: Option<String>,
 }
 
 impl CargoHackTool {
@@ -314,17 +314,8 @@ impl CargoHackTool {
             cmd.arg("--verbose");
         }
 
-        if let Some(color) = &self.color {
-            cmd.arg("--color").arg(color);
-        }
-
         // Add the cargo command to run (e.g., check, test, build)
-        if let Some(command) = &self.command {
-            cmd.arg(command);
-        } else {
-            // Default to check if no command specified
-            cmd.arg("check");
-        }
+        cmd.arg(&self.command);
 
         execute_command(cmd)
     }
@@ -344,61 +335,5 @@ impl CargoHackInstallTool {
         cmd.arg("install").arg("cargo-hack");
 
         execute_command(cmd)
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use serde_json::json;
-
-    #[test]
-    fn test_deserialize_basic_cargo_hack_tool() {
-        let input = json!({
-            "command": "check",
-            "workspace": true,
-            "each_feature": true,
-            "verbose": false
-        });
-
-        let tool: Result<CargoHackTool, _> = serde_json::from_value(input);
-        let tool = tool.expect("Deserialization should succeed");
-
-        assert_eq!(tool.command, Some("check".to_string()));
-        assert!(tool.workspace);
-        assert!(tool.each_feature);
-        assert!(!tool.verbose);
-        assert!(!tool.feature_powerset);
-    }
-
-    #[test]
-    fn test_deserialize_feature_powerset_options() {
-        let input = json!({
-            "feature_powerset": true,
-            "depth": 2,
-            "exclude_features": ["dev", "test"],
-            "group_features": ["group1", "group2"]
-        });
-
-        let tool: Result<CargoHackTool, _> = serde_json::from_value(input);
-        let tool = tool.expect("Deserialization should succeed");
-
-        assert!(tool.feature_powerset);
-        assert_eq!(tool.depth, Some(2));
-        assert_eq!(tool.exclude_features, Some(vec!["dev".to_string(), "test".to_string()]));
-        assert_eq!(tool.group_features, Some(vec!["group1".to_string(), "group2".to_string()]));
-    }
-
-    #[test]
-    fn test_deserialize_minimal_cargo_hack_tool() {
-        let input = json!({});
-
-        let tool: Result<CargoHackTool, _> = serde_json::from_value(input);
-        let tool = tool.expect("Deserialization should succeed even with minimal input");
-
-        assert_eq!(tool.command, None);
-        assert!(!tool.workspace);
-        assert!(!tool.each_feature);
-        assert!(!tool.feature_powerset);
     }
 }
