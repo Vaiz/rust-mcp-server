@@ -28,7 +28,6 @@ jobs:
     steps:
     - name: Checkout source
       uses: actions/checkout@v4
-    - uses: Swatinem/rust-cache@v2
 
     - name: Add target
       run: rustup target add ${{ matrix.target }}
