@@ -50,7 +50,11 @@ jobs:
         $outName = "$name-$target.$ext"
         New-Item -ItemType Directory -Force -Path $distDir | Out-Null
 
-        $binaryPath = "target/$target/release/$name"
+        if ($target -eq "x86_64-pc-windows-msvc") {
+            $binaryPath = "target/release/$name.exe"
+        } else {
+            $binaryPath = "target/$target/release/$name"
+        }
         $outputPath = "$distDir/$outName"
         tar -czf $outputPath -C (Split-Path $binaryPath) (Split-Path $binaryPath -Leaf)
 
