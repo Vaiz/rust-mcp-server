@@ -58,7 +58,7 @@ jobs:
         $name = "rust-mcp-server"
         $target = "${{ matrix.target }}"
         $targetDir = "target/$target/release"
-        if ($target -eq "x86_64-pc-windows-msvc") {
+        if ($target.contains("windows")) {
             $targetName = "$name.exe"
         } else {
             $targetName = $name
