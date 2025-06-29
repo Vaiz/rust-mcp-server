@@ -39,6 +39,10 @@ jobs:
     - name: Checkout source
       uses: actions/checkout@v4
 
+    - name: Install rustup
+      if: ${{ matrix.os == 'windows-11-arm' }}
+      uses: dtolnay/rust-toolchain@stable
+
     - name: Update Rust
       run: rustup update
 
