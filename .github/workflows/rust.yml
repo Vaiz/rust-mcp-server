@@ -38,7 +38,7 @@ jobs:
 
     - name: Install rustup
       if: ${{ matrix.os == 'windows-11-arm' }}
-      run: winget install Rustlang.Rustup
+      uses: dtolnay/rust-toolchain@stable
 
     - name: Add target
       run: rustup target add ${{ matrix.target }}
@@ -77,7 +77,7 @@ jobs:
 
     - name: Install rustup
       if: ${{ matrix.os == 'windows-11-arm' }}
-      run: winget install Rustlang.Rustup
+      uses: dtolnay/rust-toolchain@stable
 
     - name: Add target
       run: rustup target add ${{ matrix.target }}
