@@ -30,7 +30,7 @@ jobs:
           os: macos-latest
 
     runs-on: ${{ matrix.os }}
-    name: Build ${{ matrix.target }}
+    name: ${{ matrix.target }}
 
     steps:
     - uses: actions/checkout@v4
