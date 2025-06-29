@@ -36,6 +36,10 @@ jobs:
     - uses: actions/checkout@v4
     - uses: Swatinem/rust-cache@v2
 
+    - name: Install rustup
+      if: ${{ runner.os == 'windows-11-arm' }}
+      run: winget install Rustlang.Rustup
+
     - name: Add target
       run: rustup target add ${{ matrix.target }}
 
@@ -70,6 +74,10 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: Swatinem/rust-cache@v2
+
+    - name: Install rustup
+      if: ${{ runner.os == 'windows-11-arm' }}
+      run: winget install Rustlang.Rustup
 
     - name: Add target
       run: rustup target add ${{ matrix.target }}
