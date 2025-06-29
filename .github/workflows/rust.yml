@@ -37,7 +37,7 @@ jobs:
     - uses: Swatinem/rust-cache@v2
 
     - name: Install rustup
-      if: ${{ runner.os == 'windows-11-arm' }}
+      if: ${{ matrix.os == 'windows-11-arm' }}
       run: winget install Rustlang.Rustup
 
     - name: Add target
@@ -76,7 +76,7 @@ jobs:
     - uses: Swatinem/rust-cache@v2
 
     - name: Install rustup
-      if: ${{ runner.os == 'windows-11-arm' }}
+      if: ${{ matrix.os == 'windows-11-arm' }}
       run: winget install Rustlang.Rustup
 
     - name: Add target
