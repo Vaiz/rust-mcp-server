@@ -44,7 +44,7 @@ jobs:
       run: cargo install cargo-quickinstall    
     
     - name: Install Rust MCP Server
-      run: cargo install --git https://github.com/Vaiz/rust-mcp-server.git --tag stable
+      run: cargo quickinstall rust-mcp-server
       
     - name: Install cargo-machete
       run: cargo quickinstall cargo-machete
