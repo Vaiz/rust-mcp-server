@@ -9,15 +9,13 @@ repository = "https://github.com/Vaiz/rust-mcp-server"
 homepage = "https://github.com/Vaiz/rust-mcp-server"
 readme = "README.md"
 keywords = ["mcp", "cli"]
-exclude = [
-    "docker/",
-    ".github/",
-    ".vscode/",
-    "scripts/",
-    "docs/", 
-    "prompts/",
-    "tools.md",
-    ".gitattributes",
+include = [
+    "/src/**",
+    "/docs/**", 
+    "/prompts/**",
+    "README.md",
+    "build.rs",
+    "!docker/**",
 ]
 
 [dependencies]
