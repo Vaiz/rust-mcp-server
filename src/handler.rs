@@ -1,17 +1,20 @@
 use async_trait::async_trait;
 use rust_mcp_sdk::schema::{
-    CallToolRequest, CallToolResult, ListPromptsRequest, ListPromptsResult, ListToolsRequest,
-    ListToolsResult, RpcError, schema_utils::CallToolError,
+    CallToolRequest, CallToolResult, ListPromptsRequest, ListPromptsResult, ListResourcesRequest,
+    ListResourcesResult, ListToolsRequest, ListToolsResult, ReadResourceRequest,
+    ReadResourceResult, RpcError, schema_utils::CallToolError,
 };
 use rust_mcp_sdk::schema::{GetPromptRequest, GetPromptResult};
 use rust_mcp_sdk::{McpServer, mcp_server::ServerHandler};
 
+use crate::resources::ResourceHandler;
 use crate::tools::AllTools;
 
 // Custom Handler to handle MCP Messages
 pub struct McpServerHandler {
     disabled_tools: Vec<String>,
     prompt_handler: crate::prompts::PromptHandler,
+    resource_handler: ResourceHandler,
 }
 
 impl McpServerHandler {
@@ -20,9 +23,10 @@ impl McpServerHandler {
         let this = Self {
             disabled_tools,
             prompt_handler: crate::prompts::PromptHandler::new(),
+            resource_handler: ResourceHandler::new(),
         };
         let enabled_tools = this.enabled_tools();
-        tracing::info!(enabled_tools = ?enabled_tools, disabled_tools = ?this.disabled_tools, "Staring MCP Server");
+        tracing::info!(enabled_tools = ?enabled_tools, disabled_tools = ?this.disabled_tools, "Starting MCP Server");
         this
     }
 
@@ -89,5 +93,25 @@ impl ServerHandler for McpServerHandler {
         tracing::warn!(name, "Prompt not found");
         runtime.assert_server_request_capabilities(request.method())?;
         Err(RpcError::method_not_found().with_message(format!("Prompt not found for '{name}'.")))
+    }
+
+    async fn handle_list_resources_request(
+        &self,
+        request: ListResourcesRequest,
+        _runtime: &dyn McpServer,
+    ) -> Result<ListResourcesResult, RpcError> {
+        self.resource_handler
+            .handle_list_resources_request(request)
+            .await
+    }
+
+    async fn handle_read_resource_request(
+        &self,
+        request: ReadResourceRequest,
+        _runtime: &dyn McpServer,
+    ) -> Result<ReadResourceResult, RpcError> {
+        self.resource_handler
+            .handle_read_resource_request(request)
+            .await
     }
 }
