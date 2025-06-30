@@ -173,43 +173,45 @@ impl ResourceHandler {
         let url = format!("{CARGO_BOOK_BASE_URL}/{page_path}");
         info!(url = %url, "Fetching Cargo Book page");
 
-        match self.http_client.get(&url).send().await {
-            Ok(response) => {
-                if response.status().is_success() {
-                    match response.text().await {
-                        Ok(content) => {
-                            info!(page_path = %page_path, content_length = content.len(), "Successfully fetched Cargo Book page");
-                            Ok(ReadResourceResult {
-                                contents: vec![
-                                    TextResourceContents {
-                                        uri: format!("{CARGO_BOOK_SCHEME}{page_path}"),
-                                        mime_type: Some("text/markdown".to_string()),
-                                        text: content,
-                                    }
-                                    .into(),
-                                ],
-                                meta: None,
-                            })
-                        }
-                        Err(e) => {
-                            error!(page_path = %page_path, error = %e, "Failed to read response text");
-                            Err(RpcError::internal_error()
-                                .with_message(format!("Failed to read response: {e}")))
-                        }
-                    }
-                } else {
-                    warn!(page_path = %page_path, status = %response.status(), "HTTP request failed");
-                    Err(RpcError::internal_error().with_message(format!(
-                        "HTTP {} for page: {}",
-                        response.status(),
-                        page_path
-                    )))
-                }
-            }
+        let response = match self.http_client.get(&url).send().await {
+            Ok(response) => response,
             Err(e) => {
                 error!(page_path = %page_path, error = %e, "Failed to fetch Cargo Book page");
-                Err(RpcError::internal_error().with_message(format!("Failed to fetch page: {e}")))
+                return Err(
+                    RpcError::internal_error().with_message(format!("Failed to fetch page: {e}"))
+                );
             }
+        };
+
+        if response.status().is_success() {
+            match response.text().await {
+                Ok(content) => {
+                    info!(page_path = %page_path, content_length = content.len(), "Successfully fetched Cargo Book page");
+                    Ok(ReadResourceResult {
+                        contents: vec![
+                            TextResourceContents {
+                                uri: format!("{CARGO_BOOK_SCHEME}{page_path}"),
+                                mime_type: Some("text/markdown".to_string()),
+                                text: content,
+                            }
+                            .into(),
+                        ],
+                        meta: None,
+                    })
+                }
+                Err(e) => {
+                    error!(page_path = %page_path, error = %e, "Failed to read response text");
+                    Err(RpcError::internal_error()
+                        .with_message(format!("Failed to read response: {e}")))
+                }
+            }
+        } else {
+            warn!(page_path = %page_path, status = %response.status(), "HTTP request failed");
+            Err(RpcError::internal_error().with_message(format!(
+                "HTTP {} for page: {}",
+                response.status(),
+                page_path
+            )))
         }
     }
 }
