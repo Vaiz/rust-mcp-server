@@ -13,6 +13,7 @@ By exposing local tools and project context to the LLM, rust-mcp-server allows t
   - [Dependency Management](#dependency-management)
   - [Code Quality & Security](#code-quality--security)
   - [Rust Toolchain Management](#rust-toolchain-management)
+  - [Experimental Features](#experimental-features)
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
   - [Building the Server](#building-the-server)
@@ -72,6 +73,9 @@ rust-mcp-server exposes a comprehensive set of Rust development tools to the LLM
 *   **`rustup-show`**: Show the active and installed toolchains
 *   **`rustup-toolchain-add`**: Install or update toolchains
 *   **`rustup-update`**: Update Rust toolchains and rustup
+
+### Experimental Features
+The server provides **experimental** access to the official [Cargo Book](https://doc.rust-lang.org/cargo/) documentation through MCP resources. This feature allows LLMs to fetch and reference about 95 pages of Cargo documentation directly from the official repository, including command references, guides, and technical specifications. Resources are accessible using the `cargo-book://` URI scheme and require network connectivity.
 
 For a complete list with detailed descriptions and parameters, see [tools.md](https://github.com/Vaiz/rust-mcp-server/blob/master/tools.md).
 
