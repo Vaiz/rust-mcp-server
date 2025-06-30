@@ -439,7 +439,7 @@ impl ResourceHandler {
             resources.push(Resource {
                 uri: uri.clone(),
                 name: description.clone(),
-                description: Some(format!("Cargo Book: {}", description)),
+                description: None,
                 mime_type: Some("text/markdown".to_string()),
                 size: None,
                 annotations: None,
