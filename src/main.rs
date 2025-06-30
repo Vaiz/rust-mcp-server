@@ -1,5 +1,6 @@
 mod handler;
 mod prompts;
+mod resources;
 pub(crate) mod serde_utils;
 mod tools;
 
@@ -12,7 +13,7 @@ use rust_mcp_sdk::{
     mcp_server::server_runtime,
     schema::{
         Implementation, InitializeResult, LATEST_PROTOCOL_VERSION, ServerCapabilities,
-        ServerCapabilitiesTools,
+        ServerCapabilitiesResources, ServerCapabilitiesTools,
     },
 };
 use tracing_appender::rolling;
@@ -116,6 +117,10 @@ async fn main() -> SdkResult<()> {
         capabilities: ServerCapabilities {
             tools: Some(ServerCapabilitiesTools { list_changed: None }),
             prompts: Some(ServerCapabilitiesPrompts { list_changed: None }),
+            resources: Some(ServerCapabilitiesResources {
+                list_changed: None,
+                subscribe: None,
+            }),
             ..Default::default()
         },
         meta: None,
