@@ -5,6 +5,8 @@ use rust_mcp_sdk::schema::{
 };
 use tracing::{error, info, warn};
 
+static APP_USER_AGENT: &str = concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION"),);
+
 const CARGO_BOOK_BASE_URL: &str =
     "https://raw.githubusercontent.com/rust-lang/cargo/refs/tags/0.89.0/src/doc/src";
 const CARGO_BOOK_SCHEME: &str = "cargo-book://";
@@ -113,9 +115,11 @@ pub struct ResourceHandler {
 
 impl ResourceHandler {
     pub fn new() -> Self {
-        Self {
-            http_client: reqwest::Client::new(),
-        }
+        let http_client = reqwest::Client::builder()
+            .user_agent(APP_USER_AGENT)
+            .build()
+            .expect("Failed to create HTTP client");
+        Self { http_client }
     }
 
     pub async fn handle_list_resources_request(
