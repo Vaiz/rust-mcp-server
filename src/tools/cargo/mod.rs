@@ -71,7 +71,7 @@ pub struct CargoGenerateLockfileTool {
     #[serde(default)]
     verbose: bool,
 
-    /// No output printed to stdout. By default is `true`.
+     /// [Optional] No output returned on success. By default is `true`.
     #[serde(default = "default_true")]
     quiet: bool,
 }
@@ -192,7 +192,7 @@ pub struct CargoCleanTool {
     #[serde(default)]
     verbose: bool,
 
-    /// No output printed to stdout. By default is `true`.
+     /// [Optional] No output returned on success. By default is `true`.
     #[serde(default = "default_true")]
     quiet: bool,
 }
@@ -306,7 +306,7 @@ pub struct CargoFmtTool {
     #[serde(default)]
     verbose: bool,
 
-    /// No output printed to stdout. By default is `true`.
+     /// [Optional] No output returned on success. By default is `true`.
     #[serde(default = "default_true")]
     quiet: bool,
 }
