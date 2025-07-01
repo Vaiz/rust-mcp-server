@@ -29,97 +29,97 @@ use crate::tools::execute_command;
 )]
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoPackageTool {
-    /// The toolchain to use for packaging, e.g., "stable", "nightly", or "1.70.0".
+    /// [Optional] The toolchain to use for packaging, e.g., "stable", "nightly", or "1.70.0".
     /// When specified, cargo will use this specific Rust toolchain version.
     #[serde(default, deserialize_with = "deserialize_string")]
     toolchain: Option<String>,
 
-    /// Specific package(s) to assemble. Can specify multiple packages by name.
+    /// [Optional] Specific package(s) to assemble. Can specify multiple packages by name.
     /// If not specified, packages the current package or workspace root.
     /// Example: ["my-lib", "my-binary"]
     #[serde(default, deserialize_with = "deserialize_string_vec")]
     package: Option<Vec<String>>,
 
-    /// Assemble all packages in the workspace into separate tarballs.
+    /// [Optional] Assemble all packages in the workspace into separate tarballs.
     /// Useful for workspaces with multiple publishable crates.
     #[serde(default)]
     workspace: bool,
 
-    /// Don't assemble specified packages when using --workspace.
+    /// [Optional] Don't assemble specified packages when using --workspace.
     /// Allows selective packaging of workspace members.
     /// Example: ["internal-tools", "test-utils"]
     #[serde(default, deserialize_with = "deserialize_string_vec")]
     exclude: Option<Vec<String>>,
 
-    /// Print files that would be included in the package without creating the tarball.
+    /// [Optional] Print files that would be included in the package without creating the tarball.
     /// Useful for reviewing package contents and debugging .gitignore rules.
     #[serde(default)]
     list: bool,
 
-    /// Don't verify the package contents by building them.
+    /// [Optional] Don't verify the package contents by building them.
     /// Skips the compilation step, making packaging faster but less safe.
     /// Use when you're confident the package builds correctly.
     #[serde(default)]
     no_verify: bool,
 
-    /// Ignore warnings about missing package metadata (description, license, etc.).
+    /// [Optional] Ignore warnings about missing package metadata (description, license, etc.).
     /// Allows packaging even when human-readable metadata fields are incomplete.
     #[serde(default)]
     no_metadata: bool,
 
-    /// Allow packaging even when the working directory has uncommitted changes.
+    /// [Optional] Allow packaging even when the working directory has uncommitted changes.
     /// By default, cargo package requires a clean git working directory.
     #[serde(default)]
     allow_dirty: bool,
 
-    /// Don't include Cargo.lock in the generated package.
+    /// [Optional] Don't include Cargo.lock in the generated package.
     /// Useful for libraries where you want users to resolve dependencies freshly.
     #[serde(default)]
     exclude_lockfile: bool,
 
-    /// Space or comma separated list of features to activate during verification build.
+    /// [Optional] Space or comma separated list of features to activate during verification build.
     /// Only affects the build verification step, not the package contents.
     /// Example: ["serde", "async-std"]
     #[serde(default, deserialize_with = "deserialize_string_vec")]
     features: Option<Vec<String>>,
 
-    /// Activate all available features during verification build.
+    /// [Optional] Activate all available features during verification build.
     /// Ensures the package builds correctly with all feature combinations.
     #[serde(default)]
     all_features: bool,
 
-    /// Do not activate the `default` feature during verification build.
+    /// [Optional] Do not activate the `default` feature during verification build.
     /// Useful for testing minimal builds or when default features are problematic.
     #[serde(default)]
     no_default_features: bool,
 
-    /// Build for the specified target triple during verification.
+    /// [Optional] Build for the specified target triple during verification.
     /// Useful for cross-compilation testing or platform-specific packages.
     /// Example: "x86_64-unknown-linux-musl"
     #[serde(default, deserialize_with = "deserialize_string")]
     target: Option<String>,
 
-    /// Directory for placing generated artifacts and build cache.
+    /// [Optional] Directory for placing generated artifacts and build cache.
     /// Overrides the default target/ directory location.
     #[serde(default, deserialize_with = "deserialize_string")]
     target_dir: Option<String>,
 
-    /// Number of parallel jobs for the verification build.
+    /// [Optional] Number of parallel jobs for the verification build.
     /// Defaults to the number of CPU cores. Set to 1 for sequential builds.
     #[serde(default)]
     jobs: Option<u32>,
 
-    /// Do not abort the verification build as soon as there is an error.
+    /// [Optional] Do not abort the verification build as soon as there is an error.
     /// Continues building other targets even if some fail, useful for debugging.
     #[serde(default)]
     keep_going: bool,
 
-    /// Path to the Cargo.toml file to package.
+    /// [Optional] Path to the Cargo.toml file to package.
     /// Useful when running from a different directory or with non-standard layouts.
     #[serde(default, deserialize_with = "deserialize_string")]
     manifest_path: Option<String>,
 
-    /// Path to the Cargo.lock file (unstable feature).
+    /// [Optional] Path to the Cargo.lock file (unstable feature).
     /// Allows using a different lock file location than the default.
     #[serde(default, deserialize_with = "deserialize_string")]
     lockfile_path: Option<String>,
@@ -128,31 +128,31 @@ pub struct CargoPackageTool {
     #[serde(default = "default_true")]
     locked: bool,
 
-    /// Run without accessing the network
+    /// [Optional] Run without accessing the network
     #[serde(default)]
     offline: bool,
 
-    /// Equivalent to specifying both --locked and --offline
+    /// [Optional] Equivalent to specifying both --locked and --offline
     #[serde(default)]
     frozen: bool,
 
-    /// Registry index URL to prepare the package for (unstable)
+    /// [Optional] Registry index URL to prepare the package for (unstable)
     #[serde(default, deserialize_with = "deserialize_string")]
     index: Option<String>,
 
-    /// Registry to prepare the package for (unstable)
+    /// [Optional] Registry to prepare the package for (unstable)
     #[serde(default, deserialize_with = "deserialize_string")]
     registry: Option<String>,
 
-    /// Output representation (unstable) [possible values: human, json]
+    /// [Optional] Output representation (unstable) [possible values: human, json]
     #[serde(default, deserialize_with = "deserialize_string")]
     message_format: Option<String>,
 
-    /// Use verbose output
+    /// [Optional] Use verbose output
     #[serde(default)]
     verbose: bool,
 
-    /// No output printed to stdout. By default is `true`.
+    /// [Optional] No output returned on success. By default is `true`.
     #[serde(default = "default_true")]
     quiet: bool,
 }
