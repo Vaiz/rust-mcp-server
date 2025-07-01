@@ -16,6 +16,7 @@ include = [
     "README.md",
     "build.rs",
     "!docker/**",
+    "!*.png"
 ]
 
 [dependencies]
