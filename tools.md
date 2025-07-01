@@ -1,7 +1,7 @@
 ## Rust MCP Server 0.1.0
-| 🟢 Tools (26) | 🟢 Prompts (1) | 🟢 Resources (95) | <span style="opacity:0.6">🔴 Logging</span> | <span style="opacity:0.6">🔴 Experimental</span> |
+| 🟢 Tools (27) | 🟢 Prompts (1) | 🟢 Resources (95) | <span style="opacity:0.6">🔴 Logging</span> | <span style="opacity:0.6">🔴 Experimental</span> |
 | --- | --- | --- | --- | --- |
-## 🛠️ Tools (26)
+## 🛠️ Tools (27)
 
 
 - **cargo-add**
@@ -333,6 +333,36 @@
       - <code>toolchain</code> : string<br />
       - <code>vcs</code> : string<br />
       - <code>verbose</code> : boolean<br />
+
+- **cargo-package**
+  - Assemble the local package into a distributable tarball for publishing or distribution. <br/>    <br/>    Common use cases:<br/>    - Create a .crate file for publishing to crates.io or a private registry<br/>    - Generate distribution packages for deployment or sharing<br/>    - Validate package contents before publishing (using --list)<br/>    - Test packaging process without verification (using --no-verify)<br/>    - Package workspace members selectively or all at once<br/>    <br/>    The generated tarball contains all files needed to build the package, excluding files listed in .gitignore or .cargo_vcs_info.json. <br/>    By default, the package is also built to verify it can be compiled successfully.<br/>    <br/>    Usually run without any additional arguments for single-package projects.
+  - **Inputs:**
+      - <code>all_features</code> : boolean<br />
+      - <code>allow_dirty</code> : boolean<br />
+      - <code>exclude</code> : string [ ]<br />
+      - <code>exclude_lockfile</code> : boolean<br />
+      - <code>features</code> : string [ ]<br />
+      - <code>frozen</code> : boolean<br />
+      - <code>index</code> : string<br />
+      - <code>jobs</code> : number<br />
+      - <code>keep_going</code> : boolean<br />
+      - <code>list</code> : boolean<br />
+      - <code>locked</code> : boolean<br />
+      - <code>lockfile_path</code> : string<br />
+      - <code>manifest_path</code> : string<br />
+      - <code>message_format</code> : string<br />
+      - <code>no_default_features</code> : boolean<br />
+      - <code>no_metadata</code> : boolean<br />
+      - <code>no_verify</code> : boolean<br />
+      - <code>offline</code> : boolean<br />
+      - <code>package</code> : string [ ]<br />
+      - <code>quiet</code> : boolean<br />
+      - <code>registry</code> : string<br />
+      - <code>target</code> : string<br />
+      - <code>target_dir</code> : string<br />
+      - <code>toolchain</code> : string<br />
+      - <code>verbose</code> : boolean<br />
+      - <code>workspace</code> : boolean<br />
 
 - **cargo-remove**
   - Remove dependencies from a Cargo.toml manifest file.
