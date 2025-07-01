@@ -136,7 +136,7 @@ pub struct CargoBuildTool {
     #[serde(default)]
     verbose: bool,
 
-    /// No output printed to stdout. By default is `true`.
+    /// [Optional] Show only the essential command output. By default is `true`.
     #[serde(default = "default_true")]
     quiet: bool,
 

@@ -4,6 +4,7 @@ mod check;
 mod clippy;
 mod info;
 mod metadata;
+mod package;
 mod search;
 mod test;
 mod update;
@@ -14,6 +15,7 @@ pub use check::CargoCheckTool;
 pub use clippy::CargoClippyTool;
 pub use info::CargoInfoTool;
 pub use metadata::CargoMetadataTool;
+pub use package::CargoPackageTool;
 pub use search::CargoSearchTool;
 pub use test::CargoTestTool;
 pub use update::CargoUpdateTool;
@@ -69,7 +71,7 @@ pub struct CargoGenerateLockfileTool {
     #[serde(default)]
     verbose: bool,
 
-    /// No output printed to stdout. By default is `true`.
+    /// [Optional] Show only the essential command output. By default is `true`.
     #[serde(default = "default_true")]
     quiet: bool,
 }
@@ -190,7 +192,7 @@ pub struct CargoCleanTool {
     #[serde(default)]
     verbose: bool,
 
-    /// No output printed to stdout. By default is `true`.
+    /// [Optional] Show only the essential command output. By default is `true`.
     #[serde(default = "default_true")]
     quiet: bool,
 }
@@ -304,7 +306,7 @@ pub struct CargoFmtTool {
     #[serde(default)]
     verbose: bool,
 
-    /// No output printed to stdout. By default is `true`.
+    /// [Optional] Show only the essential command output. By default is `true`.
     #[serde(default = "default_true")]
     quiet: bool,
 }

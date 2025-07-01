@@ -49,6 +49,7 @@ rust-mcp-server exposes a comprehensive set of Rust development tools to the LLM
 ### Project Management
 *   **`cargo-new`**: Create a new cargo package
 *   **`cargo-generate_lockfile`**: Generate or update the Cargo.lock file
+*   **`cargo-package`**: Assemble the local package into a distributable tarball
 *   **`cargo-list`**: List installed cargo commands
 
 ### Dependency Management
