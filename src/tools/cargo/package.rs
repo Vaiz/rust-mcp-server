@@ -152,7 +152,7 @@ pub struct CargoPackageTool {
     #[serde(default)]
     verbose: bool,
 
-    /// [Optional] No output returned on success. By default is `true`.
+    /// [Optional] Show only the essential command output. By default is `true`.
     #[serde(default = "default_true")]
     quiet: bool,
 }
