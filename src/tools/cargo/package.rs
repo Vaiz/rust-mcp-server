@@ -12,80 +12,115 @@ use crate::tools::execute_command;
 /// for better integration with automated tooling and to avoid blocking on missing lockfiles.
 #[mcp_tool(
     name = "cargo-package",
-    description = "Assemble the local package into a distributable tarball. Usually, run without any additional arguments.",
+    description = "Assemble the local package into a distributable tarball for publishing or distribution. 
+    
+    Common use cases:
+    - Create a .crate file for publishing to crates.io or a private registry
+    - Generate distribution packages for deployment or sharing
+    - Validate package contents before publishing (using --list)
+    - Test packaging process without verification (using --no-verify)
+    - Package workspace members selectively or all at once
+    
+    The generated tarball contains all files needed to build the package, excluding files listed in .gitignore or .cargo_vcs_info.json. 
+    By default, the package is also built to verify it can be compiled successfully.
+    
+    Usually run without any additional arguments for single-package projects.",
     openWorldHint = false
 )]
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoPackageTool {
-    /// The toolchain to use, e.g., "stable" or "nightly".
+    /// The toolchain to use for packaging, e.g., "stable", "nightly", or "1.70.0".
+    /// When specified, cargo will use this specific Rust toolchain version.
     #[serde(default, deserialize_with = "deserialize_string")]
     toolchain: Option<String>,
 
-    /// Package(s) to assemble
+    /// Specific package(s) to assemble. Can specify multiple packages by name.
+    /// If not specified, packages the current package or workspace root.
+    /// Example: ["my-lib", "my-binary"]
     #[serde(default, deserialize_with = "deserialize_string_vec")]
     package: Option<Vec<String>>,
 
-    /// Assemble all packages in the workspace
+    /// Assemble all packages in the workspace into separate tarballs.
+    /// Useful for workspaces with multiple publishable crates.
     #[serde(default)]
     workspace: bool,
 
-    /// Don't assemble specified packages
+    /// Don't assemble specified packages when using --workspace.
+    /// Allows selective packaging of workspace members.
+    /// Example: ["internal-tools", "test-utils"]
     #[serde(default, deserialize_with = "deserialize_string_vec")]
     exclude: Option<Vec<String>>,
 
-    /// Print files included in a package without making one
+    /// Print files that would be included in the package without creating the tarball.
+    /// Useful for reviewing package contents and debugging .gitignore rules.
     #[serde(default)]
     list: bool,
 
-    /// Don't verify the contents by building them
+    /// Don't verify the package contents by building them.
+    /// Skips the compilation step, making packaging faster but less safe.
+    /// Use when you're confident the package builds correctly.
     #[serde(default)]
     no_verify: bool,
 
-    /// Ignore warnings about a lack of human-usable metadata
+    /// Ignore warnings about missing package metadata (description, license, etc.).
+    /// Allows packaging even when human-readable metadata fields are incomplete.
     #[serde(default)]
     no_metadata: bool,
 
-    /// Allow dirty working directories to be packaged
+    /// Allow packaging even when the working directory has uncommitted changes.
+    /// By default, cargo package requires a clean git working directory.
     #[serde(default)]
     allow_dirty: bool,
 
-    /// Don't include the lock file when packaging
+    /// Don't include Cargo.lock in the generated package.
+    /// Useful for libraries where you want users to resolve dependencies freshly.
     #[serde(default)]
     exclude_lockfile: bool,
 
-    /// Space or comma separated list of features to activate
+    /// Space or comma separated list of features to activate during verification build.
+    /// Only affects the build verification step, not the package contents.
+    /// Example: ["serde", "async-std"]
     #[serde(default, deserialize_with = "deserialize_string_vec")]
     features: Option<Vec<String>>,
 
-    /// Activate all available features
+    /// Activate all available features during verification build.
+    /// Ensures the package builds correctly with all feature combinations.
     #[serde(default)]
     all_features: bool,
 
-    /// Do not activate the `default` feature
+    /// Do not activate the `default` feature during verification build.
+    /// Useful for testing minimal builds or when default features are problematic.
     #[serde(default)]
     no_default_features: bool,
 
-    /// Build for the target triple
+    /// Build for the specified target triple during verification.
+    /// Useful for cross-compilation testing or platform-specific packages.
+    /// Example: "x86_64-unknown-linux-musl"
     #[serde(default, deserialize_with = "deserialize_string")]
     target: Option<String>,
 
-    /// Directory for all generated artifacts
+    /// Directory for placing generated artifacts and build cache.
+    /// Overrides the default target/ directory location.
     #[serde(default, deserialize_with = "deserialize_string")]
     target_dir: Option<String>,
 
-    /// Number of parallel jobs, defaults to # of CPUs
+    /// Number of parallel jobs for the verification build.
+    /// Defaults to the number of CPU cores. Set to 1 for sequential builds.
     #[serde(default)]
     jobs: Option<u32>,
 
-    /// Do not abort the build as soon as there is an error
+    /// Do not abort the verification build as soon as there is an error.
+    /// Continues building other targets even if some fail, useful for debugging.
     #[serde(default)]
     keep_going: bool,
 
-    /// Path to Cargo.toml
+    /// Path to the Cargo.toml file to package.
+    /// Useful when running from a different directory or with non-standard layouts.
     #[serde(default, deserialize_with = "deserialize_string")]
     manifest_path: Option<String>,
 
-    /// Path to Cargo.lock (unstable)
+    /// Path to the Cargo.lock file (unstable feature).
+    /// Allows using a different lock file location than the default.
     #[serde(default, deserialize_with = "deserialize_string")]
     lockfile_path: Option<String>,
 
