@@ -150,9 +150,6 @@ pub struct CargoAddTool {
 }
 
 impl CargoAddTool {
-    pub fn json_schema() -> serde_json::Map<String, serde_json::Value> {
-        <Self as Tool>::json_schema()
-    }
     pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
         let mut cmd = Command::new("cargo");
         if let Some(toolchain) = &self.toolchain {
@@ -321,9 +318,6 @@ pub struct CargoRemoveTool {
 }
 
 impl CargoRemoveTool {
-    pub fn json_schema() -> serde_json::Map<String, serde_json::Value> {
-        <Self as Tool>::json_schema()
-    }
     pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
         let mut cmd = Command::new("cargo");
         if let Some(toolchain) = &self.toolchain {
