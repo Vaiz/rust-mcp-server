@@ -1,5 +1,3 @@
-use rust_mcp_sdk::macros::JsonSchema;
-
 /// Utility function for parsing Option<String> fields in serde,
 /// returning None if the string is "null" (case-insensitive) or empty.
 pub fn deserialize_string<'de, D>(deserializer: D) -> Result<Option<String>, D::Error>
@@ -48,7 +46,7 @@ pub const fn default_true() -> bool {
 
 /// A type that represents a package with an optional version.
 /// When calling cargo commands, use `to_spec()` to get "package" or "package@version" format.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, JsonSchema, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, serde::Deserialize, schemars::JsonSchema)]
 pub struct PackageWithVersion {
     /// The package name
     pub package: String,
@@ -179,17 +177,6 @@ mod tests {
     }
 
     #[test]
-    fn test_package_with_version_serialize() {
-        let pkg1 = PackageWithVersion::new("serde".to_string());
-        let json1 = serde_json::to_string(&pkg1).unwrap();
-        assert_eq!(json1, r#"{"package":"serde","version":null}"#);
-
-        let pkg2 = PackageWithVersion::with_version("serde".to_string(), "1.0.0".to_string());
-        let json2 = serde_json::to_string(&pkg2).unwrap();
-        assert_eq!(json2, r#"{"package":"serde","version":"1.0.0"}"#);
-    }
-
-    #[test]
     fn test_package_with_version_deserialize_package_only() {
         let json = r#"{"package":"serde"}"#;
         let result: PackageWithVersion = serde_json::from_str(json).unwrap();
@@ -219,17 +206,6 @@ mod tests {
         let result: PackageWithVersion = serde_json::from_str(json).unwrap();
         assert_eq!(result.package, "serde");
         assert_eq!(result.version, None); // "null" string is treated as None by deserialize_string
-    }
-
-    #[test]
-    fn test_package_with_version_roundtrip() {
-        let original = PackageWithVersion::with_version("tokio".to_string(), "1.0.0".to_string());
-        let json = serde_json::to_string(&original).unwrap();
-        let deserialized: PackageWithVersion = serde_json::from_str(&json).unwrap();
-        assert_eq!(original, deserialized);
-
-        // Test the to_spec method works correctly
-        assert_eq!(deserialized.to_spec(), "tokio@1.0.0");
     }
 
     #[test]

@@ -60,7 +60,7 @@ impl DependencyType {
     description = "Adds a dependency to a Rust project using cargo add.",
     openWorldHint = false
 )]
-#[derive(Debug, ::serde::Deserialize, JsonSchema)]
+#[derive(Debug, ::serde::Deserialize, SchemarsJsonSchema)]
 pub struct CargoAddTool {
     /// The toolchain to use, e.g., "stable" or "nightly".
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -164,6 +164,16 @@ pub struct CargoAddTool {
 }
 
 impl CargoAddTool {
+    pub fn json_schema() -> serde_json::Map<String, serde_json::Value> {
+        use schemars::schema_for;
+        let schema = schema_for!(CargoAddTool).to_value();
+        if let serde_json::Value::Object(mut map) = schema {
+            map.remove("$schema");
+            map
+        } else {
+            panic!("Expected schema to be an object, got: {schema:?}");
+        }
+    }
     pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
         let mut cmd = Command::new("cargo");
         if let Some(toolchain) = &self.toolchain {

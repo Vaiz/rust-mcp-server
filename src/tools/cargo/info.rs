@@ -1,7 +1,7 @@
 use std::process::Command;
 
 use rust_mcp_sdk::{
-    macros::{JsonSchema, mcp_tool},
+    macros::{mcp_tool},
     schema::{CallToolResult, schema_utils::CallToolError},
 };
 
@@ -15,7 +15,7 @@ use crate::tools::execute_command;
     description = "Display information about a package. Information includes package description, list of available features, etc. Equivalent to 'cargo info <SPEC>'.",
     openWorldHint = false
 )]
-#[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
+#[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
 pub struct CargoInfoTool {
     /// Package with optional version (e.g., {"package": "serde", "version": "1.0.0"})
     #[serde(flatten)]
@@ -55,6 +55,17 @@ pub struct CargoInfoTool {
 }
 
 impl CargoInfoTool {
+    pub fn json_schema() -> serde_json::Map<String, serde_json::Value> {
+        use schemars::schema_for;
+        let schema = schema_for!(CargoInfoTool).to_value();
+        if let serde_json::Value::Object(mut map) = schema {
+            map.remove("$schema");
+            map
+        } else {
+            panic!("Expected schema to be an object, got: {schema:?}");
+        }
+    }
+
     pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
         let mut cmd = Command::new("cargo");
         cmd.arg("info");
