@@ -1,4 +1,6 @@
 use rust_mcp_sdk::macros::JsonSchema;
+use schemars::JsonSchema as SchemarsJsonSchema;
+use serde::{Deserialize, Serialize};
 
 /// Utility function for parsing Option<String> fields in serde,
 /// returning None if the string is "null" (case-insensitive) or empty.
@@ -81,6 +83,82 @@ impl PackageWithVersion {
         match &self.version {
             Some(version) => format!("{}@{}", self.package, version),
             None => self.package.clone(),
+        }
+    }
+}
+
+/// Dependency type for cargo add/remove operations
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, SchemarsJsonSchema)]
+#[serde(rename_all = "lowercase")]
+pub enum DependencyType {
+    /// Regular dependency (default section)
+    Regular,
+    /// Development dependency
+    Dev,
+    /// Build dependency
+    Build,
+}
+
+impl Default for DependencyType {
+    fn default() -> Self {
+        Self::Regular
+    }
+}
+
+impl DependencyType {
+    /// Convert to the corresponding CLI flag
+    pub fn to_cli_flag(self) -> Option<&'static str> {
+        match self {
+            DependencyType::Regular => None,
+            DependencyType::Dev => Some("--dev"),
+            DependencyType::Build => Some("--build"),
+        }
+    }
+
+    /// Check if this is a dev dependency
+    pub fn is_dev(&self) -> bool {
+        matches!(self, DependencyType::Dev)
+    }
+
+    /// Check if this is a build dependency
+    pub fn is_build(&self) -> bool {
+        matches!(self, DependencyType::Build)
+    }
+
+    /// Create from string
+    pub fn from_str(s: &str) -> Self {
+        match s.to_lowercase().as_str() {
+            "dev" | "development" => DependencyType::Dev,
+            "build" => DependencyType::Build,
+            _ => DependencyType::Regular,
+        }
+    }
+
+    /// Convert to string
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            DependencyType::Regular => "regular",
+            DependencyType::Dev => "dev",
+            DependencyType::Build => "build",
+        }
+    }
+}
+
+// Manual implementation to bridge schemars JsonSchema with MCP SDK JsonSchema
+impl DependencyType {
+    pub fn json_schema() -> serde_json::Map<String, serde_json::Value> {
+        use schemars::schema_for;
+        let schema = schema_for!(DependencyType);
+        if let serde_json::Value::Object(map) = serde_json::to_value(schema).unwrap_or_default() {
+            map
+        } else {
+            // Fallback manual schema
+            let mut map = serde_json::Map::new();
+            map.insert("type".to_string(), serde_json::Value::String("string".to_string()));
+            map.insert("enum".to_string(), serde_json::json!(["regular", "dev", "build"]));
+            map.insert("default".to_string(), serde_json::Value::String("regular".to_string()));
+            map.insert("description".to_string(), serde_json::Value::String("Dependency type".to_string()));
+            map
         }
     }
 }
@@ -242,5 +320,55 @@ mod tests {
 
         let pkg3 = PackageWithVersion::with_version("clap".to_string(), "4.0.0-beta.1".to_string());
         assert_eq!(pkg3.to_spec(), "clap@4.0.0-beta.1");
+    }
+
+    #[test]
+    fn test_dependency_type_enum() {
+        // Test default
+        assert_eq!(DependencyType::default(), DependencyType::Regular);
+
+        // Test CLI flags
+        assert_eq!(DependencyType::Regular.to_cli_flag(), None);
+        assert_eq!(DependencyType::Dev.to_cli_flag(), Some("--dev"));
+        assert_eq!(DependencyType::Build.to_cli_flag(), Some("--build"));
+
+        // Test string conversion
+        assert_eq!(DependencyType::Regular.as_str(), "regular");
+        assert_eq!(DependencyType::Dev.as_str(), "dev");
+        assert_eq!(DependencyType::Build.as_str(), "build");
+
+        // Test from_str
+        assert_eq!(DependencyType::from_str("regular"), DependencyType::Regular);
+        assert_eq!(DependencyType::from_str("dev"), DependencyType::Dev);
+        assert_eq!(DependencyType::from_str("development"), DependencyType::Dev);
+        assert_eq!(DependencyType::from_str("build"), DependencyType::Build);
+        assert_eq!(DependencyType::from_str("unknown"), DependencyType::Regular);
+
+        // Test type checks
+        assert!(!DependencyType::Regular.is_dev());
+        assert!(!DependencyType::Regular.is_build());
+        assert!(DependencyType::Dev.is_dev());
+        assert!(!DependencyType::Dev.is_build());
+        assert!(!DependencyType::Build.is_dev());
+        assert!(DependencyType::Build.is_build());
+    }
+
+    #[test]
+    fn test_dependency_type_serde() {
+        // Test serialization
+        assert_eq!(serde_json::to_string(&DependencyType::Regular).unwrap(), "\"regular\"");
+        assert_eq!(serde_json::to_string(&DependencyType::Dev).unwrap(), "\"dev\"");
+        assert_eq!(serde_json::to_string(&DependencyType::Build).unwrap(), "\"build\"");
+
+        // Test deserialization
+        assert_eq!(serde_json::from_str::<DependencyType>("\"regular\"").unwrap(), DependencyType::Regular);
+        assert_eq!(serde_json::from_str::<DependencyType>("\"dev\"").unwrap(), DependencyType::Dev);
+        assert_eq!(serde_json::from_str::<DependencyType>("\"build\"").unwrap(), DependencyType::Build);
+    }    #[test]
+    fn test_dependency_type_json_schema() {
+        let schema = DependencyType::json_schema();
+        
+        // Should have some schema content  
+        assert!(!schema.is_empty(), "Schema should not be empty");
     }
 }

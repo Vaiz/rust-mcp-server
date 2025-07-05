@@ -1,7 +1,7 @@
 use std::process::Command;
 
 use crate::{
-    serde_utils::{PackageWithVersion, default_true, deserialize_string, deserialize_string_vec},
+    serde_utils::{PackageWithVersion, DependencyType, default_true, deserialize_string, deserialize_string_vec},
     tools::execute_command,
 };
 use rust_mcp_sdk::{
@@ -28,7 +28,7 @@ pub struct CargoAddTool {
 
     /// Dependency type: "regular" (default), "dev", or "build"
     #[serde(default)]
-    pub dependency_type: String,
+    pub dependency_type: DependencyType,
 
     /// Add as an optional dependency
     #[serde(default)]
@@ -130,14 +130,8 @@ impl CargoAddTool {
         cmd.arg(self.package_spec.to_spec());
 
         // Dependency type
-        match self.dependency_type.as_str() {
-            "dev" => {
-                cmd.arg("--dev");
-            }
-            "build" => {
-                cmd.arg("--build");
-            }
-            _ => {} // regular or default
+        if let Some(flag) = self.dependency_type.to_cli_flag() {
+            cmd.arg(flag);
         };
         if self.optional {
             cmd.arg("--optional");
@@ -250,7 +244,7 @@ pub struct CargoRemoveTool {
 
     /// Dependency type: "regular" (default), "dev", or "build"
     #[serde(default)]
-    pub dependency_type: String,
+    pub dependency_type: DependencyType,
 
     /// Remove from target-dependencies
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -307,15 +301,9 @@ impl CargoRemoveTool {
         }
 
         // Section options
-        match self.dependency_type.as_str() {
-            "dev" => {
-                cmd.arg("--dev");
-            }
-            "build" => {
-                cmd.arg("--build");
-            }
-            _ => {} // regular or default
-        };
+        if let Some(flag) = self.dependency_type.to_cli_flag() {
+            cmd.arg(flag);
+        }
         if let Some(target) = &self.target {
             cmd.arg("--target").arg(target);
         }
