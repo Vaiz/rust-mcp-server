@@ -1,7 +1,7 @@
 use std::process::Command;
 
 use rust_mcp_sdk::{
-    macros::{mcp_tool},
+    macros::mcp_tool,
     schema::{CallToolResult, schema_utils::CallToolError},
 };
 

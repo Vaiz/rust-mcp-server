@@ -1,17 +1,17 @@
 use std::process::Command;
 
+use crate::serde_utils::Tool;
 use crate::{
     serde_utils::{PackageWithVersion, default_true, deserialize_string, deserialize_string_vec},
     tools::execute_command,
 };
 use rust_mcp_sdk::{
-    macros::{JsonSchema, mcp_tool},
+    macros::mcp_tool,
     schema::{CallToolResult, schema_utils::CallToolError},
 };
-use schemars::JsonSchema as SchemarsJsonSchema;
 
 /// Dependency type for cargo add/remove operations
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, ::serde::Deserialize, SchemarsJsonSchema)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, ::serde::Deserialize, schemars::JsonSchema)]
 #[serde(rename_all = "lowercase")]
 pub enum DependencyType {
     /// Regular dependency (default section)
@@ -39,20 +39,6 @@ impl DependencyType {
     }
 }
 
-// Manual implementation to bridge schemars JsonSchema with MCP SDK JsonSchema
-impl DependencyType {
-    pub fn json_schema() -> serde_json::Map<String, serde_json::Value> {
-        use schemars::schema_for;
-        let schema = schema_for!(DependencyType).to_value();
-        if let serde_json::Value::Object(mut map) = schema {
-            map.remove("$schema");
-            map
-        } else {
-            panic!("Expected schema to be an object, got: {schema:?}");
-        }
-    }
-}
-
 /// MCP defaults differ from cargo defaults: `quiet` and `locked` are `true` by default
 /// for better integration with automated tooling and to avoid blocking on missing lockfiles.
 #[mcp_tool(
@@ -60,7 +46,7 @@ impl DependencyType {
     description = "Adds a dependency to a Rust project using cargo add.",
     openWorldHint = false
 )]
-#[derive(Debug, ::serde::Deserialize, SchemarsJsonSchema)]
+#[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
 pub struct CargoAddTool {
     /// The toolchain to use, e.g., "stable" or "nightly".
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -165,14 +151,7 @@ pub struct CargoAddTool {
 
 impl CargoAddTool {
     pub fn json_schema() -> serde_json::Map<String, serde_json::Value> {
-        use schemars::schema_for;
-        let schema = schema_for!(CargoAddTool).to_value();
-        if let serde_json::Value::Object(mut map) = schema {
-            map.remove("$schema");
-            map
-        } else {
-            panic!("Expected schema to be an object, got: {schema:?}");
-        }
+        <Self as Tool>::json_schema()
     }
     pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
         let mut cmd = Command::new("cargo");
@@ -283,7 +262,7 @@ impl CargoAddTool {
     description = "Remove dependencies from a Cargo.toml manifest file.",
     openWorldHint = false
 )]
-#[derive(Debug, ::serde::Deserialize, JsonSchema)]
+#[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
 pub struct CargoRemoveTool {
     /// The toolchain to use, e.g., "stable" or "nightly".
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -342,6 +321,9 @@ pub struct CargoRemoveTool {
 }
 
 impl CargoRemoveTool {
+    pub fn json_schema() -> serde_json::Map<String, serde_json::Value> {
+        <Self as Tool>::json_schema()
+    }
     pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
         let mut cmd = Command::new("cargo");
         if let Some(toolchain) = &self.toolchain {
@@ -418,9 +400,18 @@ mod tests {
 
     #[test]
     fn test_dependency_type_serde() {
-        assert_eq!(serde_json::from_str::<DependencyType>("\"regular\"").unwrap(), DependencyType::Regular);
-        assert_eq!(serde_json::from_str::<DependencyType>("\"dev\"").unwrap(), DependencyType::Dev);
-        assert_eq!(serde_json::from_str::<DependencyType>("\"build\"").unwrap(), DependencyType::Build);
+        assert_eq!(
+            serde_json::from_str::<DependencyType>("\"regular\"").unwrap(),
+            DependencyType::Regular
+        );
+        assert_eq!(
+            serde_json::from_str::<DependencyType>("\"dev\"").unwrap(),
+            DependencyType::Dev
+        );
+        assert_eq!(
+            serde_json::from_str::<DependencyType>("\"build\"").unwrap(),
+            DependencyType::Build
+        );
     }
 
     #[test]
@@ -435,7 +426,9 @@ mod tests {
         );
         expected_schema.insert(
             "description".to_string(),
-            serde_json::Value::String("Dependency type for cargo add/remove operations".to_string()),
+            serde_json::Value::String(
+                "Dependency type for cargo add/remove operations".to_string(),
+            ),
         );
         expected_schema.insert(
             "oneOf".to_string(),
@@ -458,6 +451,9 @@ mod tests {
             ]),
         );
 
-        assert_eq!(schema, expected_schema, "Schema should match expected structure");
+        assert_eq!(
+            schema, expected_schema,
+            "Schema should match expected structure"
+        );
     }
 }

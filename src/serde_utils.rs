@@ -83,6 +83,22 @@ impl PackageWithVersion {
     }
 }
 
+pub trait Tool: schemars::JsonSchema {
+    /// Returns the JSON schema for this type.
+    fn json_schema() -> serde_json::Map<String, serde_json::Value> {
+        use schemars::schema_for;
+        let schema = schema_for!(Self).to_value();
+        if let serde_json::Value::Object(mut map) = schema {
+            map.remove("$schema");
+            map
+        } else {
+            panic!("Expected schema to be an object, got: {schema:?}");
+        }
+    }
+}
+
+impl<T: schemars::JsonSchema> Tool for T {}
+
 #[cfg(test)]
 mod tests {
     use super::*;
