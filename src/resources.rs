@@ -134,7 +134,9 @@ impl ResourceHandler {
             resources.push(Resource {
                 uri: format!("{CARGO_BOOK_SCHEME}{path}"),
                 name: description.to_string(),
+                title: Some(description.to_string()),
                 description: None,
+                meta: None,
                 mime_type: Some("text/markdown".to_string()),
                 size: None,
                 annotations: None,
@@ -197,6 +199,7 @@ impl ResourceHandler {
                                 uri: format!("{CARGO_BOOK_SCHEME}{page_path}"),
                                 mime_type: Some("text/markdown".to_string()),
                                 text: content,
+                                meta: None,
                             }
                             .into(),
                         ],

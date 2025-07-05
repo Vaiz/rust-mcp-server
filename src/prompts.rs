@@ -11,15 +11,21 @@ impl Default for PromptHandler {
         let mut prompts = HashMap::new();
 
         let prompt = Prompt {
-            arguments: Vec::new(),
-            description: Some("Provides instruction on how to update Rust toolset".into()),
             name: "rustup-update-toolset".into(),
+            title: Some("Update Rust Toolset".into()),
+            description: Some("Provides instruction on how to update Rust toolset".into()),
+            arguments: Vec::new(),
+            meta: None,
         };
 
         let prompt_message = PromptMessage {
             role: Role::Assistant,
-            content: TextContent::new(include_str!("../prompts/update-toolset.md").into(), None)
-                .into(),
+            content: TextContent::new(
+                include_str!("../prompts/update-toolset.md").into(),
+                None,
+                None,
+            )
+            .into(),
         };
 
         let result = GetPromptResult {
