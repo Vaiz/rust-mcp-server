@@ -1,4 +1,4 @@
-## Rust MCP Server 0.1.1
+## Rust MCP Server 0.2.0
 | 🟢 Tools (27) | 🟢 Prompts (1) | 🟢 Resources (95) | <span style="opacity:0.6">🔴 Logging</span> | <span style="opacity:0.6">🔴 Experimental</span> |
 | --- | --- | --- | --- | --- |
 ## 🛠️ Tools (27)
@@ -7,33 +7,32 @@
 - **cargo-add**
   - Adds a dependency to a Rust project using cargo add.
   - **Inputs:**
-      - <code>branch</code> : string<br />
-      - <code>build</code> : boolean<br />
+      - <code>branch</code> : unknown<br />
       - <code>default_features</code> : boolean<br />
-      - <code>dev</code> : boolean<br />
+      - <code>dependency_type</code> : unknown<br />
       - <code>dry_run</code> : boolean<br />
-      - <code>features</code> : string [ ]<br />
+      - <code>features</code> : unknown<br />
       - <code>frozen</code> : boolean<br />
-      - <code>git</code> : string<br />
+      - <code>git</code> : unknown<br />
       - <code>ignore_rust_version</code> : boolean<br />
       - <code>locked</code> : boolean<br />
-      - <code>lockfile_path</code> : string<br />
-      - <code>manifest_path</code> : string<br />
+      - <code>lockfile_path</code> : unknown<br />
+      - <code>manifest_path</code> : unknown<br />
       - <code>no_default_features</code> : boolean<br />
       - <code>offline</code> : boolean<br />
       - <code>optional</code> : boolean<br />
       - <code>package</code> : string<br />
-      - <code>path</code> : string<br />
+      - <code>path</code> : unknown<br />
       - <code>quiet</code> : boolean<br />
-      - <code>registry</code> : string<br />
-      - <code>rename</code> : string<br />
-      - <code>rev</code> : string<br />
-      - <code>tag</code> : string<br />
-      - <code>target</code> : string<br />
-      - <code>target_package</code> : string<br />
-      - <code>toolchain</code> : string<br />
+      - <code>registry</code> : unknown<br />
+      - <code>rename</code> : unknown<br />
+      - <code>rev</code> : unknown<br />
+      - <code>tag</code> : unknown<br />
+      - <code>target</code> : unknown<br />
+      - <code>target_package</code> : unknown<br />
+      - <code>toolchain</code> : unknown<br />
       - <code>verbose</code> : boolean<br />
-      - <code>version</code> : string<br />
+      - <code>version</code> : unknown<br />
 
 - **cargo-build**
   - Builds a Rust project using Cargo. Usually, run without any additional arguments.
@@ -114,16 +113,16 @@
       - <code>dry_run</code> : boolean<br />
       - <code>frozen</code> : boolean<br />
       - <code>locked</code> : boolean<br />
-      - <code>lockfile_path</code> : string<br />
-      - <code>manifest_path</code> : string<br />
+      - <code>lockfile_path</code> : unknown<br />
+      - <code>manifest_path</code> : unknown<br />
       - <code>offline</code> : boolean<br />
-      - <code>package</code> : string<br />
-      - <code>profile</code> : string<br />
+      - <code>package</code> : unknown<br />
+      - <code>profile</code> : unknown<br />
       - <code>quiet</code> : boolean<br />
       - <code>release</code> : boolean<br />
-      - <code>target</code> : string<br />
-      - <code>target_dir</code> : string<br />
-      - <code>toolchain</code> : string<br />
+      - <code>target</code> : unknown<br />
+      - <code>target_dir</code> : unknown<br />
+      - <code>toolchain</code> : unknown<br />
       - <code>verbose</code> : boolean<br />
 
 - **cargo-clippy**
@@ -132,32 +131,32 @@
       - <code>all_features</code> : boolean<br />
       - <code>all_targets</code> : boolean<br />
       - <code>allow_dirty</code> : boolean<br />
-      - <code>bench</code> : string<br />
+      - <code>bench</code> : unknown<br />
       - <code>benches</code> : boolean<br />
-      - <code>bin</code> : string<br />
+      - <code>bin</code> : unknown<br />
       - <code>bins</code> : boolean<br />
-      - <code>example</code> : string<br />
+      - <code>example</code> : unknown<br />
       - <code>examples</code> : boolean<br />
-      - <code>exclude</code> : string [ ]<br />
-      - <code>features</code> : string [ ]<br />
+      - <code>exclude</code> : unknown<br />
+      - <code>features</code> : unknown<br />
       - <code>fix</code> : boolean<br />
       - <code>frozen</code> : boolean<br />
       - <code>ignore_rust_version</code> : boolean<br />
       - <code>lib</code> : boolean<br />
       - <code>locked</code> : boolean<br />
-      - <code>manifest_path</code> : string<br />
+      - <code>manifest_path</code> : unknown<br />
       - <code>no_default_features</code> : boolean<br />
       - <code>no_deps</code> : boolean<br />
       - <code>offline</code> : boolean<br />
-      - <code>package</code> : string [ ]<br />
-      - <code>profile</code> : string<br />
+      - <code>package</code> : unknown<br />
+      - <code>profile</code> : unknown<br />
       - <code>quiet</code> : boolean<br />
       - <code>release</code> : boolean<br />
-      - <code>target</code> : string<br />
-      - <code>target_dir</code> : string<br />
-      - <code>test</code> : string<br />
+      - <code>target</code> : unknown<br />
+      - <code>target_dir</code> : unknown<br />
+      - <code>test</code> : unknown<br />
       - <code>tests</code> : boolean<br />
-      - <code>toolchain</code> : string<br />
+      - <code>toolchain</code> : unknown<br />
       - <code>verbose</code> : boolean<br />
       - <code>warnings_as_errors</code> : boolean<br />
       - <code>workspace</code> : boolean<br />
@@ -165,33 +164,28 @@
 - **cargo-deny-check**
   - Checks a project's crate graph for security advisories, license compliance, banned crates.
   - **Inputs:**
-      - <code>all_features</code> : boolean<br />
-      - <code>allow</code> : string [ ]<br />
-      - <code>config</code> : string<br />
-      - <code>deny</code> : string [ ]<br />
+      - <code>allow</code> : unknown<br />
+      - <code>config</code> : unknown<br />
+      - <code>deny</code> : unknown<br />
       - <code>disable_fetch</code> : boolean<br />
-      - <code>exclude</code> : string [ ]<br />
+      - <code>exclude</code> : unknown<br />
       - <code>exclude_dev</code> : boolean<br />
-      - <code>feature_depth</code> : number<br />
-      - <code>features</code> : string [ ]<br />
-      - <code>format</code> : string<br />
-      - <code>graph</code> : string<br />
+      - <code>feature_depth</code> : unknown<br />
+      - <code>format</code> : unknown<br />
+      - <code>graph</code> : unknown<br />
       - <code>hide_inclusion_graph</code> : boolean<br />
-      - <code>locked</code> : boolean<br />
-      - <code>log_level</code> : string<br />
-      - <code>manifest_path</code> : string<br />
-      - <code>no_default_features</code> : boolean<br />
-      - <code>offline</code> : boolean<br />
+      - <code>log_level</code> : unknown<br />
+      - <code>manifest_path</code> : unknown<br />
       - <code>show_stats</code> : boolean<br />
-      - <code>target</code> : string [ ]<br />
-      - <code>warn</code> : string [ ]<br />
-      - <code>which</code> : string [ ]<br />
+      - <code>target</code> : unknown<br />
+      - <code>warn</code> : unknown<br />
+      - <code>which</code> : unknown<br />
       - <code>workspace</code> : boolean<br />
 
 - **cargo-deny-init**
   - Creates a cargo-deny config from a template
   - **Inputs:**
-      - <code>config</code> : string<br />
+      - <code>config</code> : unknown<br />
 
 - **cargo-deny-install**
   - Installs cargo-deny tool for dependency graph analysis and security checks
@@ -199,21 +193,21 @@
 - **cargo-deny-list**
   - Outputs a listing of all licenses and the crates that use them
   - **Inputs:**
-      - <code>config</code> : string<br />
-      - <code>format</code> : string<br />
-      - <code>layout</code> : string<br />
-      - <code>threshold</code> : number<br />
+      - <code>config</code> : unknown<br />
+      - <code>format</code> : unknown<br />
+      - <code>layout</code> : unknown<br />
+      - <code>threshold</code> : unknown<br />
 
 - **cargo-fmt**
   - Formats Rust code using rustfmt. Usually, run without any additional arguments.
   - **Inputs:**
       - <code>all</code> : boolean<br />
       - <code>check</code> : boolean<br />
-      - <code>manifest_path</code> : string<br />
-      - <code>message_format</code> : string<br />
-      - <code>package</code> : string [ ]<br />
+      - <code>manifest_path</code> : unknown<br />
+      - <code>message_format</code> : unknown<br />
+      - <code>package</code> : unknown<br />
       - <code>quiet</code> : boolean<br />
-      - <code>toolchain</code> : string<br />
+      - <code>toolchain</code> : unknown<br />
       - <code>verbose</code> : boolean<br />
 
 - **cargo-generate_lockfile**
@@ -222,10 +216,10 @@
       - <code>frozen</code> : boolean<br />
       - <code>ignore_rust_version</code> : boolean<br />
       - <code>locked</code> : boolean<br />
-      - <code>lockfile_path</code> : string<br />
-      - <code>manifest_path</code> : string<br />
+      - <code>lockfile_path</code> : unknown<br />
+      - <code>manifest_path</code> : unknown<br />
       - <code>offline</code> : boolean<br />
-      - <code>package</code> : string<br />
+      - <code>package</code> : unknown<br />
       - <code>quiet</code> : boolean<br />
       - <code>verbose</code> : boolean<br />
 
@@ -235,36 +229,36 @@
       - <code>clean_per_run</code> : boolean<br />
       - <code>clean_per_version</code> : boolean<br />
       - <code>command</code> : string<br />
-      - <code>depth</code> : number<br />
+      - <code>depth</code> : unknown<br />
       - <code>each_feature</code> : boolean<br />
-      - <code>exclude</code> : string [ ]<br />
+      - <code>exclude</code> : unknown<br />
       - <code>exclude_all_features</code> : boolean<br />
-      - <code>exclude_features</code> : string [ ]<br />
+      - <code>exclude_features</code> : unknown<br />
       - <code>exclude_no_default_features</code> : boolean<br />
       - <code>feature_powerset</code> : boolean<br />
-      - <code>features</code> : string [ ]<br />
-      - <code>group_features</code> : string [ ]<br />
+      - <code>features</code> : unknown<br />
+      - <code>group_features</code> : unknown<br />
       - <code>ignore_private</code> : boolean<br />
       - <code>ignore_unknown_features</code> : boolean<br />
-      - <code>include_features</code> : string [ ]<br />
+      - <code>include_features</code> : unknown<br />
       - <code>keep_going</code> : boolean<br />
       - <code>locked</code> : boolean<br />
-      - <code>log_group</code> : string<br />
-      - <code>manifest_path</code> : string<br />
-      - <code>mutually_exclusive_features</code> : string [ ]<br />
+      - <code>log_group</code> : unknown<br />
+      - <code>manifest_path</code> : unknown<br />
+      - <code>mutually_exclusive_features</code> : unknown<br />
       - <code>no_dev_deps</code> : boolean<br />
       - <code>no_manifest_path</code> : boolean<br />
       - <code>no_private</code> : boolean<br />
-      - <code>optional_deps</code> : string [ ]<br />
-      - <code>package</code> : string [ ]<br />
-      - <code>partition</code> : string<br />
+      - <code>optional_deps</code> : unknown<br />
+      - <code>package</code> : unknown<br />
+      - <code>partition</code> : unknown<br />
       - <code>print_command_list</code> : boolean<br />
       - <code>remove_dev_deps</code> : boolean<br />
       - <code>rust_version</code> : boolean<br />
-      - <code>target</code> : string [ ]<br />
+      - <code>target</code> : unknown<br />
       - <code>verbose</code> : boolean<br />
-      - <code>version_range</code> : string<br />
-      - <code>version_step</code> : number<br />
+      - <code>version_range</code> : unknown<br />
+      - <code>version_step</code> : unknown<br />
       - <code>workspace</code> : boolean<br />
 
 - **cargo-hack-install**
@@ -273,16 +267,16 @@
 - **cargo-info**
   - Display information about a package. Information includes package description, list of available features, etc. Equivalent to 'cargo info <SPEC>'.
   - **Inputs:**
-      - <code>config</code> : string<br />
+      - <code>config</code> : unknown<br />
       - <code>frozen</code> : boolean<br />
-      - <code>index</code> : string<br />
+      - <code>index</code> : unknown<br />
       - <code>locked</code> : boolean<br />
       - <code>offline</code> : boolean<br />
+      - <code>package</code> : string<br />
       - <code>quiet</code> : boolean<br />
-      - <code>registry</code> : string<br />
-      - <code>spec</code> : string<br />
+      - <code>registry</code> : unknown<br />
       - <code>verbose</code> : boolean<br />
-      - <code>version</code> : string<br />
+      - <code>version</code> : unknown<br />
 
 - **cargo-list**
   - Lists installed cargo commands using 'cargo --list'.
@@ -292,7 +286,7 @@
   - **Inputs:**
       - <code>fix</code> : boolean<br />
       - <code>no_ignore</code> : boolean<br />
-      - <code>paths</code> : string [ ]<br />
+      - <code>paths</code> : unknown<br />
       - <code>skip_target_dir</code> : boolean<br />
       - <code>with_metadata</code> : boolean<br />
 
@@ -321,17 +315,17 @@
   - Create a new cargo package at <path>. Creates a new Rust project with the specified name and template.
   - **Inputs:**
       - <code>bin</code> : boolean<br />
-      - <code>edition</code> : string<br />
+      - <code>edition</code> : unknown<br />
       - <code>frozen</code> : boolean<br />
       - <code>lib</code> : boolean<br />
       - <code>locked</code> : boolean<br />
-      - <code>name</code> : string<br />
+      - <code>name</code> : unknown<br />
       - <code>offline</code> : boolean<br />
       - <code>path</code> : string<br />
       - <code>quiet</code> : boolean<br />
-      - <code>registry</code> : string<br />
-      - <code>toolchain</code> : string<br />
-      - <code>vcs</code> : string<br />
+      - <code>registry</code> : unknown<br />
+      - <code>toolchain</code> : unknown<br />
+      - <code>vcs</code> : unknown<br />
       - <code>verbose</code> : boolean<br />
 
 - **cargo-package**
@@ -339,47 +333,46 @@
   - **Inputs:**
       - <code>all_features</code> : boolean<br />
       - <code>allow_dirty</code> : boolean<br />
-      - <code>exclude</code> : string [ ]<br />
+      - <code>exclude</code> : unknown<br />
       - <code>exclude_lockfile</code> : boolean<br />
-      - <code>features</code> : string [ ]<br />
+      - <code>features</code> : unknown<br />
       - <code>frozen</code> : boolean<br />
-      - <code>index</code> : string<br />
-      - <code>jobs</code> : number<br />
+      - <code>index</code> : unknown<br />
+      - <code>jobs</code> : unknown<br />
       - <code>keep_going</code> : boolean<br />
       - <code>list</code> : boolean<br />
       - <code>locked</code> : boolean<br />
-      - <code>lockfile_path</code> : string<br />
-      - <code>manifest_path</code> : string<br />
-      - <code>message_format</code> : string<br />
+      - <code>lockfile_path</code> : unknown<br />
+      - <code>manifest_path</code> : unknown<br />
+      - <code>message_format</code> : unknown<br />
       - <code>no_default_features</code> : boolean<br />
       - <code>no_metadata</code> : boolean<br />
       - <code>no_verify</code> : boolean<br />
       - <code>offline</code> : boolean<br />
-      - <code>package</code> : string [ ]<br />
+      - <code>package</code> : unknown<br />
       - <code>quiet</code> : boolean<br />
-      - <code>registry</code> : string<br />
-      - <code>target</code> : string<br />
-      - <code>target_dir</code> : string<br />
-      - <code>toolchain</code> : string<br />
+      - <code>registry</code> : unknown<br />
+      - <code>target</code> : unknown<br />
+      - <code>target_dir</code> : unknown<br />
+      - <code>toolchain</code> : unknown<br />
       - <code>verbose</code> : boolean<br />
       - <code>workspace</code> : boolean<br />
 
 - **cargo-remove**
   - Remove dependencies from a Cargo.toml manifest file.
   - **Inputs:**
-      - <code>build</code> : boolean<br />
       - <code>dep_id</code> : string [ ]<br />
-      - <code>dev</code> : boolean<br />
+      - <code>dependency_type</code> : unknown<br />
       - <code>dry_run</code> : boolean<br />
       - <code>frozen</code> : boolean<br />
       - <code>locked</code> : boolean<br />
-      - <code>lockfile_path</code> : string<br />
-      - <code>manifest_path</code> : string<br />
+      - <code>lockfile_path</code> : unknown<br />
+      - <code>manifest_path</code> : unknown<br />
       - <code>offline</code> : boolean<br />
-      - <code>package</code> : string<br />
+      - <code>package</code> : unknown<br />
       - <code>quiet</code> : boolean<br />
-      - <code>target</code> : string<br />
-      - <code>toolchain</code> : string<br />
+      - <code>target</code> : unknown<br />
+      - <code>toolchain</code> : unknown<br />
       - <code>verbose</code> : boolean<br />
 
 - **cargo-search**
@@ -460,12 +453,12 @@
   - Install or update the given toolchains, or by default the active toolchain. Toolchain name can be <code>stable</code>, <code>nightly</code>, or a specific version like '1.8.0'.
   - **Inputs:**
       - <code>allow_downgrade</code> : boolean<br />
-      - <code>components</code> : string [ ]<br />
+      - <code>components</code> : unknown<br />
       - <code>force</code> : boolean<br />
       - <code>force_non_host</code> : boolean<br />
       - <code>no_self_update</code> : boolean<br />
-      - <code>profile</code> : string<br />
-      - <code>targets</code> : string [ ]<br />
+      - <code>profile</code> : unknown<br />
+      - <code>targets</code> : unknown<br />
       - <code>toolchain</code> : string<br />
 
 - **rustup-update**
@@ -474,7 +467,7 @@
       - <code>force</code> : boolean<br />
       - <code>force_non_host</code> : boolean<br />
       - <code>no_self_update</code> : boolean<br />
-      - <code>toolchain</code> : string<br />
+      - <code>toolchain</code> : unknown<br />
 
 
 ## 📝 Prompts (1)
