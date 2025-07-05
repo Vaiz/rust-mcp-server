@@ -20,8 +20,12 @@ impl Default for PromptHandler {
 
         let prompt_message = PromptMessage {
             role: Role::Assistant,
-            content: TextContent::new(include_str!("../prompts/update-toolset.md").into(), None, None)
-                .into(),
+            content: TextContent::new(
+                include_str!("../prompts/update-toolset.md").into(),
+                None,
+                None,
+            )
+            .into(),
         };
 
         let result = GetPromptResult {

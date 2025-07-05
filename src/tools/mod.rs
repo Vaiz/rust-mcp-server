@@ -5,7 +5,7 @@ pub mod cargo_machete;
 pub mod rustup;
 
 use rust_mcp_sdk::schema::{
-    schema_utils::CallToolError, Annotations, CallToolRequest, CallToolResult, Role, TextContent
+    Annotations, CallToolRequest, CallToolResult, Role, TextContent, schema_utils::CallToolError,
 };
 
 use cargo::{
@@ -67,11 +67,7 @@ fn execute_command(mut cmd: std::process::Command) -> Result<CallToolResult, Cal
                     last_modified: None,
                     priority: Some(0.1),
                 });
-                content.push(TextContent::new(
-                    stdout.into(),
-                    annotations,
-                    None,
-                ).into());
+                content.push(TextContent::new(stdout.into(), annotations, None).into());
             }
             if !stderr.is_empty() {
                 let annotations = Some(Annotations {
@@ -79,11 +75,7 @@ fn execute_command(mut cmd: std::process::Command) -> Result<CallToolResult, Cal
                     last_modified: None,
                     priority: Some(1.),
                 });
-                content.push(TextContent::new(
-                    stderr.into(),
-                    annotations,
-                    None,
-                ).into());
+                content.push(TextContent::new(stderr.into(), annotations, None).into());
             }
             Ok(CallToolResult {
                 content,
@@ -109,7 +101,7 @@ fn execute_command(mut cmd: std::process::Command) -> Result<CallToolResult, Cal
                         .join(" ")
                 ),
                 annotations,
-                None
+                None,
             );
 
             Ok(CallToolResult {
