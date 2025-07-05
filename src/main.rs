@@ -112,6 +112,7 @@ async fn main() -> SdkResult<()> {
     let server_details = InitializeResult {
         server_info: Implementation {
             name: "Rust MCP Server".into(),
+            title: Some("Rust MCP Server".into()),
             version: AppVersion::version(),
         },
         capabilities: ServerCapabilities {

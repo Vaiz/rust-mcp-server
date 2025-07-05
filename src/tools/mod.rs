@@ -5,8 +5,7 @@ pub mod cargo_machete;
 pub mod rustup;
 
 use rust_mcp_sdk::schema::{
-    Annotations, CallToolRequest, CallToolResult, CallToolResultContentItem, Role,
-    schema_utils::CallToolError,
+    schema_utils::CallToolError, Annotations, CallToolRequest, CallToolResult, Role, TextContent
 };
 
 use cargo::{
@@ -65,37 +64,43 @@ fn execute_command(mut cmd: std::process::Command) -> Result<CallToolResult, Cal
             if !stdout.is_empty() {
                 let annotations = Some(Annotations {
                     audience: vec![Role::User, Role::Assistant],
+                    last_modified: None,
                     priority: Some(0.1),
                 });
-                content.push(CallToolResultContentItem::text_content(
+                content.push(TextContent::new(
                     stdout.into(),
                     annotations,
-                ));
+                    None,
+                ).into());
             }
             if !stderr.is_empty() {
                 let annotations = Some(Annotations {
                     audience: vec![Role::User, Role::Assistant],
+                    last_modified: None,
                     priority: Some(1.),
                 });
-                content.push(CallToolResultContentItem::text_content(
+                content.push(TextContent::new(
                     stderr.into(),
                     annotations,
-                ));
+                    None,
+                ).into());
             }
             Ok(CallToolResult {
                 content,
                 is_error: Some(!output.status.success()),
                 meta: None,
+                structured_content: None,
             })
         }
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
             tracing::error!(error = ?e, "Command not found");
             let annotations = Some(Annotations {
                 audience: vec![Role::User, Role::Assistant],
+                last_modified: None,
                 priority: Some(1.),
             });
             let program = cmd.get_program().to_string_lossy();
-            let item = CallToolResultContentItem::text_content(
+            let item = TextContent::new(
                 format!(
                     "The command `{program}` was not found, please ensure it is installed and accessible. You can try running the following command yourself to verify: `{program} {}`",
                     cmd.get_args()
@@ -104,12 +109,14 @@ fn execute_command(mut cmd: std::process::Command) -> Result<CallToolResult, Cal
                         .join(" ")
                 ),
                 annotations,
+                None
             );
 
             Ok(CallToolResult {
-                content: vec![item],
+                content: vec![item.into()],
                 is_error: Some(true),
                 meta: None,
+                structured_content: None,
             })
         }
         Err(e) => {
