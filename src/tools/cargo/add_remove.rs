@@ -26,13 +26,9 @@ pub struct CargoAddTool {
     #[serde(flatten)]
     pub package_spec: PackageWithVersion,
 
-    /// Add as a dev-dependency
+    /// Dependency type: "regular" (default), "dev", or "build"
     #[serde(default)]
-    pub dev: bool,
-
-    /// Add as a build-dependency
-    #[serde(default)]
-    pub build: bool,
+    pub dependency_type: String,
 
     /// Add as an optional dependency
     #[serde(default)]
@@ -134,12 +130,15 @@ impl CargoAddTool {
         cmd.arg(self.package_spec.to_spec());
 
         // Dependency type
-        if self.dev {
-            cmd.arg("--dev");
-        }
-        if self.build {
-            cmd.arg("--build");
-        }
+        match self.dependency_type.as_str() {
+            "dev" => {
+                cmd.arg("--dev");
+            }
+            "build" => {
+                cmd.arg("--build");
+            }
+            _ => {} // regular or default
+        };
         if self.optional {
             cmd.arg("--optional");
         }
@@ -249,13 +248,9 @@ pub struct CargoRemoveTool {
     /// - Can be simple crate names as they appear in Cargo.toml
     pub dep_id: Vec<String>,
 
-    /// Remove from dev-dependencies
+    /// Dependency type: "regular" (default), "dev", or "build"
     #[serde(default)]
-    pub dev: bool,
-
-    /// Remove from build-dependencies
-    #[serde(default)]
-    pub build: bool,
+    pub dependency_type: String,
 
     /// Remove from target-dependencies
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -312,12 +307,15 @@ impl CargoRemoveTool {
         }
 
         // Section options
-        if self.dev {
-            cmd.arg("--dev");
-        }
-        if self.build {
-            cmd.arg("--build");
-        }
+        match self.dependency_type.as_str() {
+            "dev" => {
+                cmd.arg("--dev");
+            }
+            "build" => {
+                cmd.arg("--build");
+            }
+            _ => {} // regular or default
+        };
         if let Some(target) = &self.target {
             cmd.arg("--target").arg(target);
         }
