@@ -5,7 +5,7 @@ use rust_mcp_sdk::{
     schema::{CallToolResult, schema_utils::CallToolError},
 };
 
-use crate::serde_utils::{default_true, deserialize_string};
+use crate::serde_utils::{PackageWithVersion, default_true, deserialize_string};
 use crate::tools::execute_command;
 
 /// MCP defaults differ from cargo defaults: `quiet` and `locked` are `true` by default
@@ -17,12 +17,9 @@ use crate::tools::execute_command;
 )]
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct CargoInfoTool {
-    /// Package to inspect
-    pub spec: String,
-
-    /// Package version
-    #[serde(default, deserialize_with = "deserialize_string")]
-    pub version: Option<String>,
+    /// Package with optional version (e.g., {"package": "serde", "version": "1.0.0"})
+    #[serde(flatten)]
+    pub package_spec: PackageWithVersion,
 
     /// Registry index URL to search packages in
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -62,11 +59,7 @@ impl CargoInfoTool {
         let mut cmd = Command::new("cargo");
         cmd.arg("info");
 
-        if let Some(version) = self.version.as_ref() {
-            cmd.arg(format!("{}@{version}", self.spec));
-        } else {
-            cmd.arg(&self.spec);
-        }
+        cmd.arg(self.package_spec.to_spec());
 
         if let Some(index) = &self.index {
             cmd.arg("--index").arg(index);

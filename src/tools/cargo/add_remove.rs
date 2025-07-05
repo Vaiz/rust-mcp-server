@@ -1,7 +1,7 @@
 use std::process::Command;
 
 use crate::{
-    serde_utils::{default_true, deserialize_string, deserialize_string_vec},
+    serde_utils::{PackageWithVersion, default_true, deserialize_string, deserialize_string_vec},
     tools::execute_command,
 };
 use rust_mcp_sdk::{
@@ -22,12 +22,9 @@ pub struct CargoAddTool {
     #[serde(default, deserialize_with = "deserialize_string")]
     toolchain: Option<String>,
 
-    /// The name of the dependency to add.
-    pub package: String,
-
-    /// Optional version requirement.
-    #[serde(default, deserialize_with = "deserialize_string")]
-    pub version: Option<String>,
+    /// Package with optional version (e.g., {"package": "serde", "version": "1.0.0"})
+    #[serde(flatten)]
+    pub package_spec: PackageWithVersion,
 
     /// Add as a dev-dependency
     #[serde(default)]
@@ -134,11 +131,7 @@ impl CargoAddTool {
         }
         cmd.arg("add");
 
-        if let Some(version) = &self.version {
-            cmd.arg(format!("{}@{version}", self.package));
-        } else {
-            cmd.arg(&self.package);
-        }
+        cmd.arg(self.package_spec.to_spec());
 
         // Dependency type
         if self.dev {

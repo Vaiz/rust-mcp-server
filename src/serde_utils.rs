@@ -1,3 +1,5 @@
+use rust_mcp_sdk::macros::JsonSchema;
+
 /// Utility function for parsing Option<String> fields in serde,
 /// returning None if the string is "null" (case-insensitive) or empty.
 pub fn deserialize_string<'de, D>(deserializer: D) -> Result<Option<String>, D::Error>
@@ -42,6 +44,45 @@ where
 
 pub const fn default_true() -> bool {
     true
+}
+
+/// A type that represents a package with an optional version.
+/// When calling cargo commands, use `to_spec()` to get "package" or "package@version" format.
+#[derive(Debug, Clone, PartialEq, Eq, Hash, JsonSchema, serde::Serialize, serde::Deserialize)]
+pub struct PackageWithVersion {
+    /// The package name
+    pub package: String,
+    /// Optional version specification
+    #[serde(default, deserialize_with = "deserialize_string")]
+    pub version: Option<String>,
+}
+
+impl PackageWithVersion {
+    /// Create a new PackageWithVersion with just a package name
+    #[cfg(test)]
+    pub fn new(package: String) -> Self {
+        Self {
+            package,
+            version: None,
+        }
+    }
+
+    /// Create a new PackageWithVersion with a package name and version
+    #[cfg(test)]
+    pub fn with_version(package: String, version: String) -> Self {
+        Self {
+            package,
+            version: Some(version),
+        }
+    }
+
+    /// Get the formatted string representation (package or package@version)
+    pub fn to_spec(&self) -> String {
+        match &self.version {
+            Some(version) => format!("{}@{}", self.package, version),
+            None => self.package.clone(),
+        }
+    }
 }
 
 #[cfg(test)]
@@ -117,5 +158,89 @@ mod tests {
         let json = r#"{ "value": [1, 2, 3] }"#;
         let result: Result<TestStringVec, _> = serde_json::from_str(json);
         assert!(result.is_err());
+    }
+
+    // PackageWithVersion tests
+
+    #[test]
+    fn test_package_with_version_new() {
+        let pkg = PackageWithVersion::new("serde".to_string());
+        assert_eq!(pkg.package, "serde");
+        assert_eq!(pkg.version, None);
+        assert_eq!(pkg.to_spec(), "serde");
+    }
+
+    #[test]
+    fn test_package_with_version_with_version() {
+        let pkg = PackageWithVersion::with_version("serde".to_string(), "1.0.0".to_string());
+        assert_eq!(pkg.package, "serde");
+        assert_eq!(pkg.version, Some("1.0.0".to_string()));
+        assert_eq!(pkg.to_spec(), "serde@1.0.0");
+    }
+
+    #[test]
+    fn test_package_with_version_serialize() {
+        let pkg1 = PackageWithVersion::new("serde".to_string());
+        let json1 = serde_json::to_string(&pkg1).unwrap();
+        assert_eq!(json1, r#"{"package":"serde","version":null}"#);
+
+        let pkg2 = PackageWithVersion::with_version("serde".to_string(), "1.0.0".to_string());
+        let json2 = serde_json::to_string(&pkg2).unwrap();
+        assert_eq!(json2, r#"{"package":"serde","version":"1.0.0"}"#);
+    }
+
+    #[test]
+    fn test_package_with_version_deserialize_package_only() {
+        let json = r#"{"package":"serde"}"#;
+        let result: PackageWithVersion = serde_json::from_str(json).unwrap();
+        assert_eq!(result.package, "serde");
+        assert_eq!(result.version, None);
+    }
+
+    #[test]
+    fn test_package_with_version_deserialize_package_with_version() {
+        let json = r#"{"package":"serde","version":"1.0.0"}"#;
+        let result: PackageWithVersion = serde_json::from_str(json).unwrap();
+        assert_eq!(result.package, "serde");
+        assert_eq!(result.version, Some("1.0.0".to_string()));
+    }
+
+    #[test]
+    fn test_package_with_version_deserialize_null_version() {
+        let json = r#"{"package":"serde","version":null}"#;
+        let result: PackageWithVersion = serde_json::from_str(json).unwrap();
+        assert_eq!(result.package, "serde");
+        assert_eq!(result.version, None);
+    }
+
+    #[test]
+    fn test_package_with_version_deserialize_version_null_string() {
+        let json = r#"{"package":"serde","version":"null"}"#;
+        let result: PackageWithVersion = serde_json::from_str(json).unwrap();
+        assert_eq!(result.package, "serde");
+        assert_eq!(result.version, None); // "null" string is treated as None by deserialize_string
+    }
+
+    #[test]
+    fn test_package_with_version_roundtrip() {
+        let original = PackageWithVersion::with_version("tokio".to_string(), "1.0.0".to_string());
+        let json = serde_json::to_string(&original).unwrap();
+        let deserialized: PackageWithVersion = serde_json::from_str(&json).unwrap();
+        assert_eq!(original, deserialized);
+
+        // Test the to_spec method works correctly
+        assert_eq!(deserialized.to_spec(), "tokio@1.0.0");
+    }
+
+    #[test]
+    fn test_package_with_version_to_spec() {
+        let pkg1 = PackageWithVersion::new("serde".to_string());
+        assert_eq!(pkg1.to_spec(), "serde");
+
+        let pkg2 = PackageWithVersion::with_version("tokio".to_string(), "1.0.0".to_string());
+        assert_eq!(pkg2.to_spec(), "tokio@1.0.0");
+
+        let pkg3 = PackageWithVersion::with_version("clap".to_string(), "4.0.0-beta.1".to_string());
+        assert_eq!(pkg3.to_spec(), "clap@4.0.0-beta.1");
     }
 }
