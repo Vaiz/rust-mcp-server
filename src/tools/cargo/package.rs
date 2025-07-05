@@ -1,7 +1,7 @@
 use std::process::Command;
 
 use rust_mcp_sdk::{
-    macros::{JsonSchema, mcp_tool},
+    macros::mcp_tool,
     schema::{CallToolResult, schema_utils::CallToolError},
 };
 
@@ -10,6 +10,8 @@ use crate::tools::execute_command;
 
 /// MCP defaults differ from cargo defaults: `quiet` and `locked` are `true` by default
 /// for better integration with automated tooling and to avoid blocking on missing lockfiles.
+use crate::serde_utils::Tool;
+
 #[mcp_tool(
     name = "cargo-package",
     description = "Assemble the local package into a distributable tarball for publishing or distribution. 
@@ -27,7 +29,7 @@ use crate::tools::execute_command;
     Usually run without any additional arguments for single-package projects.",
     openWorldHint = false
 )]
-#[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
+#[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
 pub struct CargoPackageTool {
     /// [Optional] The toolchain to use for packaging, e.g., "stable", "nightly", or "1.70.0".
     /// When specified, cargo will use this specific Rust toolchain version.

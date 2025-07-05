@@ -5,18 +5,20 @@ use crate::{
     tools::execute_command,
 };
 use rust_mcp_sdk::{
-    macros::{JsonSchema, mcp_tool},
+    macros::mcp_tool,
     schema::{CallToolResult, schema_utils::CallToolError},
 };
 
 /// MCP defaults differ from cargo defaults: `quiet` and `locked` are `true` by default
 /// for better integration with automated tooling and to avoid blocking on missing lockfiles.
+use crate::serde_utils::Tool;
+
 #[mcp_tool(
     name = "cargo-clippy",
     description = "Checks a Rust package to catch common mistakes and improve code quality using Clippy",
     openWorldHint = false
 )]
-#[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
+#[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
 pub struct CargoClippyTool {
     /// The toolchain to use, e.g., "stable" or "nightly".
     #[serde(default, deserialize_with = "deserialize_string")]

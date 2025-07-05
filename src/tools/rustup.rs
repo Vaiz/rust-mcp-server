@@ -1,19 +1,21 @@
 use std::process::Command;
 
 use rust_mcp_sdk::{
-    macros::{JsonSchema, mcp_tool},
+    macros::mcp_tool,
     schema::{CallToolResult, schema_utils::CallToolError},
 };
 
 use crate::serde_utils::{deserialize_string, deserialize_string_vec};
 use crate::tools::execute_command;
 
+use crate::serde_utils::Tool;
+
 #[mcp_tool(
     name = "rustup-show",
     description = "Show the active and installed toolchains or profiles. Shows the name of the active toolchain and the version of rustc. If the active toolchain has installed support for additional compilation targets, then they are listed as well.",
     openWorldHint = false
 )]
-#[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
+#[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
 pub struct RustupShowTool {
     /// Enable verbose output with rustc information for all installed toolchains
     #[serde(default)]
@@ -38,7 +40,7 @@ impl RustupShowTool {
     description = "Install or update the given toolchains, or by default the active toolchain. Toolchain name can be 'stable', 'nightly', or a specific version like '1.8.0'.",
     openWorldHint = false
 )]
-#[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
+#[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
 pub struct RustupToolchainAddTool {
     /// Toolchain name, such as 'stable', 'nightly', or '1.8.0'
     pub toolchain: String,
@@ -118,7 +120,7 @@ impl RustupToolchainAddTool {
     description = "Update Rust toolchains and rustup. With no toolchain specified, updates each of the installed toolchains from the official release channels, then updates rustup itself. If given a toolchain argument then updates that toolchain.",
     openWorldHint = false
 )]
-#[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
+#[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
 pub struct RustupUpdateTool {
     /// Toolchain name to update, such as 'stable', 'nightly', or '1.8.0'. If not specified, updates all installed toolchains
     #[serde(default, deserialize_with = "deserialize_string")]
