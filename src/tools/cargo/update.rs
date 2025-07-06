@@ -69,10 +69,6 @@ pub struct CargoUpdateTool {
     #[serde(default, deserialize_with = "deserialize_string")]
     locking_mode: Option<String>,
 
-    /// Coloring [possible values: auto, always, never]
-    #[serde(default, deserialize_with = "deserialize_string")]
-    color: Option<String>,
-
     /// Override a configuration value
     #[serde(default, deserialize_with = "deserialize_string")]
     config: Option<String>,
@@ -143,11 +139,6 @@ impl CargoUpdateTool {
         let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref())?;
         for flag in locking_flags {
             cmd.arg(flag);
-        }
-
-        // Configuration options
-        if let Some(color) = &self.color {
-            cmd.arg("--color").arg(color);
         }
 
         if let Some(config) = &self.config {
