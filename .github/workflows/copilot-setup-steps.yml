@@ -28,7 +28,7 @@ jobs:
         key: copilot-cargo
 
     - name: Install cargo-quickinstall
-      run: cargo install cargo-quickinstall    
+      run: cargo install cargo-quickinstall
     
     - name: Install Rust MCP Server
       run: cargo quickinstall rust-mcp-server
