@@ -122,7 +122,13 @@ pub struct CargoBuildTool {
     #[serde(default)]
     ignore_rust_version: bool,
 
-    /// Locking mode for dependency management. Valid options: "locked" (default), "unlocked", "offline", "frozen".
+    /// Locking mode for dependency resolution.
+    ///
+    /// Valid options:
+    /// - "locked" (default): Assert that `Cargo.lock` will remain unchanged
+    /// - "unlocked": Allow `Cargo.lock` to be updated
+    /// - "offline": Run without accessing the network
+    /// - "frozen": Equivalent to specifying both --locked and --offline
     #[serde(default, deserialize_with = "deserialize_string")]
     locking_mode: Option<String>,
 

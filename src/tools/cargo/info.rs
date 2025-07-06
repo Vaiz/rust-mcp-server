@@ -44,7 +44,13 @@ pub struct CargoInfoTool {
     #[serde(default, deserialize_with = "deserialize_string")]
     pub config: Option<String>,
 
-    /// Locking mode for dependency management. Valid options: "locked" (default), "unlocked", "offline", "frozen".
+    /// Locking mode for dependency resolution.
+    ///
+    /// Valid options:
+    /// - "locked" (default): Assert that `Cargo.lock` will remain unchanged
+    /// - "unlocked": Allow `Cargo.lock` to be updated
+    /// - "offline": Run without accessing the network
+    /// - "frozen": Equivalent to specifying both --locked and --offline
     #[serde(default, deserialize_with = "deserialize_string")]
     pub locking_mode: Option<String>,
 }
@@ -106,7 +112,7 @@ mod tests {
     },
     "locking_mode": {
       "default": null,
-      "description": "Locking mode for dependency management. Valid options: \"locked\" (default), \"unlocked\", \"offline\", \"frozen\".",
+      "description": "Locking mode for dependency resolution.\n\nValid options:\n- \"locked\" (default): Assert that `Cargo.lock` will remain unchanged\n- \"unlocked\": Allow `Cargo.lock` to be updated\n- \"offline\": Run without accessing the network\n- \"frozen\": Equivalent to specifying both --locked and --offline",
       "type": "string"
     },
     "package": {
