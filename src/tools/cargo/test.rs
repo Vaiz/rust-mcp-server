@@ -137,7 +137,7 @@ pub struct CargoTestTool {
     ignore_rust_version: bool,
 
     /// Locking mode for dependency resolution.
-    /// 
+    ///
     /// Valid options:
     /// - "locked" (default): Assert that `Cargo.lock` will remain unchanged
     /// - "unlocked": Allow `Cargo.lock` to be updated

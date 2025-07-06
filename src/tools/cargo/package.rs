@@ -5,7 +5,9 @@ use rust_mcp_sdk::{
     schema::{CallToolResult, schema_utils::CallToolError},
 };
 
-use crate::serde_utils::{default_true, deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags};
+use crate::serde_utils::{
+    default_true, deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
+};
 use crate::tools::execute_command;
 
 /// MCP defaults differ from cargo defaults: `quiet` and `locked` are `true` by default
@@ -127,7 +129,7 @@ pub struct CargoPackageTool {
     lockfile_path: Option<String>,
 
     /// Locking mode for dependency resolution.
-    /// 
+    ///
     /// Valid options:
     /// - "locked" (default): Assert that `Cargo.lock` will remain unchanged
     /// - "unlocked": Allow `Cargo.lock` to be updated

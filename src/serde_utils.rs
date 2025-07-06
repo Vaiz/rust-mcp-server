@@ -44,7 +44,7 @@ where
 
 /// Convert locking mode string to CLI flags for cargo commands.
 /// Returns a vector of flags to add to the command.
-/// 
+///
 /// Valid modes:
 /// - "locked" (default): Assert that `Cargo.lock` will remain unchanged
 /// - "unlocked": Allow `Cargo.lock` to be updated  
@@ -54,13 +54,12 @@ pub fn locking_mode_to_cli_flags(mode: Option<&str>) -> Result<Vec<&'static str>
     Ok(match mode.unwrap_or("locked") {
         "locked" => vec!["--locked"],
         "unlocked" => vec![], // No flags needed
-        "offline" => vec!["--offline"], 
+        "offline" => vec!["--offline"],
         "frozen" => vec!["--frozen"],
         unknown => {
             return Err(CallToolError(
                 anyhow::anyhow!(
-                    "Unknown locking mode: {}. Valid options are: locked, unlocked, offline, frozen", 
-                    unknown
+                    "Unknown locking mode: {unknown}. Valid options are: locked, unlocked, offline, frozen"                    
                 ).into()
             ));
         }
@@ -393,13 +392,25 @@ mod tests {
     fn test_locking_mode_cli_flags() {
         // Test default (locked)
         assert_eq!(locking_mode_to_cli_flags(None).unwrap(), vec!["--locked"]);
-        
+
         // Test explicit modes
-        assert_eq!(locking_mode_to_cli_flags(Some("locked")).unwrap(), vec!["--locked"]);
-        assert_eq!(locking_mode_to_cli_flags(Some("unlocked")).unwrap(), Vec::<&str>::new());
-        assert_eq!(locking_mode_to_cli_flags(Some("offline")).unwrap(), vec!["--offline"]);
-        assert_eq!(locking_mode_to_cli_flags(Some("frozen")).unwrap(), vec!["--frozen"]);
-        
+        assert_eq!(
+            locking_mode_to_cli_flags(Some("locked")).unwrap(),
+            vec!["--locked"]
+        );
+        assert_eq!(
+            locking_mode_to_cli_flags(Some("unlocked")).unwrap(),
+            Vec::<&str>::new()
+        );
+        assert_eq!(
+            locking_mode_to_cli_flags(Some("offline")).unwrap(),
+            vec!["--offline"]
+        );
+        assert_eq!(
+            locking_mode_to_cli_flags(Some("frozen")).unwrap(),
+            vec!["--frozen"]
+        );
+
         // Test unknown values return error
         assert!(locking_mode_to_cli_flags(Some("invalid")).is_err());
         let error = locking_mode_to_cli_flags(Some("invalid")).unwrap_err();

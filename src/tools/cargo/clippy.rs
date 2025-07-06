@@ -1,7 +1,9 @@
 use std::process::Command;
 
 use crate::{
-    serde_utils::{default_true, deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags},
+    serde_utils::{
+        default_true, deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
+    },
     tools::execute_command,
 };
 use rust_mcp_sdk::{
@@ -125,7 +127,7 @@ pub struct CargoClippyTool {
     ignore_rust_version: bool,
 
     /// Locking mode for dependency resolution.
-    /// 
+    ///
     /// Valid options:
     /// - "locked" (default): Assert that `Cargo.lock` will remain unchanged
     /// - "unlocked": Allow `Cargo.lock` to be updated
