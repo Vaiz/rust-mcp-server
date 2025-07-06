@@ -1,12 +1,14 @@
 use std::process::Command;
 
+use crate::serde_utils::Tool;
+use crate::{
+    serde_utils::{PackageWithVersion, default_true, deserialize_string},
+    tools::execute_command,
+};
 use rust_mcp_sdk::{
     macros::mcp_tool,
     schema::{CallToolResult, schema_utils::CallToolError},
 };
-
-use crate::serde_utils::{PackageWithVersion, default_true, deserialize_string};
-use crate::tools::execute_command;
 
 /// MCP defaults differ from cargo defaults: `quiet` and `locked` are `true` by default
 /// for better integration with automated tooling and to avoid blocking on missing lockfiles.
@@ -55,17 +57,6 @@ pub struct CargoInfoTool {
 }
 
 impl CargoInfoTool {
-    pub fn json_schema() -> serde_json::Map<String, serde_json::Value> {
-        use schemars::schema_for;
-        let schema = schema_for!(CargoInfoTool).to_value();
-        if let serde_json::Value::Object(mut map) = schema {
-            map.remove("$schema");
-            map
-        } else {
-            panic!("Expected schema to be an object, got: {schema:?}");
-        }
-    }
-
     pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
         let mut cmd = Command::new("cargo");
         cmd.arg("info");
@@ -107,5 +98,84 @@ impl CargoInfoTool {
         }
 
         execute_command(cmd)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_cargo_info_schema() {
+        const EXPECTED_SCHEMA: &str = r##"{
+  "description": "MCP defaults differ from cargo defaults: `quiet` and `locked` are `true` by default\nfor better integration with automated tooling and to avoid blocking on missing lockfiles.",
+  "properties": {
+    "config": {
+      "default": null,
+      "description": "Override a configuration value",
+      "type": "string"
+    },
+    "frozen": {
+      "default": false,
+      "description": "Equivalent to specifying both --locked and --offline",
+      "type": "boolean"
+    },
+    "index": {
+      "default": null,
+      "description": "Registry index URL to search packages in",
+      "type": "string"
+    },
+    "locked": {
+      "default": true,
+      "description": "Assert that `Cargo.lock` will remain unchanged. By default is `true`.",
+      "type": "boolean"
+    },
+    "offline": {
+      "default": false,
+      "description": "Run without accessing the network",
+      "type": "boolean"
+    },
+    "package": {
+      "description": "The package name",
+      "type": "string"
+    },
+    "quiet": {
+      "default": true,
+      "description": "Do not print cargo log messages. By default is `true`.",
+      "type": "boolean"
+    },
+    "registry": {
+      "default": null,
+      "description": "Registry to search packages in",
+      "type": "string"
+    },
+    "verbose": {
+      "default": false,
+      "description": "Use verbose output that includes crate dependencies.",
+      "type": "boolean"
+    },
+    "version": {
+      "default": null,
+      "description": "Optional version specification",
+      "type": "string"
+    }
+  },
+  "required": [
+    "package"
+  ],
+  "title": "CargoInfoTool",
+  "type": "object"
+}"##;
+        let schema = serde_json::Value::from(CargoInfoTool::json_schema());
+        println!(
+            "CargoInfoTool schema: {}",
+            serde_json::to_string_pretty(&schema).unwrap()
+        );
+
+        let expected_schema: serde_json::Value = serde_json::from_str(EXPECTED_SCHEMA).unwrap();
+        assert_eq!(
+            schema, expected_schema,
+            "CargoInfoTool schema should match expected structure"
+        );
     }
 }
