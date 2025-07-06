@@ -74,8 +74,20 @@ jobs:
     - name: clippy
       run: cargo clippy --locked --all-targets --all-features -- -D warnings
 
+    - name: Install cargo-quickinstall
+      run: cargo install cargo-quickinstall
+
+    - name: Install cargo-machete
+      run: cargo quickinstall cargo-machete
+
     - name: machete
-      uses: bnjbvr/cargo-machete@main
+      run: cargo machete
+      
+    - name: Install cargo-deny
+      run: cargo quickinstall cargo-deny
+
+    - name: cargo-deny
+      run: cargo deny check --allow license-not-encountered
 
   linelint:
     runs-on: ubuntu-latest
