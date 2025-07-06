@@ -9,7 +9,7 @@ mod search;
 mod test;
 mod update;
 
-pub use add_remove::{CargoAddTool, CargoRemoveTool, TestTool1, TestTool2};
+pub use add_remove::{CargoAddTool, CargoRemoveTool};
 pub use build::CargoBuildTool;
 pub use check::CargoCheckTool;
 pub use clippy::CargoClippyTool;
