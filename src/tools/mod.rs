@@ -11,7 +11,8 @@ use rust_mcp_sdk::schema::{
 use cargo::{
     CargoAddTool, CargoBuildTool, CargoCheckTool, CargoCleanTool, CargoClippyTool, CargoFmtTool,
     CargoGenerateLockfileTool, CargoInfoTool, CargoListTool, CargoMetadataTool, CargoNewTool,
-    CargoPackageTool, CargoRemoveTool, CargoSearchTool, CargoTestTool, CargoUpdateTool,
+    CargoPackageTool, CargoRemoveTool, CargoSearchTool, CargoTestTool, CargoUpdateTool, TestTool1,
+    TestTool2,
 };
 use cargo_deny::{CargoDenyCheckTool, CargoDenyInitTool, CargoDenyInstallTool, CargoDenyListTool};
 use cargo_hack::{CargoHackInstallTool, CargoHackTool};
@@ -147,7 +148,9 @@ rust_mcp_sdk::tool_box!(
         RustupToolchainAddTool,
         RustupUpdateTool,
         CargoSearchTool,
-        CargoInfoTool
+        CargoInfoTool,
+        TestTool1,
+        TestTool2,
     ]
 );
 
@@ -201,6 +204,8 @@ pub fn handle_request(
         AllTools::RustupUpdateTool(tool) => tool.call_tool(),
         AllTools::CargoSearchTool(tool) => tool.call_tool(),
         AllTools::CargoInfoTool(tool) => tool.call_tool(),
+        AllTools::TestTool1(tool) => tool.call_tool(),
+        AllTools::TestTool2(tool) => tool.call_tool(),
     }
 }
 

@@ -5,6 +5,7 @@ use crate::{
     serde_utils::{PackageWithVersion, default_true, deserialize_string, deserialize_string_vec},
     tools::execute_command,
 };
+use rust_mcp_sdk::schema::TextContent;
 use rust_mcp_sdk::{
     macros::mcp_tool,
     schema::{CallToolResult, schema_utils::CallToolError},
@@ -374,6 +375,55 @@ impl CargoRemoveTool {
         }
 
         execute_command(cmd)
+    }
+}
+
+#[mcp_tool(
+    name = "test-tool-1",
+    description = "A test tool with an optional string parameter.",
+    openWorldHint = false
+)]
+#[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
+pub struct TestTool1 {
+    /// An optional string parameter for testing.
+    #[serde(default, deserialize_with = "deserialize_string")]
+    pub maybe_string: Option<String>,
+}
+
+impl TestTool1 {
+    pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
+        let text = TextContent::new(
+            format!("TestTool1 called with string: {:?}", self.maybe_string),
+            None,
+            None,
+        );
+        Ok(CallToolResult::text_content(vec![text.into()]))
+    }
+}
+
+#[mcp_tool(
+    name = "test-tool-2",
+    description = "A test tool with a DependencyType parameter.",
+    openWorldHint = false
+)]
+#[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
+pub struct TestTool2 {
+    /// The dependency type to test.
+    #[serde(default)]
+    pub dependency_type: DependencyType,
+}
+
+impl TestTool2 {
+    pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
+        let text = TextContent::new(
+            format!(
+                "TestTool2 called with dependency type: {:?}",
+                self.dependency_type
+            ),
+            None,
+            None,
+        );
+        Ok(CallToolResult::text_content(vec![text.into()]))
     }
 }
 
