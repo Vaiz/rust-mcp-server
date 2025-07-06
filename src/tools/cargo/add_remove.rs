@@ -29,8 +29,6 @@ fn dependency_type_to_cli_flag(
     })
 }
 
-/// MCP defaults differ from cargo defaults: `quiet` and `locked` are `true` by default
-/// for better integration with automated tooling and to avoid blocking on missing lockfiles.
 #[mcp_tool(
     name = "cargo-add",
     description = "Adds a dependency to a Rust project using cargo add.",
@@ -232,8 +230,6 @@ impl CargoAddTool {
     }
 }
 
-/// MCP defaults differ from cargo defaults: `quiet` and `locked` are `true` by default
-/// for better integration with automated tooling and to avoid blocking on missing lockfiles.
 #[mcp_tool(
     name = "cargo-remove",
     description = "Remove dependencies from a Cargo.toml manifest file.",
@@ -385,7 +381,7 @@ mod tests {
     fn test_cargo_add_schema() {
         const EXPECTED_SCHEMA: &str = r##"
         {
-  "description": "MCP defaults differ from cargo defaults: `quiet` and `locked` are `true` by default\nfor better integration with automated tooling and to avoid blocking on missing lockfiles.",
+  "description": "Adds a dependency to a Rust project using cargo add.",
   "properties": {
     "branch": {
       "default": null,

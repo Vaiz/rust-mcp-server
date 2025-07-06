@@ -30,8 +30,6 @@ use rust_mcp_sdk::{
 use crate::serde_utils::{default_true, deserialize_string, deserialize_string_vec};
 use crate::tools::execute_command;
 
-/// MCP defaults differ from cargo defaults: `quiet` and `locked` are `true` by default
-/// for better integration with automated tooling and to avoid blocking on missing lockfiles.
 use crate::serde_utils::Tool;
 
 #[mcp_tool(
@@ -126,8 +124,6 @@ impl CargoGenerateLockfileTool {
     }
 }
 
-/// MCP defaults differ from cargo defaults: `quiet` and `locked` are `true` by default
-/// for better integration with automated tooling and to avoid blocking on missing lockfiles.
 #[mcp_tool(
     name = "cargo-clean",
     description = "Cleans the target directory for a Rust project using Cargo. By default, it cleans the entire workspace.",
@@ -271,8 +267,6 @@ impl CargoCleanTool {
     }
 }
 
-/// MCP defaults differ from cargo defaults: `quiet` is `true` by default
-/// for better integration with automated tooling.
 #[mcp_tool(
     name = "cargo-fmt",
     description = "Formats Rust code using rustfmt. Usually, run without any additional arguments.",
@@ -359,8 +353,6 @@ impl CargoFmtTool {
     }
 }
 
-/// MCP defaults differ from cargo defaults: `quiet` is `true` and `locked` is `false` by default
-/// for better integration with automated tooling. `locked` is false since new projects don't have Cargo.lock yet.
 #[mcp_tool(
     name = "cargo-new",
     description = "Create a new cargo package at <path>. Creates a new Rust project with the specified name and template.",

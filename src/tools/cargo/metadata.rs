@@ -7,8 +7,6 @@ use rust_mcp_sdk::{
     schema::{CallToolResult, schema_utils::CallToolError},
 };
 
-/// MCP defaults differ from cargo defaults: `quiet` and `locked` are `true` by default
-/// for better integration with automated tooling and to avoid blocking on missing lockfiles.
 #[mcp_tool(
     name = "cargo-metadata",
     description = "Outputs a listing of a project's resolved dependencies and metadata in machine-readable format (JSON).",
