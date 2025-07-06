@@ -410,44 +410,330 @@ mod tests {
 
     #[test]
     fn test_dependency_type_json_schema() {
-        let schema = DependencyType::json_schema();
-        assert!(!schema.is_empty(), "Schema should not be empty");
+        const EXPECTED_SCHEMA: &str = r#"
+{
+  "title": "DependencyType",
+  "description": "Dependency type for cargo add/remove operations",
+  "oneOf": [
+    {
+      "const": "regular",
+      "description": "Regular dependency (default section)",
+      "type": "string"
+    },
+    {
+      "const": "dev",
+      "description": "Development dependency",
+      "type": "string"
+    },
+    {
+      "const": "build",
+      "description": "Build dependency",
+      "type": "string"
+    }
+  ]
+}"#;
 
-        let mut expected_schema = serde_json::Map::<String, serde_json::Value>::new();
-        expected_schema.insert(
-            "title".to_string(),
-            serde_json::Value::String("DependencyType".to_string()),
-        );
-        expected_schema.insert(
-            "description".to_string(),
-            serde_json::Value::String(
-                "Dependency type for cargo add/remove operations".to_string(),
-            ),
-        );
-        expected_schema.insert(
-            "oneOf".to_string(),
-            serde_json::Value::Array(vec![
-                serde_json::json!({
-                    "const": "regular",
-                    "description": "Regular dependency (default section)",
-                    "type": "string"
-                }),
-                serde_json::json!({
-                    "const": "dev",
-                    "description": "Development dependency",
-                    "type": "string"
-                }),
-                serde_json::json!({
-                    "const": "build",
-                    "description": "Build dependency",
-                    "type": "string"
-                }),
-            ]),
-        );
+        let schema = serde_json::Value::from(DependencyType::json_schema());
+        let expected_schema: serde_json::Value = serde_json::from_str(EXPECTED_SCHEMA).unwrap();
 
         assert_eq!(
             schema, expected_schema,
             "Schema should match expected structure"
+        );
+    }
+
+    #[test]
+    fn test_cargo_add_schema() {
+        const EXPECTED_SCHEMA: &str = r##"
+        {
+  "$defs": {
+    "DependencyType": {
+      "description": "Dependency type for cargo add/remove operations",
+      "oneOf": [
+        {
+          "const": "regular",
+          "description": "Regular dependency (default section)",
+          "type": "string"
+        },
+        {
+          "const": "dev",
+          "description": "Development dependency",
+          "type": "string"
+        },
+        {
+          "const": "build",
+          "description": "Build dependency",
+          "type": "string"
+        }
+      ]
+    }
+  },
+  "description": "MCP defaults differ from cargo defaults: `quiet` and `locked` are `true` by default\nfor better integration with automated tooling and to avoid blocking on missing lockfiles.",
+  "properties": {
+    "branch": {
+      "default": null,
+      "description": "Git branch to download the crate from",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "default_features": {
+      "default": false,
+      "description": "Re-enable the default features",
+      "type": "boolean"
+    },
+    "dependency_type": {
+      "$ref": "#/$defs/DependencyType",
+      "description": "Dependency type: \"regular\" (default), \"dev\", or \"build\""
+    },
+    "dry_run": {
+      "default": false,
+      "description": "Don't actually write the manifest",
+      "type": "boolean"
+    },
+    "features": {
+      "default": null,
+      "description": "Space or comma separated list of features to activate",
+      "items": {
+        "type": "string"
+      },
+      "type": [
+        "array",
+        "null"
+      ]
+    },
+    "frozen": {
+      "default": false,
+      "description": "Equivalent to specifying both --locked and --offline",
+      "type": "boolean"
+    },
+    "git": {
+      "default": null,
+      "description": "Git repository location",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "ignore_rust_version": {
+      "default": false,
+      "description": "Ignore `rust-version` specification in packages",
+      "type": "boolean"
+    },
+    "locked": {
+      "default": false,
+      "description": "Assert that `Cargo.lock` will remain unchanged.",
+      "type": "boolean"
+    },
+    "lockfile_path": {
+      "default": null,
+      "description": "Path to Cargo.lock (unstable)",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "manifest_path": {
+      "default": null,
+      "description": "Path to Cargo.toml",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "no_default_features": {
+      "default": false,
+      "description": "Disable the default features",
+      "type": "boolean"
+    },
+    "offline": {
+      "default": false,
+      "description": "Run without accessing the network",
+      "type": "boolean"
+    },
+    "optional": {
+      "default": false,
+      "description": "Add as an optional dependency",
+      "type": "boolean"
+    },
+    "package": {
+      "description": "The package name",
+      "type": "string"
+    },
+    "path": {
+      "default": null,
+      "description": "Filesystem path to local crate to add",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "quiet": {
+      "default": true,
+      "description": "Do not print cargo log messages. By default is `true`.",
+      "type": "boolean"
+    },
+    "registry": {
+      "default": null,
+      "description": "Package registry for this dependency",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "rename": {
+      "default": null,
+      "description": "Rename the dependency",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "rev": {
+      "default": null,
+      "description": "Git reference to download the crate from",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "tag": {
+      "default": null,
+      "description": "Git tag to download the crate from",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "target": {
+      "default": null,
+      "description": "Add as dependency to the given target platform",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "target_package": {
+      "default": null,
+      "description": "Package to modify",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "toolchain": {
+      "default": null,
+      "description": "The toolchain to use, e.g., \"stable\" or \"nightly\".",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "verbose": {
+      "default": false,
+      "description": "Use verbose output",
+      "type": "boolean"
+    },
+    "version": {
+      "default": null,
+      "description": "Optional version specification",
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "package"
+  ],
+  "title": "CargoAddTool",
+  "type": "object"
+}"##;
+        let schema = serde_json::Value::from(CargoAddTool::json_schema());
+        println!(
+            "CargoAddTool schema: {}",
+            serde_json::to_string_pretty(&schema).unwrap()
+        );
+
+        let expected_schema: serde_json::Value = serde_json::from_str(EXPECTED_SCHEMA).unwrap();
+
+        // Traverse both schemas to find the difference
+        fn find_diff(a: &serde_json::Value, b: &serde_json::Value, path: &str) -> Option<String> {
+            match (a, b) {
+                (serde_json::Value::Object(map_a), serde_json::Value::Object(map_b)) => {
+                    for (k, v_a) in map_a {
+                        let new_path = if path.is_empty() {
+                            k.clone()
+                        } else {
+                            format!("{}/{}", path, k)
+                        };
+                        match map_b.get(k) {
+                            Some(v_b) => {
+                                if let Some(diff) = find_diff(v_a, v_b, &new_path) {
+                                    return Some(diff);
+                                }
+                            }
+                            None => {
+                                return Some(format!(
+                                    "Key '{}' missing in expected at path '{}'",
+                                    k, new_path
+                                ));
+                            }
+                        }
+                    }
+                    for k in map_b.keys() {
+                        if !map_a.contains_key(k) {
+                            let new_path = if path.is_empty() {
+                                k.clone()
+                            } else {
+                                format!("{}/{}", path, k)
+                            };
+                            return Some(format!(
+                                "Extra key '{}' in expected at path '{}'",
+                                k, new_path
+                            ));
+                        }
+                    }
+                    None
+                }
+                (serde_json::Value::Array(arr_a), serde_json::Value::Array(arr_b)) => {
+                    if arr_a.len() != arr_b.len() {
+                        return Some(format!(
+                            "Array length mismatch at '{}': {} vs {}",
+                            path,
+                            arr_a.len(),
+                            arr_b.len()
+                        ));
+                    }
+                    for (i, (v_a, v_b)) in arr_a.iter().zip(arr_b.iter()).enumerate() {
+                        let new_path = format!("{}[{}]", path, i);
+                        if let Some(diff) = find_diff(v_a, v_b, &new_path) {
+                            return Some(diff);
+                        }
+                    }
+                    None
+                }
+                _ => {
+                    if a != b {
+                        Some(format!(
+                            "Value mismatch at '{}': left = {}, right = {}",
+                            path, a, b
+                        ))
+                    } else {
+                        None
+                    }
+                }
+            }
+        }
+
+        if let Some(diff) = find_diff(&schema, &expected_schema, "") {
+            panic!("Schema difference found: {}", diff);
+        }
+
+        assert_eq!(
+            schema, expected_schema,
+            "CargoAddTool schema should match expected structure"
         );
     }
 }
