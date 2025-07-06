@@ -147,7 +147,7 @@ rust_mcp_sdk::tool_box!(
         RustupToolchainAddTool,
         RustupUpdateTool,
         CargoSearchTool,
-        CargoInfoTool
+        CargoInfoTool,
     ]
 );
 

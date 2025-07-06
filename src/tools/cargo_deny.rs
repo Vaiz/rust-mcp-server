@@ -1,7 +1,8 @@
+use crate::serde_utils::Tool;
 use std::process::Command;
 
 use rust_mcp_sdk::{
-    macros::{JsonSchema, mcp_tool},
+    macros::mcp_tool,
     schema::{CallToolResult, schema_utils::CallToolError},
 };
 
@@ -13,7 +14,7 @@ use crate::tools::execute_command;
     description = "Checks a project's crate graph for security advisories, license compliance, banned crates.",
     openWorldHint = false
 )]
-#[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
+#[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
 pub struct CargoDenyCheckTool {
     /// The check(s) to perform. Options: advisories, ban, bans, license, licenses, sources, all
     #[serde(default, deserialize_with = "deserialize_string_vec")]
@@ -81,26 +82,6 @@ pub struct CargoDenyCheckTool {
     /// One or more platforms to filter crates by
     #[serde(default, deserialize_with = "deserialize_string_vec")]
     target: Option<Vec<String>>,
-
-    /// Activate all available features
-    #[serde(default)]
-    all_features: bool,
-
-    /// Do not activate the `default` feature
-    #[serde(default)]
-    no_default_features: bool,
-
-    /// Space or comma separated list of features to activate
-    #[serde(default, deserialize_with = "deserialize_string_vec")]
-    features: Option<Vec<String>>,
-
-    /// Run without accessing the network
-    #[serde(default)]
-    offline: bool,
-
-    /// Assert that `Cargo.lock` will remain unchanged
-    #[serde(default)]
-    locked: bool,
 }
 
 impl CargoDenyCheckTool {
@@ -135,22 +116,6 @@ impl CargoDenyCheckTool {
             for item in target {
                 cmd.arg("--target").arg(item);
             }
-        }
-
-        if self.all_features {
-            cmd.arg("--all-features");
-        }
-
-        if self.no_default_features {
-            cmd.arg("--no-default-features");
-        }
-
-        if let Some(features) = &self.features {
-            cmd.arg("--features").arg(features.join(","));
-        }
-
-        if self.offline {
-            cmd.arg("--offline");
         }
 
         cmd.arg("check");
@@ -216,7 +181,7 @@ impl CargoDenyCheckTool {
     description = "Creates a cargo-deny config from a template",
     openWorldHint = false
 )]
-#[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
+#[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
 pub struct CargoDenyInitTool {
     /// The path to create. Defaults to <cwd>/deny.toml
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -241,7 +206,7 @@ impl CargoDenyInitTool {
     description = "Outputs a listing of all licenses and the crates that use them",
     openWorldHint = false
 )]
-#[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
+#[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
 pub struct CargoDenyListTool {
     /// Path to the config to use. Defaults to a deny.toml in the same folder as the manifest path
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -289,7 +254,7 @@ impl CargoDenyListTool {
     description = "Installs cargo-deny tool for dependency graph analysis and security checks",
     openWorldHint = false
 )]
-#[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
+#[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
 pub struct CargoDenyInstallTool {}
 
 impl CargoDenyInstallTool {

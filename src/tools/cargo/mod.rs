@@ -23,7 +23,7 @@ pub use update::CargoUpdateTool;
 use std::process::Command;
 
 use rust_mcp_sdk::{
-    macros::{JsonSchema, mcp_tool},
+    macros::mcp_tool,
     schema::{CallToolResult, schema_utils::CallToolError},
 };
 
@@ -32,12 +32,14 @@ use crate::tools::execute_command;
 
 /// MCP defaults differ from cargo defaults: `quiet` and `locked` are `true` by default
 /// for better integration with automated tooling and to avoid blocking on missing lockfiles.
+use crate::serde_utils::Tool;
+
 #[mcp_tool(
     name = "cargo-generate_lockfile",
     description = "Generates or updates the Cargo.lock file for a Rust project. Usually, run without any additional arguments.",
     openWorldHint = false
 )]
-#[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
+#[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
 pub struct CargoGenerateLockfileTool {
     /// The name of the package to generate lockfile for. If not specified, generates for the current package/workspace.
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -131,7 +133,7 @@ impl CargoGenerateLockfileTool {
     description = "Cleans the target directory for a Rust project using Cargo. By default, it cleans the entire workspace.",
     openWorldHint = false
 )]
-#[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
+#[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
 pub struct CargoCleanTool {
     /// The toolchain to use, e.g., "stable" or "nightly".
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -276,7 +278,7 @@ impl CargoCleanTool {
     description = "Formats Rust code using rustfmt. Usually, run without any additional arguments.",
     openWorldHint = false
 )]
-#[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
+#[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
 pub struct CargoFmtTool {
     /// The toolchain to use, e.g., "stable" or "nightly".
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -364,7 +366,7 @@ impl CargoFmtTool {
     description = "Create a new cargo package at <path>. Creates a new Rust project with the specified name and template.",
     openWorldHint = false
 )]
-#[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
+#[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
 pub struct CargoNewTool {
     /// The toolchain to use, e.g., "stable" or "nightly".
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -483,7 +485,7 @@ impl CargoNewTool {
     description = "Lists installed cargo commands using 'cargo --list'.",
     openWorldHint = false
 )]
-#[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
+#[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
 pub struct CargoListTool {}
 
 impl CargoListTool {

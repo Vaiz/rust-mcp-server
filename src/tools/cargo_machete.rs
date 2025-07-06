@@ -1,19 +1,21 @@
 use std::process::Command;
 
 use rust_mcp_sdk::{
-    macros::{JsonSchema, mcp_tool},
+    macros::mcp_tool,
     schema::{CallToolResult, schema_utils::CallToolError},
 };
 
 use crate::serde_utils::deserialize_string_vec;
 use crate::tools::execute_command;
 
+use crate::serde_utils::Tool;
+
 #[mcp_tool(
     name = "cargo-machete",
     description = "Finds unused dependencies in a fast yet imprecise way. Helps identify dependencies that are declared in Cargo.toml but not actually used in the code.",
     openWorldHint = false
 )]
-#[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
+#[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
 pub struct CargoMacheteTool {
     /// Uses cargo-metadata to figure out the dependencies' names. May be useful if some dependencies are renamed.
     #[serde(default)]
@@ -73,7 +75,7 @@ impl CargoMacheteTool {
     description = "Installs cargo-machete tool for finding unused dependencies",
     openWorldHint = false
 )]
-#[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
+#[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
 pub struct CargoMacheteInstallTool {}
 
 impl CargoMacheteInstallTool {

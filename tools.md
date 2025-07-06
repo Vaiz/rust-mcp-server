@@ -1,4 +1,4 @@
-## Rust MCP Server 0.1.1
+## Rust MCP Server 0.2.0
 | 🟢 Tools (27) | 🟢 Prompts (1) | 🟢 Resources (95) | <span style="opacity:0.6">🔴 Logging</span> | <span style="opacity:0.6">🔴 Experimental</span> |
 | --- | --- | --- | --- | --- |
 ## 🛠️ Tools (27)
@@ -8,9 +8,8 @@
   - Adds a dependency to a Rust project using cargo add.
   - **Inputs:**
       - <code>branch</code> : string<br />
-      - <code>build</code> : boolean<br />
       - <code>default_features</code> : boolean<br />
-      - <code>dev</code> : boolean<br />
+      - <code>dependency_type</code> : string<br />
       - <code>dry_run</code> : boolean<br />
       - <code>features</code> : string [ ]<br />
       - <code>frozen</code> : boolean<br />
@@ -165,23 +164,18 @@
 - **cargo-deny-check**
   - Checks a project's crate graph for security advisories, license compliance, banned crates.
   - **Inputs:**
-      - <code>all_features</code> : boolean<br />
       - <code>allow</code> : string [ ]<br />
       - <code>config</code> : string<br />
       - <code>deny</code> : string [ ]<br />
       - <code>disable_fetch</code> : boolean<br />
       - <code>exclude</code> : string [ ]<br />
       - <code>exclude_dev</code> : boolean<br />
-      - <code>feature_depth</code> : number<br />
-      - <code>features</code> : string [ ]<br />
+      - <code>feature_depth</code> : integer<br />
       - <code>format</code> : string<br />
       - <code>graph</code> : string<br />
       - <code>hide_inclusion_graph</code> : boolean<br />
-      - <code>locked</code> : boolean<br />
       - <code>log_level</code> : string<br />
       - <code>manifest_path</code> : string<br />
-      - <code>no_default_features</code> : boolean<br />
-      - <code>offline</code> : boolean<br />
       - <code>show_stats</code> : boolean<br />
       - <code>target</code> : string [ ]<br />
       - <code>warn</code> : string [ ]<br />
@@ -235,7 +229,7 @@
       - <code>clean_per_run</code> : boolean<br />
       - <code>clean_per_version</code> : boolean<br />
       - <code>command</code> : string<br />
-      - <code>depth</code> : number<br />
+      - <code>depth</code> : integer<br />
       - <code>each_feature</code> : boolean<br />
       - <code>exclude</code> : string [ ]<br />
       - <code>exclude_all_features</code> : boolean<br />
@@ -264,7 +258,7 @@
       - <code>target</code> : string [ ]<br />
       - <code>verbose</code> : boolean<br />
       - <code>version_range</code> : string<br />
-      - <code>version_step</code> : number<br />
+      - <code>version_step</code> : integer<br />
       - <code>workspace</code> : boolean<br />
 
 - **cargo-hack-install**
@@ -278,9 +272,9 @@
       - <code>index</code> : string<br />
       - <code>locked</code> : boolean<br />
       - <code>offline</code> : boolean<br />
+      - <code>package</code> : string<br />
       - <code>quiet</code> : boolean<br />
       - <code>registry</code> : string<br />
-      - <code>spec</code> : string<br />
       - <code>verbose</code> : boolean<br />
       - <code>version</code> : string<br />
 
@@ -344,7 +338,7 @@
       - <code>features</code> : string [ ]<br />
       - <code>frozen</code> : boolean<br />
       - <code>index</code> : string<br />
-      - <code>jobs</code> : number<br />
+      - <code>jobs</code> : integer<br />
       - <code>keep_going</code> : boolean<br />
       - <code>list</code> : boolean<br />
       - <code>locked</code> : boolean<br />
@@ -367,9 +361,8 @@
 - **cargo-remove**
   - Remove dependencies from a Cargo.toml manifest file.
   - **Inputs:**
-      - <code>build</code> : boolean<br />
       - <code>dep_id</code> : string [ ]<br />
-      - <code>dev</code> : boolean<br />
+      - <code>dependency_type</code> : string<br />
       - <code>dry_run</code> : boolean<br />
       - <code>frozen</code> : boolean<br />
       - <code>locked</code> : boolean<br />
