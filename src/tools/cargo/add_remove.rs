@@ -3,8 +3,8 @@ use std::process::Command;
 use crate::serde_utils::Tool;
 use crate::{
     serde_utils::{
-        PackageWithVersion, default_true, deserialize_string, deserialize_string_vec,
-        locking_mode_to_cli_flags,
+        PackageWithVersion, deserialize_string, deserialize_string_vec,
+        locking_mode_to_cli_flags, output_verbosity_to_cli_flags,
     },
     tools::execute_command,
 };
@@ -127,13 +127,14 @@ pub struct CargoAddTool {
     #[serde(default, deserialize_with = "deserialize_string")]
     pub locking_mode: Option<String>,
 
-    /// Use verbose output
-    #[serde(default)]
-    pub verbose: bool,
-
-    /// Do not print cargo log messages. By default is `true`.
-    #[serde(default = "default_true")]
-    pub quiet: bool,
+    /// Output verbosity level.
+    ///
+    /// Valid options:
+    /// - "quiet" (default): Show only the essential command output
+    /// - "normal": Show standard output (no additional flags)
+    /// - "verbose": Show detailed output including build information
+    #[serde(default, deserialize_with = "deserialize_string")]
+    pub output_verbosity: Option<String>,
 }
 
 impl CargoAddTool {
@@ -226,12 +227,8 @@ impl CargoAddTool {
         }
 
         // Output options
-        if self.verbose {
-            cmd.arg("--verbose");
-        }
-        if self.quiet && !self.verbose {
-            cmd.arg("--quiet");
-        }
+        let output_flags = output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
+        cmd.args(output_flags);
 
         execute_command(cmd)
     }
@@ -290,13 +287,14 @@ pub struct CargoRemoveTool {
     #[serde(default, deserialize_with = "deserialize_string")]
     pub locking_mode: Option<String>,
 
-    /// Use verbose output
-    #[serde(default)]
-    pub verbose: bool,
-
-    /// Do not print cargo log messages. By default is `true`.
-    #[serde(default = "default_true")]
-    pub quiet: bool,
+    /// Output verbosity level.
+    ///
+    /// Valid options:
+    /// - "quiet" (default): Show only the essential command output
+    /// - "normal": Show standard output (no additional flags)
+    /// - "verbose": Show detailed output including build information
+    #[serde(default, deserialize_with = "deserialize_string")]
+    pub output_verbosity: Option<String>,
 }
 
 impl CargoRemoveTool {
@@ -347,12 +345,8 @@ impl CargoRemoveTool {
         }
 
         // Output options
-        if self.verbose {
-            cmd.arg("--verbose");
-        }
-        if self.quiet && !self.verbose {
-            cmd.arg("--quiet");
-        }
+        let output_flags = output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
+        cmd.args(output_flags);
 
         execute_command(cmd)
     }

@@ -5,7 +5,7 @@ use rust_mcp_sdk::{
     schema::{CallToolResult, schema_utils::CallToolError},
 };
 
-use crate::serde_utils::{default_true, deserialize_string, deserialize_string_vec};
+use crate::serde_utils::{default_true, deserialize_string, deserialize_string_vec, rustup_output_verbosity_to_cli_flags};
 use crate::tools::execute_command;
 
 fn default_check() -> String {
@@ -151,9 +151,14 @@ pub struct CargoHackTool {
     #[serde(default)]
     no_manifest_path: bool,
 
-    /// Use verbose output
-    #[serde(default)]
-    verbose: bool,
+    /// Output verbosity level.
+    ///
+    /// Valid options:
+    /// - "quiet" (default): Show standard output (no additional flags)
+    /// - "normal": Show standard output (no additional flags)
+    /// - "verbose": Show detailed output
+    #[serde(default, deserialize_with = "deserialize_string")]
+    output_verbosity: Option<String>,
 }
 
 impl CargoHackTool {
@@ -326,9 +331,8 @@ impl CargoHackTool {
         }
 
         // Output options
-        if self.verbose {
-            cmd.arg("--verbose");
-        }
+        let output_flags = rustup_output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
+        cmd.args(output_flags);
 
         // Add the cargo command to run (e.g., check, test, build)
         cmd.arg(&self.command);

@@ -1,7 +1,7 @@
 use std::process::Command;
 
 use crate::{
-    serde_utils::{deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags},
+    serde_utils::{deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags, output_verbosity_to_cli_flags},
     tools::execute_command,
 };
 use rust_mcp_sdk::{
@@ -146,13 +146,14 @@ pub struct CargoTestTool {
     #[serde(default, deserialize_with = "deserialize_string")]
     locking_mode: Option<String>,
 
-    /// Use verbose output
-    #[serde(default)]
-    verbose: bool,
-
-    /// Display one character per test instead of one line
-    #[serde(default)]
-    quiet: bool,
+    /// Output verbosity level.
+    ///
+    /// Valid options:
+    /// - "quiet" (default): Show only the essential command output
+    /// - "normal": Show standard output (no additional flags)
+    /// - "verbose": Show detailed output including build information
+    #[serde(default, deserialize_with = "deserialize_string")]
+    output_verbosity: Option<String>,
 }
 
 impl CargoTestTool {
@@ -291,13 +292,8 @@ impl CargoTestTool {
         }
 
         // Output options
-        if self.verbose {
-            cmd.arg("--verbose");
-        }
-
-        if self.quiet && !self.verbose {
-            cmd.arg("--quiet");
-        }
+        let output_flags = output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
+        cmd.args(output_flags);
 
         // Pass test binary args after --
         if let Some(test_args) = &self.test_args {

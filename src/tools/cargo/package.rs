@@ -6,7 +6,8 @@ use rust_mcp_sdk::{
 };
 
 use crate::serde_utils::{
-    default_true, deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
+    deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
+    output_verbosity_to_cli_flags,
 };
 use crate::tools::execute_command;
 
@@ -148,13 +149,14 @@ pub struct CargoPackageTool {
     #[serde(default, deserialize_with = "deserialize_string")]
     message_format: Option<String>,
 
-    /// [Optional] Use verbose output
-    #[serde(default)]
-    verbose: bool,
-
-    /// [Optional] Show only the essential command output. By default is `true`.
-    #[serde(default = "default_true")]
-    quiet: bool,
+    /// [Optional] Output verbosity level.
+    ///
+    /// Valid options:
+    /// - "quiet" (default): Show only the essential command output
+    /// - "normal": Show standard output (no additional flags)
+    /// - "verbose": Show detailed output including build information
+    #[serde(default, deserialize_with = "deserialize_string")]
+    output_verbosity: Option<String>,
 }
 
 impl CargoPackageTool {
@@ -267,13 +269,8 @@ impl CargoPackageTool {
             cmd.arg("--message-format").arg(message_format);
         }
 
-        if self.verbose {
-            cmd.arg("--verbose");
-        }
-
-        if self.quiet && !self.verbose {
-            cmd.arg("--quiet");
-        }
+        let output_flags = output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
+        cmd.args(output_flags);
 
         execute_command(cmd)
     }
