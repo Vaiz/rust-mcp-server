@@ -267,16 +267,16 @@
 - **cargo-info**
   - Display information about a package. Information includes package description, list of available features, etc. Equivalent to 'cargo info <SPEC>'.
   - **Inputs:**
-      - <code>config</code> : unknown<br />
+      - <code>config</code> : string<br />
       - <code>frozen</code> : boolean<br />
-      - <code>index</code> : unknown<br />
+      - <code>index</code> : string<br />
       - <code>locked</code> : boolean<br />
       - <code>offline</code> : boolean<br />
       - <code>package</code> : string<br />
       - <code>quiet</code> : boolean<br />
-      - <code>registry</code> : unknown<br />
+      - <code>registry</code> : string<br />
       - <code>verbose</code> : boolean<br />
-      - <code>version</code> : unknown<br />
+      - <code>version</code> : string<br />
 
 - **cargo-list**
   - Lists installed cargo commands using 'cargo --list'.
