@@ -375,8 +375,14 @@ mod tests {
     fn test_dependency_type_helper() {
         // Test CLI flags
         assert_eq!(dependency_type_to_cli_flag(Some("regular")).unwrap(), None);
-        assert_eq!(dependency_type_to_cli_flag(Some("dev")).unwrap(), Some("--dev"));
-        assert_eq!(dependency_type_to_cli_flag(Some("build")).unwrap(), Some("--build"));
+        assert_eq!(
+            dependency_type_to_cli_flag(Some("dev")).unwrap(),
+            Some("--dev")
+        );
+        assert_eq!(
+            dependency_type_to_cli_flag(Some("build")).unwrap(),
+            Some("--build")
+        );
         assert!(dependency_type_to_cli_flag(Some("unknown")).is_err());
     }
 
@@ -546,80 +552,6 @@ mod tests {
         );
 
         let expected_schema: serde_json::Value = serde_json::from_str(EXPECTED_SCHEMA).unwrap();
-
-        // Traverse both schemas to find the difference
-        fn find_diff(a: &serde_json::Value, b: &serde_json::Value, path: &str) -> Option<String> {
-            match (a, b) {
-                (serde_json::Value::Object(map_a), serde_json::Value::Object(map_b)) => {
-                    for (k, v_a) in map_a {
-                        let new_path = if path.is_empty() {
-                            k.clone()
-                        } else {
-                            format!("{}/{}", path, k)
-                        };
-                        match map_b.get(k) {
-                            Some(v_b) => {
-                                if let Some(diff) = find_diff(v_a, v_b, &new_path) {
-                                    return Some(diff);
-                                }
-                            }
-                            None => {
-                                return Some(format!(
-                                    "Key '{}' missing in expected at path '{}'",
-                                    k, new_path
-                                ));
-                            }
-                        }
-                    }
-                    for k in map_b.keys() {
-                        if !map_a.contains_key(k) {
-                            let new_path = if path.is_empty() {
-                                k.clone()
-                            } else {
-                                format!("{}/{}", path, k)
-                            };
-                            return Some(format!(
-                                "Extra key '{}' in expected at path '{}'",
-                                k, new_path
-                            ));
-                        }
-                    }
-                    None
-                }
-                (serde_json::Value::Array(arr_a), serde_json::Value::Array(arr_b)) => {
-                    if arr_a.len() != arr_b.len() {
-                        return Some(format!(
-                            "Array length mismatch at '{}': {} vs {}",
-                            path,
-                            arr_a.len(),
-                            arr_b.len()
-                        ));
-                    }
-                    for (i, (v_a, v_b)) in arr_a.iter().zip(arr_b.iter()).enumerate() {
-                        let new_path = format!("{}[{}]", path, i);
-                        if let Some(diff) = find_diff(v_a, v_b, &new_path) {
-                            return Some(diff);
-                        }
-                    }
-                    None
-                }
-                _ => {
-                    if a != b {
-                        Some(format!(
-                            "Value mismatch at '{}': left = {}, right = {}",
-                            path, a, b
-                        ))
-                    } else {
-                        None
-                    }
-                }
-            }
-        }
-
-        if let Some(diff) = find_diff(&schema, &expected_schema, "") {
-            panic!("Schema difference found: {}", diff);
-        }
-
         assert_eq!(
             schema, expected_schema,
             "CargoAddTool schema should match expected structure"
