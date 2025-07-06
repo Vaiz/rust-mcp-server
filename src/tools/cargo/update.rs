@@ -2,7 +2,8 @@ use std::process::Command;
 
 use crate::{
     serde_utils::{
-        default_true, deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
+        deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
+        output_verbosity_to_cli_flags,
     },
     tools::execute_command,
 };
@@ -77,13 +78,14 @@ pub struct CargoUpdateTool {
     #[serde(default, deserialize_with = "deserialize_string_vec")]
     unstable_flags: Option<Vec<String>>,
 
-    /// Use verbose output (-vv very verbose/build.rs output)
-    #[serde(default)]
-    verbose: bool,
-
-    /// Do not print cargo log messages. By default is `true`.
-    #[serde(default = "default_true")]
-    quiet: bool,
+    /// Output verbosity level.
+    ///
+    /// Valid options:
+    /// - "quiet" (default): Show only the essential command output
+    /// - "normal": Show standard output (no additional flags)
+    /// - "verbose": Show detailed output including build information
+    #[serde(default, deserialize_with = "deserialize_string")]
+    output_verbosity: Option<String>,
 }
 
 impl CargoUpdateTool {
@@ -152,13 +154,8 @@ impl CargoUpdateTool {
         }
 
         // Output options
-        if self.verbose {
-            cmd.arg("--verbose");
-        }
-
-        if self.quiet && !self.verbose {
-            cmd.arg("--quiet");
-        }
+        let output_flags = output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
+        cmd.args(output_flags);
 
         execute_command(cmd)
     }

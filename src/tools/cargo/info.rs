@@ -3,7 +3,8 @@ use std::process::Command;
 use crate::serde_utils::Tool;
 use crate::{
     serde_utils::{
-        PackageWithVersion, default_true, deserialize_string, locking_mode_to_cli_flags,
+        PackageWithVersion, deserialize_string, locking_mode_to_cli_flags,
+        output_verbosity_to_cli_flags,
     },
     tools::execute_command,
 };
@@ -32,13 +33,14 @@ pub struct CargoInfoTool {
     #[serde(default, deserialize_with = "deserialize_string")]
     pub registry: Option<String>,
 
-    /// Use verbose output that includes crate dependencies.
-    #[serde(default)]
-    pub verbose: bool,
-
-    /// Do not print cargo log messages. By default is `true`.
-    #[serde(default = "default_true")]
-    pub quiet: bool,
+    /// Output verbosity level.
+    ///
+    /// Valid options:
+    /// - "quiet" (default): Show only the essential command output
+    /// - "normal": Show standard output (no additional flags)
+    /// - "verbose": Show detailed output including build information
+    #[serde(default, deserialize_with = "deserialize_string")]
+    pub output_verbosity: Option<String>,
 
     /// Override a configuration value
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -79,13 +81,8 @@ impl CargoInfoTool {
         cmd.args(locking_flags);
 
         // Output options
-        if self.verbose {
-            cmd.arg("--verbose");
-        }
-
-        if self.quiet && !self.verbose {
-            cmd.arg("--quiet");
-        }
+        let output_flags = output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
+        cmd.args(output_flags);
 
         execute_command(cmd)
     }
