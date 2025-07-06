@@ -255,7 +255,9 @@ impl CargoCheckTool {
         }
 
         // Apply locking mode flags
-        for flag in locking_mode_to_cli_flags(self.locking_mode.as_deref()) {
+        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref())
+            .map_err(|e| CallToolError(e.into()))?;
+        for flag in locking_flags {
             cmd.arg(flag);
         }
 

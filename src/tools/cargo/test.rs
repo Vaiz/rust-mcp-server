@@ -1,7 +1,7 @@
 use std::process::Command;
 
 use crate::{
-    serde_utils::{default_true, deserialize_string, deserialize_string_vec},
+    serde_utils::{deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags},
     tools::execute_command,
 };
 use rust_mcp_sdk::{
@@ -136,17 +136,15 @@ pub struct CargoTestTool {
     #[serde(default)]
     ignore_rust_version: bool,
 
-    /// Assert that `Cargo.lock` will remain unchanged
-    #[serde(default = "default_true")]
-    locked: bool,
-
-    /// Run without accessing the network
-    #[serde(default)]
-    offline: bool,
-
-    /// Equivalent to specifying both --locked and --offline
-    #[serde(default)]
-    frozen: bool,
+    /// Locking mode for dependency resolution.
+    /// 
+    /// Valid options:
+    /// - "locked" (default): Assert that `Cargo.lock` will remain unchanged
+    /// - "unlocked": Allow `Cargo.lock` to be updated
+    /// - "offline": Run without accessing the network
+    /// - "frozen": Equivalent to specifying both --locked and --offline
+    #[serde(default, deserialize_with = "deserialize_string")]
+    locking_mode: Option<String>,
 
     /// Use verbose output
     #[serde(default)]
@@ -286,16 +284,11 @@ impl CargoTestTool {
             cmd.arg("--ignore-rust-version");
         }
 
-        if self.locked {
-            cmd.arg("--locked");
-        }
-
-        if self.offline {
-            cmd.arg("--offline");
-        }
-
-        if self.frozen {
-            cmd.arg("--frozen");
+        // Apply locking mode flags
+        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref())
+            .map_err(|e| CallToolError(e.into()))?;
+        for flag in locking_flags {
+            cmd.arg(flag);
         }
 
         // Output options

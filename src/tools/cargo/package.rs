@@ -5,7 +5,7 @@ use rust_mcp_sdk::{
     schema::{CallToolResult, schema_utils::CallToolError},
 };
 
-use crate::serde_utils::{default_true, deserialize_string, deserialize_string_vec};
+use crate::serde_utils::{default_true, deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags};
 use crate::tools::execute_command;
 
 /// MCP defaults differ from cargo defaults: `quiet` and `locked` are `true` by default
@@ -126,17 +126,15 @@ pub struct CargoPackageTool {
     #[serde(default, deserialize_with = "deserialize_string")]
     lockfile_path: Option<String>,
 
-    /// Assert that `Cargo.lock` will remain unchanged. By default is `true`.
-    #[serde(default = "default_true")]
-    locked: bool,
-
-    /// [Optional] Run without accessing the network
-    #[serde(default)]
-    offline: bool,
-
-    /// [Optional] Equivalent to specifying both --locked and --offline
-    #[serde(default)]
-    frozen: bool,
+    /// Locking mode for dependency resolution.
+    /// 
+    /// Valid options:
+    /// - "locked" (default): Assert that `Cargo.lock` will remain unchanged
+    /// - "unlocked": Allow `Cargo.lock` to be updated
+    /// - "offline": Run without accessing the network
+    /// - "frozen": Equivalent to specifying both --locked and --offline
+    #[serde(default, deserialize_with = "deserialize_string")]
+    locking_mode: Option<String>,
 
     /// [Optional] Registry index URL to prepare the package for (unstable)
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -249,16 +247,11 @@ impl CargoPackageTool {
             cmd.arg("--lockfile-path").arg(lockfile_path);
         }
 
-        if self.locked {
-            cmd.arg("--locked");
-        }
-
-        if self.offline {
-            cmd.arg("--offline");
-        }
-
-        if self.frozen {
-            cmd.arg("--frozen");
+        // Apply locking mode flags
+        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref())
+            .map_err(|e| CallToolError(e.into()))?;
+        for flag in locking_flags {
+            cmd.arg(flag);
         }
 
         // Registry options
