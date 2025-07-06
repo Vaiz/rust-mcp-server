@@ -29,6 +29,7 @@ fn dependency_type_to_cli_flag(
     })
 }
 
+/// Adds a dependency to a Rust project using cargo add.
 #[mcp_tool(
     name = "cargo-add",
     description = "Adds a dependency to a Rust project using cargo add.",
@@ -230,6 +231,7 @@ impl CargoAddTool {
     }
 }
 
+/// Remove dependencies from a Cargo.toml manifest file.
 #[mcp_tool(
     name = "cargo-remove",
     description = "Remove dependencies from a Cargo.toml manifest file.",

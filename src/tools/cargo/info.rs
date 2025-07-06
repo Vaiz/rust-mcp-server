@@ -12,6 +12,7 @@ use rust_mcp_sdk::{
     schema::{CallToolResult, schema_utils::CallToolError},
 };
 
+/// Display information about a package. Information includes package description, list of available features, etc. Equivalent to 'cargo info <SPEC>'.
 #[mcp_tool(
     name = "cargo-info",
     description = "Display information about a package. Information includes package description, list of available features, etc. Equivalent to 'cargo info <SPEC>'.",

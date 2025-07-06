@@ -12,14 +12,12 @@
       - <code>dependency_type</code> : string<br />
       - <code>dry_run</code> : boolean<br />
       - <code>features</code> : string [ ]<br />
-      - <code>frozen</code> : boolean<br />
       - <code>git</code> : string<br />
       - <code>ignore_rust_version</code> : boolean<br />
-      - <code>locked</code> : boolean<br />
       - <code>lockfile_path</code> : string<br />
+      - <code>locking_mode</code> : string<br />
       - <code>manifest_path</code> : string<br />
       - <code>no_default_features</code> : boolean<br />
-      - <code>offline</code> : boolean<br />
       - <code>optional</code> : boolean<br />
       - <code>package</code> : string<br />
       - <code>path</code> : string<br />
@@ -47,16 +45,14 @@
       - <code>examples</code> : boolean<br />
       - <code>exclude</code> : string [ ]<br />
       - <code>features</code> : string [ ]<br />
-      - <code>frozen</code> : boolean<br />
       - <code>ignore_rust_version</code> : boolean<br />
       - <code>jobs</code> : number<br />
       - <code>keep_going</code> : boolean<br />
       - <code>lib</code> : boolean<br />
-      - <code>locked</code> : boolean<br />
       - <code>lockfile_path</code> : string<br />
+      - <code>locking_mode</code> : string<br />
       - <code>manifest_path</code> : string<br />
       - <code>no_default_features</code> : boolean<br />
-      - <code>offline</code> : boolean<br />
       - <code>package</code> : string [ ]<br />
       - <code>profile</code> : string<br />
       - <code>quiet</code> : boolean<br />
@@ -83,16 +79,14 @@
       - <code>examples</code> : boolean<br />
       - <code>exclude</code> : string [ ]<br />
       - <code>features</code> : string [ ]<br />
-      - <code>frozen</code> : boolean<br />
       - <code>ignore_rust_version</code> : boolean<br />
       - <code>jobs</code> : number<br />
       - <code>keep_going</code> : boolean<br />
       - <code>lib</code> : boolean<br />
-      - <code>locked</code> : boolean<br />
       - <code>lockfile_path</code> : string<br />
+      - <code>locking_mode</code> : string<br />
       - <code>manifest_path</code> : string<br />
       - <code>no_default_features</code> : boolean<br />
-      - <code>offline</code> : boolean<br />
       - <code>package</code> : string [ ]<br />
       - <code>profile</code> : string<br />
       - <code>quiet</code> : boolean<br />
@@ -111,11 +105,9 @@
   - **Inputs:**
       - <code>doc</code> : boolean<br />
       - <code>dry_run</code> : boolean<br />
-      - <code>frozen</code> : boolean<br />
-      - <code>locked</code> : boolean<br />
       - <code>lockfile_path</code> : string<br />
+      - <code>locking_mode</code> : string<br />
       - <code>manifest_path</code> : string<br />
-      - <code>offline</code> : boolean<br />
       - <code>package</code> : string<br />
       - <code>profile</code> : string<br />
       - <code>quiet</code> : boolean<br />
@@ -140,14 +132,12 @@
       - <code>exclude</code> : string [ ]<br />
       - <code>features</code> : string [ ]<br />
       - <code>fix</code> : boolean<br />
-      - <code>frozen</code> : boolean<br />
       - <code>ignore_rust_version</code> : boolean<br />
       - <code>lib</code> : boolean<br />
-      - <code>locked</code> : boolean<br />
+      - <code>locking_mode</code> : string<br />
       - <code>manifest_path</code> : string<br />
       - <code>no_default_features</code> : boolean<br />
       - <code>no_deps</code> : boolean<br />
-      - <code>offline</code> : boolean<br />
       - <code>package</code> : string [ ]<br />
       - <code>profile</code> : string<br />
       - <code>quiet</code> : boolean<br />
@@ -164,18 +154,25 @@
 - **cargo-deny-check**
   - Checks a project's crate graph for security advisories, license compliance, banned crates.
   - **Inputs:**
+      - <code>all_features</code> : boolean<br />
       - <code>allow</code> : string [ ]<br />
+      - <code>allow_git_index</code> : boolean<br />
+      - <code>audit_compatible_output</code> : boolean<br />
       - <code>config</code> : string<br />
       - <code>deny</code> : string [ ]<br />
       - <code>disable_fetch</code> : boolean<br />
       - <code>exclude</code> : string [ ]<br />
       - <code>exclude_dev</code> : boolean<br />
+      - <code>exclude_unpublished</code> : boolean<br />
       - <code>feature_depth</code> : integer<br />
+      - <code>features</code> : string [ ]<br />
       - <code>format</code> : string<br />
       - <code>graph</code> : string<br />
       - <code>hide_inclusion_graph</code> : boolean<br />
+      - <code>locking_mode</code> : string<br />
       - <code>log_level</code> : string<br />
       - <code>manifest_path</code> : string<br />
+      - <code>no_default_features</code> : boolean<br />
       - <code>show_stats</code> : boolean<br />
       - <code>target</code> : string [ ]<br />
       - <code>warn</code> : string [ ]<br />
@@ -213,12 +210,10 @@
 - **cargo-generate_lockfile**
   - Generates or updates the Cargo.lock file for a Rust project. Usually, run without any additional arguments.
   - **Inputs:**
-      - <code>frozen</code> : boolean<br />
       - <code>ignore_rust_version</code> : boolean<br />
-      - <code>locked</code> : boolean<br />
       - <code>lockfile_path</code> : string<br />
+      - <code>locking_mode</code> : string<br />
       - <code>manifest_path</code> : string<br />
-      - <code>offline</code> : boolean<br />
       - <code>package</code> : string<br />
       - <code>quiet</code> : boolean<br />
       - <code>verbose</code> : boolean<br />
@@ -268,10 +263,8 @@
   - Display information about a package. Information includes package description, list of available features, etc. Equivalent to 'cargo info <SPEC>'.
   - **Inputs:**
       - <code>config</code> : string<br />
-      - <code>frozen</code> : boolean<br />
       - <code>index</code> : string<br />
-      - <code>locked</code> : boolean<br />
-      - <code>offline</code> : boolean<br />
+      - <code>locking_mode</code> : string<br />
       - <code>package</code> : string<br />
       - <code>quiet</code> : boolean<br />
       - <code>registry</code> : string<br />
@@ -300,13 +293,11 @@
       - <code>config</code> : string<br />
       - <code>features</code> : string<br />
       - <code>filter_platform</code> : string<br />
-      - <code>frozen</code> : boolean<br />
-      - <code>locked</code> : boolean<br />
       - <code>lockfile_path</code> : string<br />
+      - <code>locking_mode</code> : string<br />
       - <code>manifest_path</code> : string<br />
       - <code>no_default_features</code> : boolean<br />
       - <code>no_deps</code> : boolean<br />
-      - <code>offline</code> : boolean<br />
       - <code>quiet</code> : boolean<br />
       - <code>toolchain</code> : string<br />
       - <code>verbose</code> : boolean<br />
@@ -316,11 +307,9 @@
   - **Inputs:**
       - <code>bin</code> : boolean<br />
       - <code>edition</code> : string<br />
-      - <code>frozen</code> : boolean<br />
       - <code>lib</code> : boolean<br />
-      - <code>locked</code> : boolean<br />
+      - <code>locking_mode</code> : string<br />
       - <code>name</code> : string<br />
-      - <code>offline</code> : boolean<br />
       - <code>path</code> : string<br />
       - <code>quiet</code> : boolean<br />
       - <code>registry</code> : string<br />
@@ -336,19 +325,17 @@
       - <code>exclude</code> : string [ ]<br />
       - <code>exclude_lockfile</code> : boolean<br />
       - <code>features</code> : string [ ]<br />
-      - <code>frozen</code> : boolean<br />
       - <code>index</code> : string<br />
       - <code>jobs</code> : integer<br />
       - <code>keep_going</code> : boolean<br />
       - <code>list</code> : boolean<br />
-      - <code>locked</code> : boolean<br />
       - <code>lockfile_path</code> : string<br />
+      - <code>locking_mode</code> : string<br />
       - <code>manifest_path</code> : string<br />
       - <code>message_format</code> : string<br />
       - <code>no_default_features</code> : boolean<br />
       - <code>no_metadata</code> : boolean<br />
       - <code>no_verify</code> : boolean<br />
-      - <code>offline</code> : boolean<br />
       - <code>package</code> : string [ ]<br />
       - <code>quiet</code> : boolean<br />
       - <code>registry</code> : string<br />
@@ -364,11 +351,9 @@
       - <code>dep_id</code> : string [ ]<br />
       - <code>dependency_type</code> : string<br />
       - <code>dry_run</code> : boolean<br />
-      - <code>frozen</code> : boolean<br />
-      - <code>locked</code> : boolean<br />
       - <code>lockfile_path</code> : string<br />
+      - <code>locking_mode</code> : string<br />
       - <code>manifest_path</code> : string<br />
-      - <code>offline</code> : boolean<br />
       - <code>package</code> : string<br />
       - <code>quiet</code> : boolean<br />
       - <code>target</code> : string<br />
@@ -397,17 +382,15 @@
       - <code>examples</code> : boolean<br />
       - <code>exclude</code> : string [ ]<br />
       - <code>features</code> : string<br />
-      - <code>frozen</code> : boolean<br />
       - <code>ignore_rust_version</code> : boolean<br />
       - <code>jobs</code> : number<br />
       - <code>lib</code> : boolean<br />
-      - <code>locked</code> : boolean<br />
       - <code>lockfile_path</code> : string<br />
+      - <code>locking_mode</code> : string<br />
       - <code>manifest_path</code> : string<br />
       - <code>no_default_features</code> : boolean<br />
       - <code>no_fail_fast</code> : boolean<br />
       - <code>no_run</code> : boolean<br />
-      - <code>offline</code> : boolean<br />
       - <code>package</code> : string<br />
       - <code>profile</code> : string<br />
       - <code>quiet</code> : boolean<br />
@@ -429,12 +412,10 @@
       - <code>color</code> : string<br />
       - <code>config</code> : string<br />
       - <code>dry_run</code> : boolean<br />
-      - <code>frozen</code> : boolean<br />
       - <code>ignore_rust_version</code> : boolean<br />
-      - <code>locked</code> : boolean<br />
       - <code>lockfile_path</code> : string<br />
+      - <code>locking_mode</code> : string<br />
       - <code>manifest_path</code> : string<br />
-      - <code>offline</code> : boolean<br />
       - <code>precise</code> : string<br />
       - <code>quiet</code> : boolean<br />
       - <code>recursive</code> : boolean<br />
