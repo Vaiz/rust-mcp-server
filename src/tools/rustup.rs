@@ -5,7 +5,7 @@ use rust_mcp_sdk::{
     schema::{CallToolResult, schema_utils::CallToolError},
 };
 
-use crate::serde_utils::{deserialize_string, deserialize_string_vec, rustup_output_verbosity_to_cli_flags};
+use crate::serde_utils::{deserialize_string, deserialize_string_vec};
 use crate::tools::execute_command;
 
 use crate::serde_utils::Tool;
@@ -17,14 +17,9 @@ use crate::serde_utils::Tool;
 )]
 #[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
 pub struct RustupShowTool {
-    /// Output verbosity level.
-    ///
-    /// Valid options:
-    /// - "quiet" (default): Show standard output (no additional flags)
-    /// - "normal": Show standard output (no additional flags)
-    /// - "verbose": Show detailed output including rustc information for all installed toolchains
-    #[serde(default, deserialize_with = "deserialize_string")]
-    output_verbosity: Option<String>,
+    /// Enable verbose output with rustc information for all installed toolchains
+    #[serde(default)]
+    verbose: bool,
 }
 
 impl RustupShowTool {
@@ -32,8 +27,9 @@ impl RustupShowTool {
         let mut cmd = Command::new("rustup");
         cmd.arg("show");
 
-        let output_flags = rustup_output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
-        cmd.args(output_flags);
+        if self.verbose {
+            cmd.arg("--verbose");
+        }
 
         execute_command(cmd)
     }

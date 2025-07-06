@@ -413,7 +413,7 @@
 - **rustup-show**
   - Show the active and installed toolchains or profiles. Shows the name of the active toolchain and the version of rustc. If the active toolchain has installed support for additional compilation targets, then they are listed as well.
   - **Inputs:**
-      - <code>output_verbosity</code> : string<br />
+      - <code>verbose</code> : boolean<br />
 
 - **rustup-toolchain-add**
   - Install or update the given toolchains, or by default the active toolchain. Toolchain name can be <code>stable</code>, <code>nightly</code>, or a specific version like '1.8.0'.
