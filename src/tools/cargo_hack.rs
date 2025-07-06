@@ -5,7 +5,9 @@ use rust_mcp_sdk::{
     schema::{CallToolResult, schema_utils::CallToolError},
 };
 
-use crate::serde_utils::{default_true, deserialize_string, deserialize_string_vec, rustup_output_verbosity_to_cli_flags};
+use crate::serde_utils::{
+    default_true, deserialize_string, deserialize_string_vec, output_verbosity_to_cli_flags,
+};
 use crate::tools::execute_command;
 
 fn default_check() -> String {
@@ -331,7 +333,7 @@ impl CargoHackTool {
         }
 
         // Output options
-        let output_flags = rustup_output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
+        let output_flags = output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
         cmd.args(output_flags);
 
         // Add the cargo command to run (e.g., check, test, build)

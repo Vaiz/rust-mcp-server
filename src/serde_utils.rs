@@ -73,7 +73,9 @@ pub fn locking_mode_to_cli_flags(mode: Option<&str>) -> Result<Vec<&'static str>
 /// - "quiet" (default): Show only the essential command output
 /// - "normal": Show standard output (no additional flags)
 /// - "verbose": Show detailed output including build information
-pub fn output_verbosity_to_cli_flags(mode: Option<&str>) -> Result<Vec<&'static str>, CallToolError> {
+pub fn output_verbosity_to_cli_flags(
+    mode: Option<&str>,
+) -> Result<Vec<&'static str>, CallToolError> {
     Ok(match mode.unwrap_or("quiet") {
         "quiet" => vec!["--quiet"],
         "normal" => vec![], // No flags needed
@@ -82,29 +84,8 @@ pub fn output_verbosity_to_cli_flags(mode: Option<&str>) -> Result<Vec<&'static 
             return Err(CallToolError(
                 anyhow::anyhow!(
                     "Unknown output verbosity: {unknown}. Valid options are: quiet, normal, verbose"
-                ).into()
-            ));
-        }
-    })
-}
-
-/// Convert output verbosity string to CLI flags for rustup commands.
-/// Rustup doesn't have a --quiet flag, so quiet and normal both result in no flags.
-/// Returns a vector of flags to add to the command.
-///
-/// Valid modes:
-/// - "quiet" (default): Show standard output (no additional flags)
-/// - "normal": Show standard output (no additional flags)
-/// - "verbose": Show detailed output
-pub fn rustup_output_verbosity_to_cli_flags(mode: Option<&str>) -> Result<Vec<&'static str>, CallToolError> {
-    Ok(match mode.unwrap_or("quiet") {
-        "quiet" | "normal" => vec![], // No flags needed
-        "verbose" => vec!["--verbose"],
-        unknown => {
-            return Err(CallToolError(
-                anyhow::anyhow!(
-                    "Unknown output verbosity: {unknown}. Valid options are: quiet, normal, verbose"
-                ).into()
+                )
+                .into(),
             ));
         }
     })
@@ -464,7 +445,10 @@ mod tests {
     #[test]
     fn test_output_verbosity_to_cli_flags() {
         // Test default (quiet)
-        assert_eq!(output_verbosity_to_cli_flags(None).unwrap(), vec!["--quiet"]);
+        assert_eq!(
+            output_verbosity_to_cli_flags(None).unwrap(),
+            vec!["--quiet"]
+        );
 
         // Test explicit modes
         assert_eq!(
@@ -483,7 +467,11 @@ mod tests {
         // Test unknown values return error
         assert!(output_verbosity_to_cli_flags(Some("invalid")).is_err());
         let error = output_verbosity_to_cli_flags(Some("invalid")).unwrap_err();
-        assert!(error.to_string().contains("Unknown output verbosity: invalid"));
+        assert!(
+            error
+                .to_string()
+                .contains("Unknown output verbosity: invalid")
+        );
     }
 
     #[test]
@@ -493,56 +481,26 @@ mod tests {
             output_verbosity_to_cli_flags(None).unwrap(),
             vec!["--quiet"]
         );
-        
+
         // Test explicit quiet
         assert_eq!(
             output_verbosity_to_cli_flags(Some("quiet")).unwrap(),
             vec!["--quiet"]
         );
-        
+
         // Test normal (no flags)
         assert_eq!(
             output_verbosity_to_cli_flags(Some("normal")).unwrap(),
             Vec::<&'static str>::new()
         );
-        
+
         // Test verbose
         assert_eq!(
             output_verbosity_to_cli_flags(Some("verbose")).unwrap(),
             vec!["--verbose"]
         );
-        
+
         // Test invalid option
         assert!(output_verbosity_to_cli_flags(Some("invalid")).is_err());
-    }
-
-    #[test]
-    fn test_rustup_output_verbosity_cli_flags() {
-        // Test default (quiet)
-        assert_eq!(
-            rustup_output_verbosity_to_cli_flags(None).unwrap(),
-            Vec::<&'static str>::new()
-        );
-        
-        // Test explicit quiet
-        assert_eq!(
-            rustup_output_verbosity_to_cli_flags(Some("quiet")).unwrap(),
-            Vec::<&'static str>::new()
-        );
-        
-        // Test normal (no flags)
-        assert_eq!(
-            rustup_output_verbosity_to_cli_flags(Some("normal")).unwrap(),
-            Vec::<&'static str>::new()
-        );
-        
-        // Test verbose
-        assert_eq!(
-            rustup_output_verbosity_to_cli_flags(Some("verbose")).unwrap(),
-            vec!["--verbose"]
-        );
-        
-        // Test invalid option
-        assert!(rustup_output_verbosity_to_cli_flags(Some("invalid")).is_err());
     }
 }

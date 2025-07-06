@@ -1,6 +1,8 @@
 use std::process::Command;
 
-use crate::serde_utils::{deserialize_string, locking_mode_to_cli_flags, output_verbosity_to_cli_flags};
+use crate::serde_utils::{
+    deserialize_string, locking_mode_to_cli_flags, output_verbosity_to_cli_flags,
+};
 use crate::tools::execute_command;
 use rust_mcp_sdk::{
     macros::{JsonSchema, mcp_tool},

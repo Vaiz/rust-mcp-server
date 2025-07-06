@@ -3,8 +3,8 @@ use std::process::Command;
 use crate::serde_utils::Tool;
 use crate::{
     serde_utils::{
-        PackageWithVersion, deserialize_string, deserialize_string_vec,
-        locking_mode_to_cli_flags, output_verbosity_to_cli_flags,
+        PackageWithVersion, deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
+        output_verbosity_to_cli_flags,
     },
     tools::execute_command,
 };
