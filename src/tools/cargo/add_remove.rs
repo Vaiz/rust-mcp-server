@@ -2,7 +2,10 @@ use std::process::Command;
 
 use crate::serde_utils::Tool;
 use crate::{
-    serde_utils::{PackageWithVersion, default_true, deserialize_string, deserialize_string_vec},
+    serde_utils::{
+        PackageWithVersion, deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
+        output_verbosity_to_cli_flags,
+    },
     tools::execute_command,
 };
 use rust_mcp_sdk::{
@@ -26,8 +29,7 @@ fn dependency_type_to_cli_flag(
     })
 }
 
-/// MCP defaults differ from cargo defaults: `quiet` and `locked` are `true` by default
-/// for better integration with automated tooling and to avoid blocking on missing lockfiles.
+/// Adds a dependency to a Rust project using cargo add.
 #[mcp_tool(
     name = "cargo-add",
     description = "Adds a dependency to a Rust project using cargo add.",
@@ -115,25 +117,24 @@ pub struct CargoAddTool {
     #[serde(default)]
     pub ignore_rust_version: bool,
 
-    /// Assert that `Cargo.lock` will remain unchanged.
-    #[serde(default)]
-    pub locked: bool,
+    /// Locking mode for dependency resolution.
+    ///
+    /// Valid options:
+    /// - "locked" (default): Assert that `Cargo.lock` will remain unchanged
+    /// - "unlocked": Allow `Cargo.lock` to be updated
+    /// - "offline": Run without accessing the network
+    /// - "frozen": Equivalent to specifying both --locked and --offline
+    #[serde(default, deserialize_with = "deserialize_string")]
+    pub locking_mode: Option<String>,
 
-    /// Run without accessing the network
-    #[serde(default)]
-    pub offline: bool,
-
-    /// Equivalent to specifying both --locked and --offline
-    #[serde(default)]
-    pub frozen: bool,
-
-    /// Use verbose output
-    #[serde(default)]
-    pub verbose: bool,
-
-    /// Do not print cargo log messages. By default is `true`.
-    #[serde(default = "default_true")]
-    pub quiet: bool,
+    /// Output verbosity level.
+    ///
+    /// Valid options:
+    /// - "quiet" (default): Show only the essential command output
+    /// - "normal": Show standard output (no additional flags)
+    /// - "verbose": Show detailed output including build information
+    #[serde(default, deserialize_with = "deserialize_string")]
+    pub output_verbosity: Option<String>,
 }
 
 impl CargoAddTool {
@@ -218,30 +219,22 @@ impl CargoAddTool {
         if self.ignore_rust_version {
             cmd.arg("--ignore-rust-version");
         }
-        if self.locked {
-            cmd.arg("--locked");
-        }
-        if self.offline {
-            cmd.arg("--offline");
-        }
-        if self.frozen {
-            cmd.arg("--frozen");
+
+        // Apply locking mode flags
+        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref())?;
+        for flag in locking_flags {
+            cmd.arg(flag);
         }
 
         // Output options
-        if self.verbose {
-            cmd.arg("--verbose");
-        }
-        if self.quiet && !self.verbose {
-            cmd.arg("--quiet");
-        }
+        let output_flags = output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
+        cmd.args(output_flags);
 
         execute_command(cmd)
     }
 }
 
-/// MCP defaults differ from cargo defaults: `quiet` and `locked` are `true` by default
-/// for better integration with automated tooling and to avoid blocking on missing lockfiles.
+/// Remove dependencies from a Cargo.toml manifest file.
 #[mcp_tool(
     name = "cargo-remove",
     description = "Remove dependencies from a Cargo.toml manifest file.",
@@ -284,25 +277,24 @@ pub struct CargoRemoveTool {
     #[serde(default, deserialize_with = "deserialize_string")]
     pub lockfile_path: Option<String>,
 
-    /// Assert that `Cargo.lock` will remain unchanged.
-    #[serde(default)]
-    pub locked: bool,
+    /// Locking mode for dependency resolution.
+    ///
+    /// Valid options:
+    /// - "locked" (default): Assert that `Cargo.lock` will remain unchanged
+    /// - "unlocked": Allow `Cargo.lock` to be updated
+    /// - "offline": Run without accessing the network
+    /// - "frozen": Equivalent to specifying both --locked and --offline
+    #[serde(default, deserialize_with = "deserialize_string")]
+    pub locking_mode: Option<String>,
 
-    /// Run without accessing the network
-    #[serde(default)]
-    pub offline: bool,
-
-    /// Equivalent to specifying both --locked and --offline
-    #[serde(default)]
-    pub frozen: bool,
-
-    /// Use verbose output
-    #[serde(default)]
-    pub verbose: bool,
-
-    /// Do not print cargo log messages. By default is `true`.
-    #[serde(default = "default_true")]
-    pub quiet: bool,
+    /// Output verbosity level.
+    ///
+    /// Valid options:
+    /// - "quiet" (default): Show only the essential command output
+    /// - "normal": Show standard output (no additional flags)
+    /// - "verbose": Show detailed output including build information
+    #[serde(default, deserialize_with = "deserialize_string")]
+    pub output_verbosity: Option<String>,
 }
 
 impl CargoRemoveTool {
@@ -345,23 +337,16 @@ impl CargoRemoveTool {
         if let Some(lockfile_path) = &self.lockfile_path {
             cmd.arg("--lockfile-path").arg(lockfile_path);
         }
-        if self.locked {
-            cmd.arg("--locked");
-        }
-        if self.offline {
-            cmd.arg("--offline");
-        }
-        if self.frozen {
-            cmd.arg("--frozen");
+
+        // Apply locking mode flags
+        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref())?;
+        for flag in locking_flags {
+            cmd.arg(flag);
         }
 
         // Output options
-        if self.verbose {
-            cmd.arg("--verbose");
-        }
-        if self.quiet && !self.verbose {
-            cmd.arg("--quiet");
-        }
+        let output_flags = output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
+        cmd.args(output_flags);
 
         execute_command(cmd)
     }
@@ -404,7 +389,7 @@ mod tests {
     fn test_cargo_add_schema() {
         const EXPECTED_SCHEMA: &str = r##"
         {
-  "description": "MCP defaults differ from cargo defaults: `quiet` and `locked` are `true` by default\nfor better integration with automated tooling and to avoid blocking on missing lockfiles.",
+  "description": "Adds a dependency to a Rust project using cargo add.",
   "properties": {
     "branch": {
       "default": null,
@@ -434,11 +419,6 @@ mod tests {
       },
       "type": "array"
     },
-    "frozen": {
-      "default": false,
-      "description": "Equivalent to specifying both --locked and --offline",
-      "type": "boolean"
-    },
     "git": {
       "default": null,
       "description": "Git repository location",
@@ -449,10 +429,10 @@ mod tests {
       "description": "Ignore `rust-version` specification in packages",
       "type": "boolean"
     },
-    "locked": {
-      "default": false,
-      "description": "Assert that `Cargo.lock` will remain unchanged.",
-      "type": "boolean"
+    "locking_mode": {
+      "default": null,
+      "description": "Locking mode for dependency resolution.\n\nValid options:\n- \"locked\" (default): Assert that `Cargo.lock` will remain unchanged\n- \"unlocked\": Allow `Cargo.lock` to be updated\n- \"offline\": Run without accessing the network\n- \"frozen\": Equivalent to specifying both --locked and --offline",
+      "type": "string"
     },
     "lockfile_path": {
       "default": null,
@@ -469,15 +449,15 @@ mod tests {
       "description": "Disable the default features",
       "type": "boolean"
     },
-    "offline": {
-      "default": false,
-      "description": "Run without accessing the network",
-      "type": "boolean"
-    },
     "optional": {
       "default": false,
       "description": "Add as an optional dependency",
       "type": "boolean"
+    },
+    "output_verbosity": {
+      "default": null,
+      "description": "Output verbosity level.\n\nValid options:\n- \"quiet\" (default): Show only the essential command output\n- \"normal\": Show standard output (no additional flags)\n- \"verbose\": Show detailed output including build information",
+      "type": "string"
     },
     "package": {
       "description": "The package name",
@@ -487,11 +467,6 @@ mod tests {
       "default": null,
       "description": "Filesystem path to local crate to add",
       "type": "string"
-    },
-    "quiet": {
-      "default": true,
-      "description": "Do not print cargo log messages. By default is `true`.",
-      "type": "boolean"
     },
     "registry": {
       "default": null,
@@ -527,11 +502,6 @@ mod tests {
       "default": null,
       "description": "The toolchain to use, e.g., \"stable\" or \"nightly\".",
       "type": "string"
-    },
-    "verbose": {
-      "default": false,
-      "description": "Use verbose output",
-      "type": "boolean"
     },
     "version": {
       "default": null,

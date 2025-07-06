@@ -6,7 +6,7 @@ use rust_mcp_sdk::{
     schema::{CallToolResult, schema_utils::CallToolError},
 };
 
-use crate::serde_utils::{deserialize_string, deserialize_string_vec};
+use crate::serde_utils::{deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags};
 use crate::tools::execute_command;
 
 #[mcp_tool(
@@ -39,6 +39,10 @@ pub struct CargoDenyCheckTool {
     /// If set, excludes all dev-dependencies, not just ones for non-workspace crates
     #[serde(default)]
     exclude_dev: bool,
+
+    /// To ease transition from cargo-audit to cargo-deny, this flag will tell cargo-deny to output the exact same output as cargo-audit would
+    #[serde(default)]
+    audit_compatible_output: bool,
 
     /// Show stats for all the checks, regardless of the log-level
     #[serde(default)]
@@ -82,14 +86,44 @@ pub struct CargoDenyCheckTool {
     /// One or more platforms to filter crates by
     #[serde(default, deserialize_with = "deserialize_string_vec")]
     target: Option<Vec<String>>,
+
+    /// Activate all available features
+    #[serde(default)]
+    all_features: bool,
+
+    /// Do not activate the `default` feature
+    #[serde(default)]
+    no_default_features: bool,
+
+    /// Space or comma separated list of features to activate
+    #[serde(default, deserialize_with = "deserialize_string_vec")]
+    features: Option<Vec<String>>,
+
+    /// Locking mode for dependency resolution.
+    ///
+    /// Valid options:
+    /// - "locked" (default): Assert that `Cargo.lock` will remain unchanged
+    /// - "unlocked": Allow `Cargo.lock` to be updated
+    /// - "offline": Run without accessing the network
+    /// - "frozen": Equivalent to specifying both --locked and --offline
+    #[serde(default, deserialize_with = "deserialize_string")]
+    locking_mode: Option<String>,
+
+    /// If set, the crates.io git index is initialized for use in fetching crate information
+    #[serde(default)]
+    allow_git_index: bool,
+
+    /// If set, exclude unpublished workspace members from graph roots
+    #[serde(default)]
+    exclude_unpublished: bool,
 }
 
 impl CargoDenyCheckTool {
     pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
         let mut cmd = Command::new("cargo");
         cmd.arg("deny");
-        cmd.arg("--locked");
 
+        // Apply global options first
         if let Some(log_level) = &self.log_level {
             cmd.arg("--log-level").arg(log_level);
         }
@@ -118,8 +152,37 @@ impl CargoDenyCheckTool {
             }
         }
 
+        if self.all_features {
+            cmd.arg("--all-features");
+        }
+
+        if self.no_default_features {
+            cmd.arg("--no-default-features");
+        }
+
+        if let Some(features) = &self.features {
+            cmd.arg("--features").arg(features.join(","));
+        }
+
+        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref())?;
+        cmd.args(locking_flags);
+
+        if self.allow_git_index {
+            cmd.arg("--allow-git-index");
+        }
+
+        if self.exclude_dev {
+            cmd.arg("--exclude-dev");
+        }
+
+        if self.exclude_unpublished {
+            cmd.arg("--exclude-unpublished");
+        }
+
+        // Add the subcommand
         cmd.arg("check");
 
+        // Apply check-specific options
         if let Some(config) = &self.config {
             cmd.arg("--config").arg(config);
         }
@@ -136,8 +199,8 @@ impl CargoDenyCheckTool {
             cmd.arg("--disable-fetch");
         }
 
-        if self.exclude_dev {
-            cmd.arg("--exclude-dev");
+        if self.audit_compatible_output {
+            cmd.arg("--audit-compatible-output");
         }
 
         if self.show_stats {
@@ -166,6 +229,7 @@ impl CargoDenyCheckTool {
             cmd.arg("--feature-depth").arg(feature_depth.to_string());
         }
 
+        // Add the check types as positional arguments
         if let Some(which) = &self.which {
             for check in which {
                 cmd.arg(check);

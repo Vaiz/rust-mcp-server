@@ -1,14 +1,14 @@
 use std::process::Command;
 
-use crate::serde_utils::default_true;
-use crate::{serde_utils::deserialize_string, tools::execute_command};
+use crate::serde_utils::{
+    deserialize_string, locking_mode_to_cli_flags, output_verbosity_to_cli_flags,
+};
+use crate::tools::execute_command;
 use rust_mcp_sdk::{
     macros::{JsonSchema, mcp_tool},
     schema::{CallToolResult, schema_utils::CallToolError},
 };
 
-/// MCP defaults differ from cargo defaults: `quiet` and `locked` are `true` by default
-/// for better integration with automated tooling and to avoid blocking on missing lockfiles.
 #[mcp_tool(
     name = "cargo-metadata",
     description = "Outputs a listing of a project's resolved dependencies and metadata in machine-readable format (JSON).",
@@ -29,12 +29,14 @@ pub struct CargoMetadataTool {
     no_deps: bool,
 
     /// Use verbose output (-vv very verbose/build.rs output)
-    #[serde(default)]
-    verbose: bool,
-
-    /// Do not print cargo log messages. By default is `true`.
-    #[serde(default = "default_true")]
-    quiet: bool,
+    /// Output verbosity level.
+    ///
+    /// Valid options:
+    /// - "quiet" (default): Show only the essential command output
+    /// - "normal": Show standard output (no additional flags)
+    /// - "verbose": Show detailed output including build information
+    #[serde(default, deserialize_with = "deserialize_string")]
+    output_verbosity: Option<String>,
 
     /// Override a configuration value
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -60,17 +62,15 @@ pub struct CargoMetadataTool {
     #[serde(default, deserialize_with = "deserialize_string")]
     lockfile_path: Option<String>,
 
-    /// Assert that `Cargo.lock` will remain unchanged. By default is `true`.
-    #[serde(default = "default_true")]
-    locked: bool,
-
-    /// Run without accessing the network
-    #[serde(default)]
-    offline: bool,
-
-    /// Equivalent to specifying both --locked and --offline
-    #[serde(default)]
-    frozen: bool,
+    /// Locking mode for dependency resolution.
+    ///
+    /// Valid options:
+    /// - "locked" (default): Assert that `Cargo.lock` will remain unchanged
+    /// - "unlocked": Allow `Cargo.lock` to be updated
+    /// - "offline": Run without accessing the network
+    /// - "frozen": Equivalent to specifying both --locked and --offline
+    #[serde(default, deserialize_with = "deserialize_string")]
+    locking_mode: Option<String>,
 }
 
 impl CargoMetadataTool {
@@ -92,13 +92,8 @@ impl CargoMetadataTool {
         }
 
         // Output options
-        if self.verbose {
-            cmd.arg("--verbose");
-        }
-
-        if self.quiet && !self.verbose {
-            cmd.arg("--quiet");
-        }
+        let output_flags = output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
+        cmd.args(output_flags);
 
         if let Some(config) = &self.config {
             cmd.arg("--config").arg(config);
@@ -126,17 +121,8 @@ impl CargoMetadataTool {
             cmd.arg("--lockfile-path").arg(lockfile_path);
         }
 
-        if self.locked {
-            cmd.arg("--locked");
-        }
-
-        if self.offline {
-            cmd.arg("--offline");
-        }
-
-        if self.frozen {
-            cmd.arg("--frozen");
-        }
+        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref())?;
+        cmd.args(locking_flags);
 
         execute_command(cmd)
     }

@@ -5,11 +5,12 @@ use rust_mcp_sdk::{
     schema::{CallToolResult, schema_utils::CallToolError},
 };
 
-use crate::serde_utils::{default_true, deserialize_string, deserialize_string_vec};
+use crate::serde_utils::{
+    deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
+    output_verbosity_to_cli_flags,
+};
 use crate::tools::execute_command;
 
-/// MCP defaults differ from cargo defaults: `quiet` and `locked` are `true` by default
-/// for better integration with automated tooling and to avoid blocking on missing lockfiles.
 use crate::serde_utils::Tool;
 
 #[mcp_tool(
@@ -126,17 +127,15 @@ pub struct CargoPackageTool {
     #[serde(default, deserialize_with = "deserialize_string")]
     lockfile_path: Option<String>,
 
-    /// Assert that `Cargo.lock` will remain unchanged. By default is `true`.
-    #[serde(default = "default_true")]
-    locked: bool,
-
-    /// [Optional] Run without accessing the network
-    #[serde(default)]
-    offline: bool,
-
-    /// [Optional] Equivalent to specifying both --locked and --offline
-    #[serde(default)]
-    frozen: bool,
+    /// Locking mode for dependency resolution.
+    ///
+    /// Valid options:
+    /// - "locked" (default): Assert that `Cargo.lock` will remain unchanged
+    /// - "unlocked": Allow `Cargo.lock` to be updated
+    /// - "offline": Run without accessing the network
+    /// - "frozen": Equivalent to specifying both --locked and --offline
+    #[serde(default, deserialize_with = "deserialize_string")]
+    locking_mode: Option<String>,
 
     /// [Optional] Registry index URL to prepare the package for (unstable)
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -150,13 +149,14 @@ pub struct CargoPackageTool {
     #[serde(default, deserialize_with = "deserialize_string")]
     message_format: Option<String>,
 
-    /// [Optional] Use verbose output
-    #[serde(default)]
-    verbose: bool,
-
-    /// [Optional] Show only the essential command output. By default is `true`.
-    #[serde(default = "default_true")]
-    quiet: bool,
+    /// [Optional] Output verbosity level.
+    ///
+    /// Valid options:
+    /// - "quiet" (default): Show only the essential command output
+    /// - "normal": Show standard output (no additional flags)
+    /// - "verbose": Show detailed output including build information
+    #[serde(default, deserialize_with = "deserialize_string")]
+    output_verbosity: Option<String>,
 }
 
 impl CargoPackageTool {
@@ -249,16 +249,10 @@ impl CargoPackageTool {
             cmd.arg("--lockfile-path").arg(lockfile_path);
         }
 
-        if self.locked {
-            cmd.arg("--locked");
-        }
-
-        if self.offline {
-            cmd.arg("--offline");
-        }
-
-        if self.frozen {
-            cmd.arg("--frozen");
+        // Apply locking mode flags
+        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref())?;
+        for flag in locking_flags {
+            cmd.arg(flag);
         }
 
         // Registry options
@@ -275,13 +269,8 @@ impl CargoPackageTool {
             cmd.arg("--message-format").arg(message_format);
         }
 
-        if self.verbose {
-            cmd.arg("--verbose");
-        }
-
-        if self.quiet && !self.verbose {
-            cmd.arg("--quiet");
-        }
+        let output_flags = output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
+        cmd.args(output_flags);
 
         execute_command(cmd)
     }

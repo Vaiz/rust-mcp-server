@@ -27,11 +27,12 @@ use rust_mcp_sdk::{
     schema::{CallToolResult, schema_utils::CallToolError},
 };
 
-use crate::serde_utils::{default_true, deserialize_string, deserialize_string_vec};
+use crate::serde_utils::{
+    deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
+    output_verbosity_to_cli_flags,
+};
 use crate::tools::execute_command;
 
-/// MCP defaults differ from cargo defaults: `quiet` and `locked` are `true` by default
-/// for better integration with automated tooling and to avoid blocking on missing lockfiles.
 use crate::serde_utils::Tool;
 
 #[mcp_tool(
@@ -57,25 +58,24 @@ pub struct CargoGenerateLockfileTool {
     #[serde(default)]
     ignore_rust_version: bool,
 
-    /// Assert that `Cargo.lock` will remain unchanged. By default is `true`.
-    #[serde(default = "default_true")]
-    locked: bool,
+    /// Locking mode for dependency resolution.
+    ///
+    /// Valid options:
+    /// - "locked" (default): Assert that `Cargo.lock` will remain unchanged
+    /// - "unlocked": Allow `Cargo.lock` to be updated
+    /// - "offline": Run without accessing the network
+    /// - "frozen": Equivalent to specifying both --locked and --offline
+    #[serde(default, deserialize_with = "deserialize_string")]
+    locking_mode: Option<String>,
 
-    /// Run without accessing the network
-    #[serde(default)]
-    offline: bool,
-
-    /// Equivalent to specifying both --locked and --offline
-    #[serde(default)]
-    frozen: bool,
-
-    /// Use verbose output
-    #[serde(default)]
-    verbose: bool,
-
-    /// [Optional] Show only the essential command output. By default is `true`.
-    #[serde(default = "default_true")]
-    quiet: bool,
+    /// Output verbosity level.
+    ///
+    /// Valid options:
+    /// - "quiet" (default): Show only the essential command output
+    /// - "normal": Show standard output (no additional flags)
+    /// - "verbose": Show detailed output including build information
+    #[serde(default, deserialize_with = "deserialize_string")]
+    output_verbosity: Option<String>,
 }
 
 impl CargoGenerateLockfileTool {
@@ -101,33 +101,17 @@ impl CargoGenerateLockfileTool {
             cmd.arg("--ignore-rust-version");
         }
 
-        if self.locked {
-            cmd.arg("--locked");
-        }
-
-        if self.offline {
-            cmd.arg("--offline");
-        }
-
-        if self.frozen {
-            cmd.arg("--frozen");
-        }
+        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref())?;
+        cmd.args(locking_flags);
 
         // Output options
-        if self.verbose {
-            cmd.arg("--verbose");
-        }
-
-        if self.quiet && !self.verbose {
-            cmd.arg("--quiet");
-        }
+        let output_flags = output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
+        cmd.args(output_flags);
 
         execute_command(cmd)
     }
 }
 
-/// MCP defaults differ from cargo defaults: `quiet` and `locked` are `true` by default
-/// for better integration with automated tooling and to avoid blocking on missing lockfiles.
 #[mcp_tool(
     name = "cargo-clean",
     description = "Cleans the target directory for a Rust project using Cargo. By default, it cleans the entire workspace.",
@@ -178,25 +162,24 @@ pub struct CargoCleanTool {
     #[serde(default, deserialize_with = "deserialize_string")]
     lockfile_path: Option<String>,
 
-    /// Assert that `Cargo.lock` will remain unchanged. By default is `true`.
-    #[serde(default = "default_true")]
-    locked: bool,
+    /// Locking mode for dependency resolution.
+    ///
+    /// Valid options:
+    /// - "locked" (default): Assert that `Cargo.lock` will remain unchanged
+    /// - "unlocked": Allow `Cargo.lock` to be updated
+    /// - "offline": Run without accessing the network
+    /// - "frozen": Equivalent to specifying both --locked and --offline
+    #[serde(default, deserialize_with = "deserialize_string")]
+    locking_mode: Option<String>,
 
-    /// Run without accessing the network
-    #[serde(default)]
-    offline: bool,
-
-    /// Equivalent to specifying both --locked and --offline
-    #[serde(default)]
-    frozen: bool,
-
-    /// Use verbose output
-    #[serde(default)]
-    verbose: bool,
-
-    /// [Optional] Show only the essential command output. By default is `true`.
-    #[serde(default = "default_true")]
-    quiet: bool,
+    /// Output verbosity level.
+    ///
+    /// Valid options:
+    /// - "quiet" (default): Show only the essential command output
+    /// - "normal": Show standard output (no additional flags)
+    /// - "verbose": Show detailed output including build information
+    #[serde(default, deserialize_with = "deserialize_string")]
+    output_verbosity: Option<String>,
 }
 
 impl CargoCleanTool {
@@ -246,33 +229,17 @@ impl CargoCleanTool {
             cmd.arg("--lockfile-path").arg(lockfile_path);
         }
 
-        if self.locked {
-            cmd.arg("--locked");
-        }
-
-        if self.offline {
-            cmd.arg("--offline");
-        }
-
-        if self.frozen {
-            cmd.arg("--frozen");
-        }
+        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref())?;
+        cmd.args(locking_flags);
 
         // Output options
-        if self.verbose {
-            cmd.arg("--verbose");
-        }
-
-        if self.quiet && !self.verbose {
-            cmd.arg("--quiet");
-        }
+        let output_flags = output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
+        cmd.args(output_flags);
 
         execute_command(cmd)
     }
 }
 
-/// MCP defaults differ from cargo defaults: `quiet` is `true` by default
-/// for better integration with automated tooling.
 #[mcp_tool(
     name = "cargo-fmt",
     description = "Formats Rust code using rustfmt. Usually, run without any additional arguments.",
@@ -304,13 +271,14 @@ pub struct CargoFmtTool {
     #[serde(default, deserialize_with = "deserialize_string")]
     message_format: Option<String>,
 
-    /// Use verbose output
-    #[serde(default)]
-    verbose: bool,
-
-    /// [Optional] Show only the essential command output. By default is `true`.
-    #[serde(default = "default_true")]
-    quiet: bool,
+    /// Output verbosity level.
+    ///
+    /// Valid options:
+    /// - "quiet" (default): Show only the essential command output
+    /// - "normal": Show standard output (no additional flags)
+    /// - "verbose": Show detailed output including build information
+    #[serde(default, deserialize_with = "deserialize_string")]
+    output_verbosity: Option<String>,
 }
 
 impl CargoFmtTool {
@@ -347,20 +315,13 @@ impl CargoFmtTool {
         }
 
         // Output options
-        if self.verbose {
-            cmd.arg("--verbose");
-        }
-
-        if self.quiet && !self.verbose {
-            cmd.arg("--quiet");
-        }
+        let output_flags = output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
+        cmd.args(output_flags);
 
         execute_command(cmd)
     }
 }
 
-/// MCP defaults differ from cargo defaults: `quiet` is `true` and `locked` is `false` by default
-/// for better integration with automated tooling. `locked` is false since new projects don't have Cargo.lock yet.
 #[mcp_tool(
     name = "cargo-new",
     description = "Create a new cargo package at <path>. Creates a new Rust project with the specified name and template.",
@@ -401,25 +362,24 @@ pub struct CargoNewTool {
     #[serde(default, deserialize_with = "deserialize_string")]
     pub registry: Option<String>,
 
-    /// Assert that `Cargo.lock` will remain unchanged. By default is `false` for new projects.
-    #[serde(default)]
-    pub locked: bool,
+    /// Locking mode for dependency resolution.
+    ///
+    /// Valid options:
+    /// - "locked" (default): Assert that `Cargo.lock` will remain unchanged
+    /// - "unlocked": Allow `Cargo.lock` to be updated
+    /// - "offline": Run without accessing the network
+    /// - "frozen": Equivalent to specifying both --locked and --offline
+    #[serde(default, deserialize_with = "deserialize_string")]
+    pub locking_mode: Option<String>,
 
-    /// Run without accessing the network
-    #[serde(default)]
-    pub offline: bool,
-
-    /// Equivalent to specifying both --locked and --offline
-    #[serde(default)]
-    pub frozen: bool,
-
-    /// Use verbose output
-    #[serde(default)]
-    pub verbose: bool,
-
-    /// Do not print cargo log messages. By default is `true`.
-    #[serde(default = "default_true")]
-    pub quiet: bool,
+    /// Output verbosity level.
+    ///
+    /// Valid options:
+    /// - "quiet" (default): Show only the essential command output
+    /// - "normal": Show standard output (no additional flags)
+    /// - "verbose": Show detailed output including build information
+    #[serde(default, deserialize_with = "deserialize_string")]
+    pub output_verbosity: Option<String>,
 }
 
 impl CargoNewTool {
@@ -458,23 +418,12 @@ impl CargoNewTool {
         }
 
         // Manifest options
-        if self.locked {
-            cmd.arg("--locked");
-        }
-        if self.offline {
-            cmd.arg("--offline");
-        }
-        if self.frozen {
-            cmd.arg("--frozen");
-        }
+        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref())?;
+        cmd.args(locking_flags);
 
         // Output options
-        if self.verbose {
-            cmd.arg("--verbose");
-        }
-        if self.quiet && !self.verbose {
-            cmd.arg("--quiet");
-        }
+        let output_flags = output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
+        cmd.args(output_flags);
 
         execute_command(cmd)
     }

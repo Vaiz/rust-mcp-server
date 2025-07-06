@@ -1,3 +1,5 @@
+use rust_mcp_sdk::schema::schema_utils::CallToolError;
+
 /// Utility function for parsing Option<String> fields in serde,
 /// returning None if the string is "null" (case-insensitive) or empty.
 pub fn deserialize_string<'de, D>(deserializer: D) -> Result<Option<String>, D::Error>
@@ -38,6 +40,55 @@ where
         }
         _ => Err(serde::de::Error::custom("Expected array or null")),
     }
+}
+
+/// Convert locking mode string to CLI flags for cargo commands.
+/// Returns a vector of flags to add to the command.
+///
+/// Valid modes:
+/// - "locked" (default): Assert that `Cargo.lock` will remain unchanged
+/// - "unlocked": Allow `Cargo.lock` to be updated  
+/// - "offline": Run without accessing the network
+/// - "frozen": Equivalent to specifying both --locked and --offline
+pub fn locking_mode_to_cli_flags(mode: Option<&str>) -> Result<Vec<&'static str>, CallToolError> {
+    Ok(match mode.unwrap_or("locked") {
+        "locked" => vec!["--locked"],
+        "unlocked" => vec![], // No flags needed
+        "offline" => vec!["--offline"],
+        "frozen" => vec!["--frozen"],
+        unknown => {
+            return Err(CallToolError(
+                anyhow::anyhow!(
+                    "Unknown locking mode: {unknown}. Valid options are: locked, unlocked, offline, frozen"                    
+                ).into()
+            ));
+        }
+    })
+}
+
+/// Convert output verbosity string to CLI flags for cargo commands.
+/// Returns a vector of flags to add to the command.
+///
+/// Valid modes:
+/// - "quiet" (default): Show only the essential command output
+/// - "normal": Show standard output (no additional flags)
+/// - "verbose": Show detailed output including build information
+pub fn output_verbosity_to_cli_flags(
+    mode: Option<&str>,
+) -> Result<Vec<&'static str>, CallToolError> {
+    Ok(match mode.unwrap_or("quiet") {
+        "quiet" => vec!["--quiet"],
+        "normal" => vec![], // No flags needed
+        "verbose" => vec!["--verbose"],
+        unknown => {
+            return Err(CallToolError(
+                anyhow::anyhow!(
+                    "Unknown output verbosity: {unknown}. Valid options are: quiet, normal, verbose"
+                )
+                .into(),
+            ));
+        }
+    })
 }
 
 pub const fn default_true() -> bool {
@@ -360,5 +411,96 @@ mod tests {
         } else {
             panic!("Expected value property to be an object");
         }
+    }
+
+    #[test]
+    fn test_locking_mode_cli_flags() {
+        // Test default (locked)
+        assert_eq!(locking_mode_to_cli_flags(None).unwrap(), vec!["--locked"]);
+
+        // Test explicit modes
+        assert_eq!(
+            locking_mode_to_cli_flags(Some("locked")).unwrap(),
+            vec!["--locked"]
+        );
+        assert_eq!(
+            locking_mode_to_cli_flags(Some("unlocked")).unwrap(),
+            Vec::<&str>::new()
+        );
+        assert_eq!(
+            locking_mode_to_cli_flags(Some("offline")).unwrap(),
+            vec!["--offline"]
+        );
+        assert_eq!(
+            locking_mode_to_cli_flags(Some("frozen")).unwrap(),
+            vec!["--frozen"]
+        );
+
+        // Test unknown values return error
+        assert!(locking_mode_to_cli_flags(Some("invalid")).is_err());
+        let error = locking_mode_to_cli_flags(Some("invalid")).unwrap_err();
+        assert!(error.to_string().contains("Unknown locking mode: invalid"));
+    }
+
+    #[test]
+    fn test_output_verbosity_to_cli_flags() {
+        // Test default (quiet)
+        assert_eq!(
+            output_verbosity_to_cli_flags(None).unwrap(),
+            vec!["--quiet"]
+        );
+
+        // Test explicit modes
+        assert_eq!(
+            output_verbosity_to_cli_flags(Some("quiet")).unwrap(),
+            vec!["--quiet"]
+        );
+        assert_eq!(
+            output_verbosity_to_cli_flags(Some("normal")).unwrap(),
+            Vec::<&str>::new()
+        );
+        assert_eq!(
+            output_verbosity_to_cli_flags(Some("verbose")).unwrap(),
+            vec!["--verbose"]
+        );
+
+        // Test unknown values return error
+        assert!(output_verbosity_to_cli_flags(Some("invalid")).is_err());
+        let error = output_verbosity_to_cli_flags(Some("invalid")).unwrap_err();
+        assert!(
+            error
+                .to_string()
+                .contains("Unknown output verbosity: invalid")
+        );
+    }
+
+    #[test]
+    fn test_output_verbosity_cli_flags() {
+        // Test default (quiet)
+        assert_eq!(
+            output_verbosity_to_cli_flags(None).unwrap(),
+            vec!["--quiet"]
+        );
+
+        // Test explicit quiet
+        assert_eq!(
+            output_verbosity_to_cli_flags(Some("quiet")).unwrap(),
+            vec!["--quiet"]
+        );
+
+        // Test normal (no flags)
+        assert_eq!(
+            output_verbosity_to_cli_flags(Some("normal")).unwrap(),
+            Vec::<&'static str>::new()
+        );
+
+        // Test verbose
+        assert_eq!(
+            output_verbosity_to_cli_flags(Some("verbose")).unwrap(),
+            vec!["--verbose"]
+        );
+
+        // Test invalid option
+        assert!(output_verbosity_to_cli_flags(Some("invalid")).is_err());
     }
 }

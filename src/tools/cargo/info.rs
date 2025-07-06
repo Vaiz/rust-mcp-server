@@ -2,7 +2,10 @@ use std::process::Command;
 
 use crate::serde_utils::Tool;
 use crate::{
-    serde_utils::{PackageWithVersion, default_true, deserialize_string},
+    serde_utils::{
+        PackageWithVersion, deserialize_string, locking_mode_to_cli_flags,
+        output_verbosity_to_cli_flags,
+    },
     tools::execute_command,
 };
 use rust_mcp_sdk::{
@@ -10,8 +13,7 @@ use rust_mcp_sdk::{
     schema::{CallToolResult, schema_utils::CallToolError},
 };
 
-/// MCP defaults differ from cargo defaults: `quiet` and `locked` are `true` by default
-/// for better integration with automated tooling and to avoid blocking on missing lockfiles.
+/// Display information about a package. Information includes package description, list of available features, etc. Equivalent to 'cargo info <SPEC>'.
 #[mcp_tool(
     name = "cargo-info",
     description = "Display information about a package. Information includes package description, list of available features, etc. Equivalent to 'cargo info <SPEC>'.",
@@ -31,29 +33,28 @@ pub struct CargoInfoTool {
     #[serde(default, deserialize_with = "deserialize_string")]
     pub registry: Option<String>,
 
-    /// Use verbose output that includes crate dependencies.
-    #[serde(default)]
-    pub verbose: bool,
-
-    /// Do not print cargo log messages. By default is `true`.
-    #[serde(default = "default_true")]
-    pub quiet: bool,
+    /// Output verbosity level.
+    ///
+    /// Valid options:
+    /// - "quiet" (default): Show only the essential command output
+    /// - "normal": Show standard output (no additional flags)
+    /// - "verbose": Show detailed output including build information
+    #[serde(default, deserialize_with = "deserialize_string")]
+    pub output_verbosity: Option<String>,
 
     /// Override a configuration value
     #[serde(default, deserialize_with = "deserialize_string")]
     pub config: Option<String>,
 
-    /// Assert that `Cargo.lock` will remain unchanged. By default is `true`.
-    #[serde(default = "default_true")]
-    pub locked: bool,
-
-    /// Run without accessing the network
-    #[serde(default)]
-    pub offline: bool,
-
-    /// Equivalent to specifying both --locked and --offline
-    #[serde(default)]
-    pub frozen: bool,
+    /// Locking mode for dependency resolution.
+    ///
+    /// Valid options:
+    /// - "locked" (default): Assert that `Cargo.lock` will remain unchanged
+    /// - "unlocked": Allow `Cargo.lock` to be updated
+    /// - "offline": Run without accessing the network
+    /// - "frozen": Equivalent to specifying both --locked and --offline
+    #[serde(default, deserialize_with = "deserialize_string")]
+    pub locking_mode: Option<String>,
 }
 
 impl CargoInfoTool {
@@ -76,26 +77,12 @@ impl CargoInfoTool {
         }
 
         // Manifest options
-        if self.locked {
-            cmd.arg("--locked");
-        }
-
-        if self.offline {
-            cmd.arg("--offline");
-        }
-
-        if self.frozen {
-            cmd.arg("--frozen");
-        }
+        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref())?;
+        cmd.args(locking_flags);
 
         // Output options
-        if self.verbose {
-            cmd.arg("--verbose");
-        }
-
-        if self.quiet && !self.verbose {
-            cmd.arg("--quiet");
-        }
+        let output_flags = output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
+        cmd.args(output_flags);
 
         execute_command(cmd)
     }
@@ -108,51 +95,36 @@ mod tests {
     #[test]
     fn test_cargo_info_schema() {
         const EXPECTED_SCHEMA: &str = r##"{
-  "description": "MCP defaults differ from cargo defaults: `quiet` and `locked` are `true` by default\nfor better integration with automated tooling and to avoid blocking on missing lockfiles.",
+  "description": "Display information about a package. Information includes package description, list of available features, etc. Equivalent to 'cargo info <SPEC>'.",
   "properties": {
     "config": {
       "default": null,
       "description": "Override a configuration value",
       "type": "string"
     },
-    "frozen": {
-      "default": false,
-      "description": "Equivalent to specifying both --locked and --offline",
-      "type": "boolean"
-    },
     "index": {
       "default": null,
       "description": "Registry index URL to search packages in",
       "type": "string"
     },
-    "locked": {
-      "default": true,
-      "description": "Assert that `Cargo.lock` will remain unchanged. By default is `true`.",
-      "type": "boolean"
+    "locking_mode": {
+      "default": null,
+      "description": "Locking mode for dependency resolution.\n\nValid options:\n- \"locked\" (default): Assert that `Cargo.lock` will remain unchanged\n- \"unlocked\": Allow `Cargo.lock` to be updated\n- \"offline\": Run without accessing the network\n- \"frozen\": Equivalent to specifying both --locked and --offline",
+      "type": "string"
     },
-    "offline": {
-      "default": false,
-      "description": "Run without accessing the network",
-      "type": "boolean"
+    "output_verbosity": {
+      "default": null,
+      "description": "Output verbosity level.\n\nValid options:\n- \"quiet\" (default): Show only the essential command output\n- \"normal\": Show standard output (no additional flags)\n- \"verbose\": Show detailed output including build information",
+      "type": "string"
     },
     "package": {
       "description": "The package name",
       "type": "string"
     },
-    "quiet": {
-      "default": true,
-      "description": "Do not print cargo log messages. By default is `true`.",
-      "type": "boolean"
-    },
     "registry": {
       "default": null,
       "description": "Registry to search packages in",
       "type": "string"
-    },
-    "verbose": {
-      "default": false,
-      "description": "Use verbose output that includes crate dependencies.",
-      "type": "boolean"
     },
     "version": {
       "default": null,
