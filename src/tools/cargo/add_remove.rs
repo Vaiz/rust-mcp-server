@@ -11,33 +11,20 @@ use rust_mcp_sdk::{
     schema::{CallToolResult, schema_utils::CallToolError},
 };
 
-/// Dependency type for cargo add/remove operations
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, ::serde::Deserialize, schemars::JsonSchema)]
-#[serde(rename_all = "lowercase")]
-pub enum DependencyType {
-    /// Regular dependency (default section)
-    Regular,
-    /// Development dependency
-    Dev,
-    /// Build dependency
-    Build,
-}
-
-impl Default for DependencyType {
-    fn default() -> Self {
-        Self::Regular
-    }
-}
-
-impl DependencyType {
-    /// Convert to the corresponding CLI flag
-    pub fn to_cli_flag(self) -> Option<&'static str> {
-        match self {
-            DependencyType::Regular => None,
-            DependencyType::Dev => Some("--dev"),
-            DependencyType::Build => Some("--build"),
+fn dependency_type_to_cli_flag(
+    dependency_type: Option<&str>,
+) -> Result<Option<&'static str>, CallToolError> {
+    Ok(match dependency_type {
+        None => None,
+        Some("regular") => None,
+        Some("dev") => Some("--dev"),
+        Some("build") => Some("--build"),
+        Some(dep) => {
+            return Err(CallToolError(
+                anyhow::anyhow!("Unknown dependency type: {dep}").into(),
+            ));
         }
-    }
+    })
 }
 
 /// MCP defaults differ from cargo defaults: `quiet` and `locked` are `true` by default
@@ -58,8 +45,8 @@ pub struct CargoAddTool {
     pub package_spec: PackageWithVersion,
 
     /// Dependency type: "regular" (default), "dev", or "build"
-    #[serde(default)]
-    pub dependency_type: DependencyType,
+    #[serde(default, deserialize_with = "deserialize_string")]
+    pub dependency_type: Option<String>,
 
     /// Add as an optional dependency
     #[serde(default)]
@@ -161,9 +148,10 @@ impl CargoAddTool {
         cmd.arg(self.package_spec.to_spec());
 
         // Dependency type
-        if let Some(flag) = self.dependency_type.to_cli_flag() {
+        if let Some(flag) = dependency_type_to_cli_flag(self.dependency_type.as_deref())? {
             cmd.arg(flag);
-        };
+        }
+
         if self.optional {
             cmd.arg("--optional");
         }
@@ -274,8 +262,8 @@ pub struct CargoRemoveTool {
     pub dep_id: Vec<String>,
 
     /// Dependency type: "regular" (default), "dev", or "build"
-    #[serde(default)]
-    pub dependency_type: DependencyType,
+    #[serde(default, deserialize_with = "deserialize_string")]
+    pub dependency_type: Option<String>,
 
     /// Remove from target-dependencies
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -332,9 +320,11 @@ impl CargoRemoveTool {
         }
 
         // Section options
-        if let Some(flag) = self.dependency_type.to_cli_flag() {
+
+        if let Some(flag) = dependency_type_to_cli_flag(self.dependency_type.as_deref())? {
             cmd.arg(flag);
         }
+
         if let Some(target) = &self.target {
             cmd.arg("--target").arg(target);
         }
@@ -403,23 +393,21 @@ impl TestTool1 {
 
 #[mcp_tool(
     name = "test-tool-2",
-    description = "A test tool with a DependencyType parameter.",
+    description = "A test tool with a dependency type parameter.",
     openWorldHint = false
 )]
 #[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
 pub struct TestTool2 {
-    /// The dependency type to test.
-    #[serde(default)]
-    pub dependency_type: DependencyType,
+    /// The dependency type to test: "regular", "dev", or "build"
+    #[serde(default, deserialize_with = "deserialize_string")]
+    pub dependency_type: Option<String>,
 }
 
 impl TestTool2 {
     pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
+        let dep_type = self.dependency_type.as_deref().unwrap_or("regular");
         let text = TextContent::new(
-            format!(
-                "TestTool2 called with dependency type: {:?}",
-                self.dependency_type
-            ),
+            format!("TestTool2 called with dependency type: {}", dep_type),
             None,
             None,
         );
@@ -432,63 +420,25 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_dependency_type_enum() {
-        // Test default
-        assert_eq!(DependencyType::default(), DependencyType::Regular);
-
+    fn test_dependency_type_helper() {
         // Test CLI flags
-        assert_eq!(DependencyType::Regular.to_cli_flag(), None);
-        assert_eq!(DependencyType::Dev.to_cli_flag(), Some("--dev"));
-        assert_eq!(DependencyType::Build.to_cli_flag(), Some("--build"));
+        assert_eq!(dependency_type_to_cli_flag(Some("regular")).unwrap(), None);
+        assert_eq!(dependency_type_to_cli_flag(Some("dev")).unwrap(), Some("--dev"));
+        assert_eq!(dependency_type_to_cli_flag(Some("build")).unwrap(), Some("--build"));
+        assert!(dependency_type_to_cli_flag(Some("unknown")).is_err());
     }
 
     #[test]
     fn test_dependency_type_serde() {
+        // Test string parsing for dependency types
         assert_eq!(
-            serde_json::from_str::<DependencyType>("\"regular\"").unwrap(),
-            DependencyType::Regular
+            serde_json::from_str::<String>("\"regular\"").unwrap(),
+            "regular"
         );
+        assert_eq!(serde_json::from_str::<String>("\"dev\"").unwrap(), "dev");
         assert_eq!(
-            serde_json::from_str::<DependencyType>("\"dev\"").unwrap(),
-            DependencyType::Dev
-        );
-        assert_eq!(
-            serde_json::from_str::<DependencyType>("\"build\"").unwrap(),
-            DependencyType::Build
-        );
-    }
-
-    #[test]
-    fn test_dependency_type_json_schema() {
-        const EXPECTED_SCHEMA: &str = r#"
-{
-  "title": "DependencyType",
-  "description": "Dependency type for cargo add/remove operations",
-  "oneOf": [
-    {
-      "const": "regular",
-      "description": "Regular dependency (default section)",
-      "type": "string"
-    },
-    {
-      "const": "dev",
-      "description": "Development dependency",
-      "type": "string"
-    },
-    {
-      "const": "build",
-      "description": "Build dependency",
-      "type": "string"
-    }
-  ]
-}"#;
-
-        let schema = serde_json::Value::from(DependencyType::json_schema());
-        let expected_schema: serde_json::Value = serde_json::from_str(EXPECTED_SCHEMA).unwrap();
-
-        assert_eq!(
-            schema, expected_schema,
-            "Schema should match expected structure"
+            serde_json::from_str::<String>("\"build\"").unwrap(),
+            "build"
         );
     }
 
@@ -496,28 +446,6 @@ mod tests {
     fn test_cargo_add_schema() {
         const EXPECTED_SCHEMA: &str = r##"
         {
-  "$defs": {
-    "DependencyType": {
-      "description": "Dependency type for cargo add/remove operations",
-      "oneOf": [
-        {
-          "const": "regular",
-          "description": "Regular dependency (default section)",
-          "type": "string"
-        },
-        {
-          "const": "dev",
-          "description": "Development dependency",
-          "type": "string"
-        },
-        {
-          "const": "build",
-          "description": "Build dependency",
-          "type": "string"
-        }
-      ]
-    }
-  },
   "description": "MCP defaults differ from cargo defaults: `quiet` and `locked` are `true` by default\nfor better integration with automated tooling and to avoid blocking on missing lockfiles.",
   "properties": {
     "branch": {
@@ -531,8 +459,9 @@ mod tests {
       "type": "boolean"
     },
     "dependency_type": {
-      "$ref": "#/$defs/DependencyType",
-      "description": "Dependency type: \"regular\" (default), \"dev\", or \"build\""
+      "default": null,
+      "description": "Dependency type: \"regular\" (default), \"dev\", or \"build\"",
+      "type": "string"
     },
     "dry_run": {
       "default": false,
