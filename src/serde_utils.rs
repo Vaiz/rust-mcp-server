@@ -40,6 +40,24 @@ where
     }
 }
 
+/// Convert locking mode string to CLI flags for cargo commands.
+/// Returns a vector of flags to add to the command.
+/// 
+/// Valid modes:
+/// - "locked" (default): Assert that `Cargo.lock` will remain unchanged
+/// - "unlocked": Allow `Cargo.lock` to be updated  
+/// - "offline": Run without accessing the network
+/// - "frozen": Equivalent to specifying both --locked and --offline
+pub fn locking_mode_to_cli_flags(mode: Option<&str>) -> Vec<&'static str> {
+    match mode.unwrap_or("locked") {
+        "locked" => vec!["--locked"],
+        "unlocked" => vec![], // No flags needed
+        "offline" => vec!["--offline"], 
+        "frozen" => vec!["--frozen"],
+        _ => vec!["--locked"], // Default to locked for unknown values
+    }
+}
+
 pub const fn default_true() -> bool {
     true
 }
@@ -360,5 +378,20 @@ mod tests {
         } else {
             panic!("Expected value property to be an object");
         }
+    }
+
+    #[test]
+    fn test_locking_mode_cli_flags() {
+        // Test default (locked)
+        assert_eq!(locking_mode_to_cli_flags(None), vec!["--locked"]);
+        
+        // Test explicit modes
+        assert_eq!(locking_mode_to_cli_flags(Some("locked")), vec!["--locked"]);
+        assert_eq!(locking_mode_to_cli_flags(Some("unlocked")), Vec::<&str>::new());
+        assert_eq!(locking_mode_to_cli_flags(Some("offline")), vec!["--offline"]);
+        assert_eq!(locking_mode_to_cli_flags(Some("frozen")), vec!["--frozen"]);
+        
+        // Test unknown values default to locked
+        assert_eq!(locking_mode_to_cli_flags(Some("invalid")), vec!["--locked"]);
     }
 }

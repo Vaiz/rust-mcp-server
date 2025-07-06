@@ -2,7 +2,7 @@ use std::process::Command;
 
 use crate::serde_utils::Tool;
 use crate::{
-    serde_utils::{PackageWithVersion, default_true, deserialize_string, deserialize_string_vec},
+    serde_utils::{PackageWithVersion, default_true, deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags},
     tools::execute_command,
 };
 use rust_mcp_sdk::{
@@ -115,17 +115,9 @@ pub struct CargoAddTool {
     #[serde(default)]
     pub ignore_rust_version: bool,
 
-    /// Assert that `Cargo.lock` will remain unchanged.
-    #[serde(default)]
-    pub locked: bool,
-
-    /// Run without accessing the network
-    #[serde(default)]
-    pub offline: bool,
-
-    /// Equivalent to specifying both --locked and --offline
-    #[serde(default)]
-    pub frozen: bool,
+    /// Locking mode for dependency management. Valid options: "locked" (default), "unlocked", "offline", "frozen".
+    #[serde(default, deserialize_with = "deserialize_string")]
+    pub locking_mode: Option<String>,
 
     /// Use verbose output
     #[serde(default)]
@@ -218,14 +210,10 @@ impl CargoAddTool {
         if self.ignore_rust_version {
             cmd.arg("--ignore-rust-version");
         }
-        if self.locked {
-            cmd.arg("--locked");
-        }
-        if self.offline {
-            cmd.arg("--offline");
-        }
-        if self.frozen {
-            cmd.arg("--frozen");
+
+        // Apply locking mode flags
+        for flag in locking_mode_to_cli_flags(self.locking_mode.as_deref()) {
+            cmd.arg(flag);
         }
 
         // Output options
@@ -284,17 +272,9 @@ pub struct CargoRemoveTool {
     #[serde(default, deserialize_with = "deserialize_string")]
     pub lockfile_path: Option<String>,
 
-    /// Assert that `Cargo.lock` will remain unchanged.
-    #[serde(default)]
-    pub locked: bool,
-
-    /// Run without accessing the network
-    #[serde(default)]
-    pub offline: bool,
-
-    /// Equivalent to specifying both --locked and --offline
-    #[serde(default)]
-    pub frozen: bool,
+    /// Locking mode for dependency management. Valid options: "locked" (default), "unlocked", "offline", "frozen".
+    #[serde(default, deserialize_with = "deserialize_string")]
+    pub locking_mode: Option<String>,
 
     /// Use verbose output
     #[serde(default)]
@@ -345,14 +325,10 @@ impl CargoRemoveTool {
         if let Some(lockfile_path) = &self.lockfile_path {
             cmd.arg("--lockfile-path").arg(lockfile_path);
         }
-        if self.locked {
-            cmd.arg("--locked");
-        }
-        if self.offline {
-            cmd.arg("--offline");
-        }
-        if self.frozen {
-            cmd.arg("--frozen");
+
+        // Apply locking mode flags
+        for flag in locking_mode_to_cli_flags(self.locking_mode.as_deref()) {
+            cmd.arg(flag);
         }
 
         // Output options
@@ -434,11 +410,6 @@ mod tests {
       },
       "type": "array"
     },
-    "frozen": {
-      "default": false,
-      "description": "Equivalent to specifying both --locked and --offline",
-      "type": "boolean"
-    },
     "git": {
       "default": null,
       "description": "Git repository location",
@@ -449,10 +420,10 @@ mod tests {
       "description": "Ignore `rust-version` specification in packages",
       "type": "boolean"
     },
-    "locked": {
-      "default": false,
-      "description": "Assert that `Cargo.lock` will remain unchanged.",
-      "type": "boolean"
+    "locking_mode": {
+      "default": null,
+      "description": "Locking mode for dependency management. Valid options: \"locked\" (default), \"unlocked\", \"offline\", \"frozen\".",
+      "type": "string"
     },
     "lockfile_path": {
       "default": null,
@@ -467,11 +438,6 @@ mod tests {
     "no_default_features": {
       "default": false,
       "description": "Disable the default features",
-      "type": "boolean"
-    },
-    "offline": {
-      "default": false,
-      "description": "Run without accessing the network",
       "type": "boolean"
     },
     "optional": {
