@@ -212,8 +212,7 @@ impl CargoAddTool {
         }
 
         // Apply locking mode flags
-        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref())
-            .map_err(|e| CallToolError(e.into()))?;
+        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref())?;
         for flag in locking_flags {
             cmd.arg(flag);
         }
@@ -329,8 +328,7 @@ impl CargoRemoveTool {
         }
 
         // Apply locking mode flags
-        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref())
-            .map_err(|e| CallToolError(e.into()))?;
+        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref())?;
         for flag in locking_flags {
             cmd.arg(flag);
         }

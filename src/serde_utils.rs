@@ -1,3 +1,5 @@
+use rust_mcp_sdk::schema::schema_utils::CallToolError;
+
 /// Utility function for parsing Option<String> fields in serde,
 /// returning None if the string is "null" (case-insensitive) or empty.
 pub fn deserialize_string<'de, D>(deserializer: D) -> Result<Option<String>, D::Error>
@@ -48,16 +50,18 @@ where
 /// - "unlocked": Allow `Cargo.lock` to be updated  
 /// - "offline": Run without accessing the network
 /// - "frozen": Equivalent to specifying both --locked and --offline
-pub fn locking_mode_to_cli_flags(mode: Option<&str>) -> Result<Vec<&'static str>, anyhow::Error> {
+pub fn locking_mode_to_cli_flags(mode: Option<&str>) -> Result<Vec<&'static str>, CallToolError> {
     Ok(match mode.unwrap_or("locked") {
         "locked" => vec!["--locked"],
         "unlocked" => vec![], // No flags needed
         "offline" => vec!["--offline"], 
         "frozen" => vec!["--frozen"],
         unknown => {
-            return Err(anyhow::anyhow!(
-                "Unknown locking mode: {}. Valid options are: locked, unlocked, offline, frozen", 
-                unknown
+            return Err(CallToolError(
+                anyhow::anyhow!(
+                    "Unknown locking mode: {}. Valid options are: locked, unlocked, offline, frozen", 
+                    unknown
+                ).into()
             ));
         }
     })
