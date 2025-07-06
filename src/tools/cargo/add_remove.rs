@@ -454,6 +454,11 @@ mod tests {
       "description": "Add as an optional dependency",
       "type": "boolean"
     },
+    "output_verbosity": {
+      "default": null,
+      "description": "Output verbosity level.\n\nValid options:\n- \"quiet\" (default): Show only the essential command output\n- \"normal\": Show standard output (no additional flags)\n- \"verbose\": Show detailed output including build information",
+      "type": "string"
+    },
     "package": {
       "description": "The package name",
       "type": "string"
@@ -462,11 +467,6 @@ mod tests {
       "default": null,
       "description": "Filesystem path to local crate to add",
       "type": "string"
-    },
-    "quiet": {
-      "default": true,
-      "description": "Do not print cargo log messages. By default is `true`.",
-      "type": "boolean"
     },
     "registry": {
       "default": null,
@@ -502,11 +502,6 @@ mod tests {
       "default": null,
       "description": "The toolchain to use, e.g., \"stable\" or \"nightly\".",
       "type": "string"
-    },
-    "verbose": {
-      "default": false,
-      "description": "Use verbose output",
-      "type": "boolean"
     },
     "version": {
       "default": null,

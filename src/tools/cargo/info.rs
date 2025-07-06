@@ -112,24 +112,19 @@ mod tests {
       "description": "Locking mode for dependency resolution.\n\nValid options:\n- \"locked\" (default): Assert that `Cargo.lock` will remain unchanged\n- \"unlocked\": Allow `Cargo.lock` to be updated\n- \"offline\": Run without accessing the network\n- \"frozen\": Equivalent to specifying both --locked and --offline",
       "type": "string"
     },
+    "output_verbosity": {
+      "default": null,
+      "description": "Output verbosity level.\n\nValid options:\n- \"quiet\" (default): Show only the essential command output\n- \"normal\": Show standard output (no additional flags)\n- \"verbose\": Show detailed output including build information",
+      "type": "string"
+    },
     "package": {
       "description": "The package name",
       "type": "string"
-    },
-    "quiet": {
-      "default": true,
-      "description": "Do not print cargo log messages. By default is `true`.",
-      "type": "boolean"
     },
     "registry": {
       "default": null,
       "description": "Registry to search packages in",
       "type": "string"
-    },
-    "verbose": {
-      "default": false,
-      "description": "Use verbose output that includes crate dependencies.",
-      "type": "boolean"
     },
     "version": {
       "default": null,
