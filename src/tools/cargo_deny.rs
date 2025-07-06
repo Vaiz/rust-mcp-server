@@ -6,7 +6,7 @@ use rust_mcp_sdk::{
     schema::{CallToolResult, schema_utils::CallToolError},
 };
 
-use crate::serde_utils::{deserialize_string, deserialize_string_vec};
+use crate::serde_utils::{deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags};
 use crate::tools::execute_command;
 
 #[mcp_tool(
@@ -99,17 +99,9 @@ pub struct CargoDenyCheckTool {
     #[serde(default, deserialize_with = "deserialize_string_vec")]
     features: Option<Vec<String>>,
 
-    /// Equivalent to specifying both --locked and --offline
-    #[serde(default)]
-    frozen: bool,
-
-    /// Run without accessing the network
-    #[serde(default)]
-    offline: bool,
-
-    /// Assert that `Cargo.lock` will remain unchanged
-    #[serde(default)]
-    locked: bool,
+    /// Locking mode for dependency management. Valid options: "locked" (default), "unlocked", "offline", "frozen".
+    #[serde(default, deserialize_with = "deserialize_string")]
+    locking_mode: Option<String>,
 
     /// If set, the crates.io git index is initialized for use in fetching crate information
     #[serde(default)]
@@ -166,17 +158,8 @@ impl CargoDenyCheckTool {
             cmd.arg("--features").arg(features.join(","));
         }
 
-        if self.frozen {
-            cmd.arg("--frozen");
-        }
-
-        if self.offline {
-            cmd.arg("--offline");
-        }
-
-        if self.locked {
-            cmd.arg("--locked");
-        }
+        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref())?;
+        cmd.args(locking_flags);
 
         if self.allow_git_index {
             cmd.arg("--allow-git-index");

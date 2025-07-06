@@ -2,7 +2,9 @@ use std::process::Command;
 
 use crate::serde_utils::Tool;
 use crate::{
-    serde_utils::{PackageWithVersion, default_true, deserialize_string},
+    serde_utils::{
+        PackageWithVersion, default_true, deserialize_string, locking_mode_to_cli_flags,
+    },
     tools::execute_command,
 };
 use rust_mcp_sdk::{
@@ -41,17 +43,9 @@ pub struct CargoInfoTool {
     #[serde(default, deserialize_with = "deserialize_string")]
     pub config: Option<String>,
 
-    /// Assert that `Cargo.lock` will remain unchanged. By default is `true`.
-    #[serde(default = "default_true")]
-    pub locked: bool,
-
-    /// Run without accessing the network
-    #[serde(default)]
-    pub offline: bool,
-
-    /// Equivalent to specifying both --locked and --offline
-    #[serde(default)]
-    pub frozen: bool,
+    /// Locking mode for dependency management. Valid options: "locked" (default), "unlocked", "offline", "frozen".
+    #[serde(default, deserialize_with = "deserialize_string")]
+    pub locking_mode: Option<String>,
 }
 
 impl CargoInfoTool {
@@ -74,17 +68,8 @@ impl CargoInfoTool {
         }
 
         // Manifest options
-        if self.locked {
-            cmd.arg("--locked");
-        }
-
-        if self.offline {
-            cmd.arg("--offline");
-        }
-
-        if self.frozen {
-            cmd.arg("--frozen");
-        }
+        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref())?;
+        cmd.args(locking_flags);
 
         // Output options
         if self.verbose {
@@ -113,25 +98,15 @@ mod tests {
       "description": "Override a configuration value",
       "type": "string"
     },
-    "frozen": {
-      "default": false,
-      "description": "Equivalent to specifying both --locked and --offline",
-      "type": "boolean"
-    },
     "index": {
       "default": null,
       "description": "Registry index URL to search packages in",
       "type": "string"
     },
-    "locked": {
-      "default": true,
-      "description": "Assert that `Cargo.lock` will remain unchanged. By default is `true`.",
-      "type": "boolean"
-    },
-    "offline": {
-      "default": false,
-      "description": "Run without accessing the network",
-      "type": "boolean"
+    "locking_mode": {
+      "default": null,
+      "description": "Locking mode for dependency management. Valid options: \"locked\" (default), \"unlocked\", \"offline\", \"frozen\".",
+      "type": "string"
     },
     "package": {
       "description": "The package name",

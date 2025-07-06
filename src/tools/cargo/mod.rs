@@ -27,7 +27,9 @@ use rust_mcp_sdk::{
     schema::{CallToolResult, schema_utils::CallToolError},
 };
 
-use crate::serde_utils::{default_true, deserialize_string, deserialize_string_vec};
+use crate::serde_utils::{
+    default_true, deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
+};
 use crate::tools::execute_command;
 
 use crate::serde_utils::Tool;
@@ -55,17 +57,9 @@ pub struct CargoGenerateLockfileTool {
     #[serde(default)]
     ignore_rust_version: bool,
 
-    /// Assert that `Cargo.lock` will remain unchanged. By default is `true`.
-    #[serde(default = "default_true")]
-    locked: bool,
-
-    /// Run without accessing the network
-    #[serde(default)]
-    offline: bool,
-
-    /// Equivalent to specifying both --locked and --offline
-    #[serde(default)]
-    frozen: bool,
+    /// Locking mode for dependency management. Valid options: "locked" (default), "unlocked", "offline", "frozen".
+    #[serde(default, deserialize_with = "deserialize_string")]
+    locking_mode: Option<String>,
 
     /// Use verbose output
     #[serde(default)]
@@ -99,17 +93,8 @@ impl CargoGenerateLockfileTool {
             cmd.arg("--ignore-rust-version");
         }
 
-        if self.locked {
-            cmd.arg("--locked");
-        }
-
-        if self.offline {
-            cmd.arg("--offline");
-        }
-
-        if self.frozen {
-            cmd.arg("--frozen");
-        }
+        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref())?;
+        cmd.args(locking_flags);
 
         // Output options
         if self.verbose {
@@ -174,17 +159,9 @@ pub struct CargoCleanTool {
     #[serde(default, deserialize_with = "deserialize_string")]
     lockfile_path: Option<String>,
 
-    /// Assert that `Cargo.lock` will remain unchanged. By default is `true`.
-    #[serde(default = "default_true")]
-    locked: bool,
-
-    /// Run without accessing the network
-    #[serde(default)]
-    offline: bool,
-
-    /// Equivalent to specifying both --locked and --offline
-    #[serde(default)]
-    frozen: bool,
+    /// Locking mode for dependency management. Valid options: "locked" (default), "unlocked", "offline", "frozen".
+    #[serde(default, deserialize_with = "deserialize_string")]
+    locking_mode: Option<String>,
 
     /// Use verbose output
     #[serde(default)]
@@ -242,17 +219,8 @@ impl CargoCleanTool {
             cmd.arg("--lockfile-path").arg(lockfile_path);
         }
 
-        if self.locked {
-            cmd.arg("--locked");
-        }
-
-        if self.offline {
-            cmd.arg("--offline");
-        }
-
-        if self.frozen {
-            cmd.arg("--frozen");
-        }
+        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref())?;
+        cmd.args(locking_flags);
 
         // Output options
         if self.verbose {
@@ -393,17 +361,9 @@ pub struct CargoNewTool {
     #[serde(default, deserialize_with = "deserialize_string")]
     pub registry: Option<String>,
 
-    /// Assert that `Cargo.lock` will remain unchanged. By default is `false` for new projects.
-    #[serde(default)]
-    pub locked: bool,
-
-    /// Run without accessing the network
-    #[serde(default)]
-    pub offline: bool,
-
-    /// Equivalent to specifying both --locked and --offline
-    #[serde(default)]
-    pub frozen: bool,
+    /// Locking mode for dependency management. Valid options: "locked" (default), "unlocked", "offline", "frozen".
+    #[serde(default, deserialize_with = "deserialize_string")]
+    pub locking_mode: Option<String>,
 
     /// Use verbose output
     #[serde(default)]
@@ -450,15 +410,8 @@ impl CargoNewTool {
         }
 
         // Manifest options
-        if self.locked {
-            cmd.arg("--locked");
-        }
-        if self.offline {
-            cmd.arg("--offline");
-        }
-        if self.frozen {
-            cmd.arg("--frozen");
-        }
+        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref())?;
+        cmd.args(locking_flags);
 
         // Output options
         if self.verbose {
