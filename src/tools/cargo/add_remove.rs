@@ -523,10 +523,7 @@ mod tests {
     "branch": {
       "default": null,
       "description": "Git branch to download the crate from",
-      "type": [
-        "string",
-        "null"
-      ]
+      "type": "string"
     },
     "default_features": {
       "default": false,
@@ -548,10 +545,7 @@ mod tests {
       "items": {
         "type": "string"
       },
-      "type": [
-        "array",
-        "null"
-      ]
+      "type": "array"
     },
     "frozen": {
       "default": false,
@@ -561,10 +555,7 @@ mod tests {
     "git": {
       "default": null,
       "description": "Git repository location",
-      "type": [
-        "string",
-        "null"
-      ]
+      "type": "string"
     },
     "ignore_rust_version": {
       "default": false,
@@ -579,18 +570,12 @@ mod tests {
     "lockfile_path": {
       "default": null,
       "description": "Path to Cargo.lock (unstable)",
-      "type": [
-        "string",
-        "null"
-      ]
+      "type": "string"
     },
     "manifest_path": {
       "default": null,
       "description": "Path to Cargo.toml",
-      "type": [
-        "string",
-        "null"
-      ]
+      "type": "string"
     },
     "no_default_features": {
       "default": false,
@@ -614,10 +599,7 @@ mod tests {
     "path": {
       "default": null,
       "description": "Filesystem path to local crate to add",
-      "type": [
-        "string",
-        "null"
-      ]
+      "type": "string"
     },
     "quiet": {
       "default": true,
@@ -627,58 +609,37 @@ mod tests {
     "registry": {
       "default": null,
       "description": "Package registry for this dependency",
-      "type": [
-        "string",
-        "null"
-      ]
+      "type": "string"
     },
     "rename": {
       "default": null,
       "description": "Rename the dependency",
-      "type": [
-        "string",
-        "null"
-      ]
+      "type": "string"
     },
     "rev": {
       "default": null,
       "description": "Git reference to download the crate from",
-      "type": [
-        "string",
-        "null"
-      ]
+      "type": "string"
     },
     "tag": {
       "default": null,
       "description": "Git tag to download the crate from",
-      "type": [
-        "string",
-        "null"
-      ]
+      "type": "string"
     },
     "target": {
       "default": null,
       "description": "Add as dependency to the given target platform",
-      "type": [
-        "string",
-        "null"
-      ]
+      "type": "string"
     },
     "target_package": {
       "default": null,
       "description": "Package to modify",
-      "type": [
-        "string",
-        "null"
-      ]
+      "type": "string"
     },
     "toolchain": {
       "default": null,
       "description": "The toolchain to use, e.g., \"stable\" or \"nightly\".",
-      "type": [
-        "string",
-        "null"
-      ]
+      "type": "string"
     },
     "verbose": {
       "default": false,
@@ -688,10 +649,7 @@ mod tests {
     "version": {
       "default": null,
       "description": "Optional version specification",
-      "type": [
-        "string",
-        "null"
-      ]
+      "type": "string"
     }
   },
   "required": [
