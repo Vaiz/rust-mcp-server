@@ -19,9 +19,9 @@
       - <code>manifest_path</code> : string<br />
       - <code>no_default_features</code> : boolean<br />
       - <code>optional</code> : boolean<br />
+      - <code>output_verbosity</code> : string<br />
       - <code>package</code> : string<br />
       - <code>path</code> : string<br />
-      - <code>quiet</code> : boolean<br />
       - <code>registry</code> : string<br />
       - <code>rename</code> : string<br />
       - <code>rev</code> : string<br />
@@ -29,7 +29,6 @@
       - <code>target</code> : string<br />
       - <code>target_package</code> : string<br />
       - <code>toolchain</code> : string<br />
-      - <code>verbose</code> : boolean<br />
       - <code>version</code> : string<br />
 
 - **cargo-build**
@@ -53,16 +52,15 @@
       - <code>locking_mode</code> : string<br />
       - <code>manifest_path</code> : string<br />
       - <code>no_default_features</code> : boolean<br />
+      - <code>output_verbosity</code> : string<br />
       - <code>package</code> : string [ ]<br />
       - <code>profile</code> : string<br />
-      - <code>quiet</code> : boolean<br />
       - <code>release</code> : boolean<br />
       - <code>target</code> : string<br />
       - <code>target_dir</code> : string<br />
       - <code>test</code> : string<br />
       - <code>tests</code> : boolean<br />
       - <code>toolchain</code> : string<br />
-      - <code>verbose</code> : boolean<br />
       - <code>warnings_as_errors</code> : boolean<br />
       - <code>workspace</code> : boolean<br />
 
@@ -87,16 +85,15 @@
       - <code>locking_mode</code> : string<br />
       - <code>manifest_path</code> : string<br />
       - <code>no_default_features</code> : boolean<br />
+      - <code>output_verbosity</code> : string<br />
       - <code>package</code> : string [ ]<br />
       - <code>profile</code> : string<br />
-      - <code>quiet</code> : boolean<br />
       - <code>release</code> : boolean<br />
       - <code>target</code> : string<br />
       - <code>target_dir</code> : string<br />
       - <code>test</code> : string<br />
       - <code>tests</code> : boolean<br />
       - <code>toolchain</code> : string<br />
-      - <code>verbose</code> : boolean<br />
       - <code>warnings_as_errors</code> : boolean<br />
       - <code>workspace</code> : boolean<br />
 
@@ -108,14 +105,13 @@
       - <code>lockfile_path</code> : string<br />
       - <code>locking_mode</code> : string<br />
       - <code>manifest_path</code> : string<br />
+      - <code>output_verbosity</code> : string<br />
       - <code>package</code> : string<br />
       - <code>profile</code> : string<br />
-      - <code>quiet</code> : boolean<br />
       - <code>release</code> : boolean<br />
       - <code>target</code> : string<br />
       - <code>target_dir</code> : string<br />
       - <code>toolchain</code> : string<br />
-      - <code>verbose</code> : boolean<br />
 
 - **cargo-clippy**
   - Checks a Rust package to catch common mistakes and improve code quality using Clippy
@@ -138,16 +134,15 @@
       - <code>manifest_path</code> : string<br />
       - <code>no_default_features</code> : boolean<br />
       - <code>no_deps</code> : boolean<br />
+      - <code>output_verbosity</code> : string<br />
       - <code>package</code> : string [ ]<br />
       - <code>profile</code> : string<br />
-      - <code>quiet</code> : boolean<br />
       - <code>release</code> : boolean<br />
       - <code>target</code> : string<br />
       - <code>target_dir</code> : string<br />
       - <code>test</code> : string<br />
       - <code>tests</code> : boolean<br />
       - <code>toolchain</code> : string<br />
-      - <code>verbose</code> : boolean<br />
       - <code>warnings_as_errors</code> : boolean<br />
       - <code>workspace</code> : boolean<br />
 
@@ -202,10 +197,9 @@
       - <code>check</code> : boolean<br />
       - <code>manifest_path</code> : string<br />
       - <code>message_format</code> : string<br />
+      - <code>output_verbosity</code> : string<br />
       - <code>package</code> : string [ ]<br />
-      - <code>quiet</code> : boolean<br />
       - <code>toolchain</code> : string<br />
-      - <code>verbose</code> : boolean<br />
 
 - **cargo-generate_lockfile**
   - Generates or updates the Cargo.lock file for a Rust project. Usually, run without any additional arguments.
@@ -214,9 +208,8 @@
       - <code>lockfile_path</code> : string<br />
       - <code>locking_mode</code> : string<br />
       - <code>manifest_path</code> : string<br />
+      - <code>output_verbosity</code> : string<br />
       - <code>package</code> : string<br />
-      - <code>quiet</code> : boolean<br />
-      - <code>verbose</code> : boolean<br />
 
 - **cargo-hack**
   - Cargo subcommand to provide various options useful for testing and continuous integration, including feature testing and multi-version compatibility. Available commands: check, test, build, clippy. Recommend using <code>check</code> for fast validation. Example: cargo-hack with "feature_powerset": true, "depth": 3, "keep_going": true
@@ -245,13 +238,13 @@
       - <code>no_manifest_path</code> : boolean<br />
       - <code>no_private</code> : boolean<br />
       - <code>optional_deps</code> : string [ ]<br />
+      - <code>output_verbosity</code> : string<br />
       - <code>package</code> : string [ ]<br />
       - <code>partition</code> : string<br />
       - <code>print_command_list</code> : boolean<br />
       - <code>remove_dev_deps</code> : boolean<br />
       - <code>rust_version</code> : boolean<br />
       - <code>target</code> : string [ ]<br />
-      - <code>verbose</code> : boolean<br />
       - <code>version_range</code> : string<br />
       - <code>version_step</code> : integer<br />
       - <code>workspace</code> : boolean<br />
@@ -265,10 +258,9 @@
       - <code>config</code> : string<br />
       - <code>index</code> : string<br />
       - <code>locking_mode</code> : string<br />
+      - <code>output_verbosity</code> : string<br />
       - <code>package</code> : string<br />
-      - <code>quiet</code> : boolean<br />
       - <code>registry</code> : string<br />
-      - <code>verbose</code> : boolean<br />
       - <code>version</code> : string<br />
 
 - **cargo-list**
@@ -298,9 +290,8 @@
       - <code>manifest_path</code> : string<br />
       - <code>no_default_features</code> : boolean<br />
       - <code>no_deps</code> : boolean<br />
-      - <code>quiet</code> : boolean<br />
+      - <code>output_verbosity</code> : string<br />
       - <code>toolchain</code> : string<br />
-      - <code>verbose</code> : boolean<br />
 
 - **cargo-new**
   - Create a new cargo package at <path>. Creates a new Rust project with the specified name and template.
@@ -310,12 +301,11 @@
       - <code>lib</code> : boolean<br />
       - <code>locking_mode</code> : string<br />
       - <code>name</code> : string<br />
+      - <code>output_verbosity</code> : string<br />
       - <code>path</code> : string<br />
-      - <code>quiet</code> : boolean<br />
       - <code>registry</code> : string<br />
       - <code>toolchain</code> : string<br />
       - <code>vcs</code> : string<br />
-      - <code>verbose</code> : boolean<br />
 
 - **cargo-package**
   - Assemble the local package into a distributable tarball for publishing or distribution. <br/>    <br/>    Common use cases:<br/>    - Create a .crate file for publishing to crates.io or a private registry<br/>    - Generate distribution packages for deployment or sharing<br/>    - Validate package contents before publishing (using --list)<br/>    - Test packaging process without verification (using --no-verify)<br/>    - Package workspace members selectively or all at once<br/>    <br/>    The generated tarball contains all files needed to build the package, excluding files listed in .gitignore or .cargo_vcs_info.json. <br/>    By default, the package is also built to verify it can be compiled successfully.<br/>    <br/>    Usually run without any additional arguments for single-package projects.
@@ -336,13 +326,12 @@
       - <code>no_default_features</code> : boolean<br />
       - <code>no_metadata</code> : boolean<br />
       - <code>no_verify</code> : boolean<br />
+      - <code>output_verbosity</code> : string<br />
       - <code>package</code> : string [ ]<br />
-      - <code>quiet</code> : boolean<br />
       - <code>registry</code> : string<br />
       - <code>target</code> : string<br />
       - <code>target_dir</code> : string<br />
       - <code>toolchain</code> : string<br />
-      - <code>verbose</code> : boolean<br />
       - <code>workspace</code> : boolean<br />
 
 - **cargo-remove**
@@ -354,18 +343,17 @@
       - <code>lockfile_path</code> : string<br />
       - <code>locking_mode</code> : string<br />
       - <code>manifest_path</code> : string<br />
+      - <code>output_verbosity</code> : string<br />
       - <code>package</code> : string<br />
-      - <code>quiet</code> : boolean<br />
       - <code>target</code> : string<br />
       - <code>toolchain</code> : string<br />
-      - <code>verbose</code> : boolean<br />
 
 - **cargo-search**
   - Search packages in the registry. Default registry is crates.io. Equivalent to 'cargo search <code>QUERY</code>'.
   - **Inputs:**
       - <code>limit</code> : number<br />
+      - <code>output_verbosity</code> : string<br />
       - <code>query</code> : string<br />
-      - <code>quiet</code> : boolean<br />
       - <code>registry</code> : string<br />
 
 - **cargo-test**
@@ -391,9 +379,9 @@
       - <code>no_default_features</code> : boolean<br />
       - <code>no_fail_fast</code> : boolean<br />
       - <code>no_run</code> : boolean<br />
+      - <code>output_verbosity</code> : string<br />
       - <code>package</code> : string<br />
       - <code>profile</code> : string<br />
-      - <code>quiet</code> : boolean<br />
       - <code>release</code> : boolean<br />
       - <code>target</code> : string<br />
       - <code>target_dir</code> : string<br />
@@ -402,33 +390,30 @@
       - <code>testname</code> : string<br />
       - <code>tests</code> : boolean<br />
       - <code>toolchain</code> : string<br />
-      - <code>verbose</code> : boolean<br />
       - <code>workspace</code> : boolean<br />
 
 - **cargo-update**
   - Update dependencies as recorded in the local lock file. Updates the dependencies in Cargo.lock to their latest compatible versions.
   - **Inputs:**
       - <code>breaking</code> : boolean<br />
-      - <code>color</code> : string<br />
       - <code>config</code> : string<br />
       - <code>dry_run</code> : boolean<br />
       - <code>ignore_rust_version</code> : boolean<br />
       - <code>lockfile_path</code> : string<br />
       - <code>locking_mode</code> : string<br />
       - <code>manifest_path</code> : string<br />
+      - <code>output_verbosity</code> : string<br />
       - <code>precise</code> : string<br />
-      - <code>quiet</code> : boolean<br />
       - <code>recursive</code> : boolean<br />
       - <code>spec</code> : string [ ]<br />
       - <code>toolchain</code> : string<br />
       - <code>unstable_flags</code> : string [ ]<br />
-      - <code>verbose</code> : boolean<br />
       - <code>workspace</code> : boolean<br />
 
 - **rustup-show**
   - Show the active and installed toolchains or profiles. Shows the name of the active toolchain and the version of rustc. If the active toolchain has installed support for additional compilation targets, then they are listed as well.
   - **Inputs:**
-      - <code>verbose</code> : boolean<br />
+      - <code>output_verbosity</code> : string<br />
 
 - **rustup-toolchain-add**
   - Install or update the given toolchains, or by default the active toolchain. Toolchain name can be <code>stable</code>, <code>nightly</code>, or a specific version like '1.8.0'.
