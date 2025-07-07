@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1](https://github.com/Vaiz/rust-mcp-server/compare/v0.2.0...v0.2.1) - 2025-07-06
+
+### Changes
+
+- merge flags into enums to reduce the number of parameters ([#43](https://github.com/Vaiz/rust-mcp-server/pull/43))
+- switch to `schemars` crate for generating JsonSchema ([#40](https://github.com/Vaiz/rust-mcp-server/pull/40))
+
 ## [0.2.0](https://github.com/Vaiz/rust-mcp-server/compare/v0.1.1...v0.2.0) - 2025-07-05
 
 ### Added
