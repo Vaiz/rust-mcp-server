@@ -15,7 +15,7 @@ use rust_mcp_sdk::{
 
 #[mcp_tool(
     name = "cargo-doc",
-    description = "Build documentation for a Rust package using Cargo. Recommended to use with --no-deps and specific --package for faster builds. Returns path to generated documentation index.",
+    description = "Build documentation for a Rust package using Cargo. Recommended to use with no_deps and specific package for faster builds. Returns path to generated documentation index.",
     openWorldHint = false
 )]
 #[derive(Debug, ::serde::Deserialize, JsonSchema)]
