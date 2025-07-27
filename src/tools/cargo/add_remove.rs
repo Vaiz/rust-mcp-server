@@ -69,9 +69,8 @@ pub struct CargoAddTool {
     #[serde(default, deserialize_with = "deserialize_string")]
     pub rename: Option<String>,
 
-    /// Package to modify
-    #[serde(default, deserialize_with = "deserialize_string")]
-    pub target_package: Option<String>,
+    /// Package to modify, must be specified
+    pub target_package: String,
 
     /// Filesystem path to local crate to add
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -168,9 +167,7 @@ impl CargoAddTool {
         }
 
         // Package selection
-        if let Some(target_package) = &self.target_package {
-            cmd.arg("--package").arg(target_package);
-        }
+        cmd.arg("--package").arg(&self.target_package);
 
         // Source options
         if let Some(path) = &self.path {
@@ -261,9 +258,8 @@ pub struct CargoRemoveTool {
     #[serde(default, deserialize_with = "deserialize_string")]
     pub target: Option<String>,
 
-    /// Package to remove from
-    #[serde(default, deserialize_with = "deserialize_string")]
-    pub package: Option<String>,
+    /// Package to remove from, must be specified
+    pub target_package: String,
 
     /// Don't actually write the manifest
     #[serde(default)]
@@ -321,9 +317,7 @@ impl CargoRemoveTool {
         }
 
         // Package selection
-        if let Some(package) = &self.package {
-            cmd.arg("--package").arg(package);
-        }
+        cmd.arg("--package").arg(&self.target_package);
 
         // Other options
         if self.dry_run {
