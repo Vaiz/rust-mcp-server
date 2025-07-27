@@ -42,6 +42,7 @@ rust-mcp-server exposes a comprehensive set of Rust development tools to the LLM
 *   **`cargo-build`**: Compile your package
 *   **`cargo-check`**: Analyze the current package and report errors, but don't build it
 *   **`cargo-test`**: Run the tests
+*   **`cargo-doc`**: Build documentation for your package (recommended with `--no-deps` and specific `--package` for faster builds)
 *   **`cargo-fmt`**: Format the code according to the project's style
 *   **`cargo-clippy`**: Check for common mistakes and improve code quality using Clippy
 *   **`cargo-clean`**: Clean the target directory

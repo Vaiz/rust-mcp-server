@@ -10,9 +10,10 @@ use rust_mcp_sdk::schema::{
 };
 
 use cargo::{
-    CargoAddTool, CargoBuildTool, CargoCheckTool, CargoCleanTool, CargoClippyTool, CargoFmtTool,
-    CargoGenerateLockfileTool, CargoInfoTool, CargoListTool, CargoMetadataTool, CargoNewTool,
-    CargoPackageTool, CargoRemoveTool, CargoSearchTool, CargoTestTool, CargoUpdateTool,
+    CargoAddTool, CargoBuildTool, CargoCheckTool, CargoCleanTool, CargoClippyTool, CargoDocTool,
+    CargoFmtTool, CargoGenerateLockfileTool, CargoInfoTool, CargoListTool, CargoMetadataTool,
+    CargoNewTool, CargoPackageTool, CargoRemoveTool, CargoSearchTool, CargoTestTool,
+    CargoUpdateTool,
 };
 use cargo_deny::{CargoDenyCheckTool, CargoDenyInitTool, CargoDenyInstallTool, CargoDenyListTool};
 use cargo_hack::{CargoHackInstallTool, CargoHackTool};
@@ -128,6 +129,7 @@ rust_mcp_sdk::tool_box!(
         CargoFmtTool,
         CargoCheckTool,
         CargoClippyTool,
+        CargoDocTool,
         CargoGenerateLockfileTool,
         CargoHackTool,
         CargoHackInstallTool,
@@ -182,6 +184,7 @@ pub fn handle_request(
         AllTools::CargoFmtTool(tool) => tool.call_tool(),
         AllTools::CargoCheckTool(tool) => tool.call_tool(),
         AllTools::CargoClippyTool(tool) => tool.call_tool(),
+        AllTools::CargoDocTool(tool) => tool.call_tool(),
         AllTools::CargoGenerateLockfileTool(tool) => tool.call_tool(),
         AllTools::CargoHackTool(tool) => tool.call_tool(),
         AllTools::CargoHackInstallTool(tool) => tool.call_tool(),

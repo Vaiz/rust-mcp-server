@@ -83,16 +83,16 @@ impl RustupToolchainAddTool {
             cmd.arg("--profile").arg(profile);
         }
 
-        if let Some(components) = &self.components {
-            if !components.is_empty() {
-                cmd.arg("--component").arg(components.join(","));
-            }
+        if let Some(components) = &self.components
+            && !components.is_empty()
+        {
+            cmd.arg("--component").arg(components.join(","));
         }
 
-        if let Some(targets) = &self.targets {
-            if !targets.is_empty() {
-                cmd.arg("--target").arg(targets.join(","));
-            }
+        if let Some(targets) = &self.targets
+            && !targets.is_empty()
+        {
+            cmd.arg("--target").arg(targets.join(","));
         }
 
         if self.no_self_update {
