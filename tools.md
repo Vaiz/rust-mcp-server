@@ -191,7 +191,7 @@
       - <code>threshold</code> : number<br />
 
 - **cargo-doc**
-  - Build documentation for a Rust package using Cargo. Recommended to use with --no-deps and specific --package for faster builds. Returns path to generated documentation index.
+  - Build documentation for a Rust package using Cargo. Recommended to use with no_deps and specific package for faster builds. Returns path to generated documentation index.
   - **Inputs:**
       - <code>all_features</code> : boolean<br />
       - <code>bin</code> : string<br />
