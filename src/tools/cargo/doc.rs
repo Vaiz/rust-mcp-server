@@ -319,7 +319,7 @@ impl CargoDocTool {
             let package_path_name = first_package.replace('-', "_");
             let package_index = absolute_doc_dir.join(&package_path_name).join("index.html");
             if package_index.exists() {
-                return Some(package_index.to_string_lossy().to_string());
+                return Some(Self::normalize_path(&package_index));
             }
         }
 
@@ -330,7 +330,7 @@ impl CargoDocTool {
                     if entry.file_type().is_ok_and(|ft| ft.is_dir()) {
                         let index_path = entry.path().join("index.html");
                         if index_path.exists() {
-                            return Some(index_path.to_string_lossy().to_string());
+                            return Some(Self::normalize_path(&index_path));
                         }
                     }
                 }
@@ -339,10 +339,19 @@ impl CargoDocTool {
             // Check for a top-level index.html
             let top_index = absolute_doc_dir.join("index.html");
             if top_index.exists() {
-                return Some(top_index.to_string_lossy().to_string());
+                return Some(Self::normalize_path(&top_index));
             }
         }
 
         None
+    }
+
+    fn normalize_path(path: &Path) -> String {
+        let absolute_path = match path.canonicalize() {
+            Ok(canonical) => canonical,
+            Err(_) => path.to_path_buf(),
+        };
+        
+        absolute_path.to_string_lossy().into_owned()
     }
 }
