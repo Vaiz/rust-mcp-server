@@ -48,12 +48,19 @@ fn execute_command(mut cmd: std::process::Command) -> Result<CallToolResult, Cal
             let stdout = String::from_utf8_lossy(output.stdout.trim_ascii());
             let stderr = String::from_utf8_lossy(output.stderr.trim_ascii());
 
+            let mut content = Vec::new();
             if output.status.success() {
                 tracing::info!(
                     stdout = ?stdout,
                     stderr = ?stderr,
                     "Command executed successfully"
                 );
+                let annotations = Some(Annotations {
+                    audience: vec![Role::User, Role::Assistant],
+                    last_modified: None,
+                    priority: Some(0.3),
+                });
+                content.push(TextContent::new("✅ Success".to_owned(), annotations, None).into());
             } else {
                 tracing::warn!(
                     stdout = ?stdout,
@@ -61,14 +68,19 @@ fn execute_command(mut cmd: std::process::Command) -> Result<CallToolResult, Cal
                     status = ?output.status,
                     "Command execution failed",
                 );
+                let annotations = Some(Annotations {
+                    audience: vec![Role::User, Role::Assistant],
+                    last_modified: None,
+                    priority: Some(0.3),
+                });
+                content.push(TextContent::new("❌ Failure".to_owned(), annotations, None).into());
             }
 
-            let mut content = Vec::new();
             if !stdout.is_empty() {
                 let annotations = Some(Annotations {
                     audience: vec![Role::User, Role::Assistant],
                     last_modified: None,
-                    priority: Some(0.1),
+                    priority: Some(0.2),
                 });
                 content.push(TextContent::new(stdout.into(), annotations, None).into());
             }
