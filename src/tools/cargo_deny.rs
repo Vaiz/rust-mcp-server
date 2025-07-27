@@ -30,23 +30,23 @@ pub struct CargoDenyCheckTool {
 
     /// Hides the inclusion graph when printing out info for a crate
     #[serde(default)]
-    hide_inclusion_graph: bool,
+    hide_inclusion_graph: Option<bool>,
 
     /// Disable fetching of the advisory database
     #[serde(default)]
-    disable_fetch: bool,
+    disable_fetch: Option<bool>,
 
     /// If set, excludes all dev-dependencies, not just ones for non-workspace crates
     #[serde(default)]
-    exclude_dev: bool,
+    exclude_dev: Option<bool>,
 
     /// To ease transition from cargo-audit to cargo-deny, this flag will tell cargo-deny to output the exact same output as cargo-audit would
     #[serde(default)]
-    audit_compatible_output: bool,
+    audit_compatible_output: Option<bool>,
 
     /// Show stats for all the checks, regardless of the log-level
     #[serde(default)]
-    show_stats: bool,
+    show_stats: Option<bool>,
 
     /// Set lint warnings
     #[serde(default, deserialize_with = "deserialize_string_vec")]
@@ -77,7 +77,7 @@ pub struct CargoDenyCheckTool {
 
     /// If passed, all workspace packages are used as roots for the crate graph
     #[serde(default)]
-    workspace: bool,
+    workspace: Option<bool>,
 
     /// One or more crates to exclude from the crate graph that is used
     #[serde(default, deserialize_with = "deserialize_string_vec")]
@@ -89,11 +89,11 @@ pub struct CargoDenyCheckTool {
 
     /// Activate all available features
     #[serde(default)]
-    all_features: bool,
+    all_features: Option<bool>,
 
     /// Do not activate the `default` feature
     #[serde(default)]
-    no_default_features: bool,
+    no_default_features: Option<bool>,
 
     /// Space or comma separated list of features to activate
     #[serde(default, deserialize_with = "deserialize_string_vec")]
@@ -111,11 +111,11 @@ pub struct CargoDenyCheckTool {
 
     /// If set, the crates.io git index is initialized for use in fetching crate information
     #[serde(default)]
-    allow_git_index: bool,
+    allow_git_index: Option<bool>,
 
     /// If set, exclude unpublished workspace members from graph roots
     #[serde(default)]
-    exclude_unpublished: bool,
+    exclude_unpublished: Option<bool>,
 }
 
 impl CargoDenyCheckTool {
@@ -136,7 +136,7 @@ impl CargoDenyCheckTool {
             cmd.arg("--manifest-path").arg(manifest_path);
         }
 
-        if self.workspace {
+        if self.workspace.unwrap_or(false) {
             cmd.arg("--workspace");
         }
 
@@ -152,11 +152,11 @@ impl CargoDenyCheckTool {
             }
         }
 
-        if self.all_features {
+        if self.all_features.unwrap_or(false) {
             cmd.arg("--all-features");
         }
 
-        if self.no_default_features {
+        if self.no_default_features.unwrap_or(false) {
             cmd.arg("--no-default-features");
         }
 
@@ -164,18 +164,18 @@ impl CargoDenyCheckTool {
             cmd.arg("--features").arg(features.join(","));
         }
 
-        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref())?;
+        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref(), "locked")?;
         cmd.args(locking_flags);
 
-        if self.allow_git_index {
+        if self.allow_git_index.unwrap_or(false) {
             cmd.arg("--allow-git-index");
         }
 
-        if self.exclude_dev {
+        if self.exclude_dev.unwrap_or(false) {
             cmd.arg("--exclude-dev");
         }
 
-        if self.exclude_unpublished {
+        if self.exclude_unpublished.unwrap_or(false) {
             cmd.arg("--exclude-unpublished");
         }
 
@@ -191,19 +191,19 @@ impl CargoDenyCheckTool {
             cmd.arg("--graph").arg(graph);
         }
 
-        if self.hide_inclusion_graph {
+        if self.hide_inclusion_graph.unwrap_or(false) {
             cmd.arg("--hide-inclusion-graph");
         }
 
-        if self.disable_fetch {
+        if self.disable_fetch.unwrap_or(false) {
             cmd.arg("--disable-fetch");
         }
 
-        if self.audit_compatible_output {
+        if self.audit_compatible_output.unwrap_or(false) {
             cmd.arg("--audit-compatible-output");
         }
 
-        if self.show_stats {
+        if self.show_stats.unwrap_or(false) {
             cmd.arg("--show-stats");
         }
 
@@ -236,7 +236,7 @@ impl CargoDenyCheckTool {
             }
         }
 
-        execute_command(cmd)
+        execute_command(cmd, &Self::tool_name())
     }
 }
 
@@ -261,7 +261,7 @@ impl CargoDenyInitTool {
             cmd.arg(config);
         }
 
-        execute_command(cmd)
+        execute_command(cmd, &Self::tool_name())
     }
 }
 
@@ -309,7 +309,7 @@ impl CargoDenyListTool {
             cmd.arg("--layout").arg(layout);
         }
 
-        execute_command(cmd)
+        execute_command(cmd, &Self::tool_name())
     }
 }
 
@@ -326,6 +326,6 @@ impl CargoDenyInstallTool {
         let mut cmd = Command::new("cargo");
         cmd.arg("install").arg("cargo-deny");
 
-        execute_command(cmd)
+        execute_command(cmd, &Self::tool_name())
     }
 }

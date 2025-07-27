@@ -50,8 +50,11 @@ where
 /// - "unlocked": Allow `Cargo.lock` to be updated  
 /// - "offline": Run without accessing the network
 /// - "frozen": Equivalent to specifying both --locked and --offline
-pub fn locking_mode_to_cli_flags(mode: Option<&str>) -> Result<Vec<&'static str>, CallToolError> {
-    Ok(match mode.unwrap_or("locked") {
+pub fn locking_mode_to_cli_flags(
+    mode: Option<&str>,
+    preferred: &str,
+) -> Result<Vec<&'static str>, CallToolError> {
+    Ok(match mode.unwrap_or(preferred) {
         "locked" => vec!["--locked"],
         "unlocked" => vec![], // No flags needed
         "offline" => vec!["--offline"],
@@ -89,10 +92,6 @@ pub fn output_verbosity_to_cli_flags(
             ));
         }
     })
-}
-
-pub const fn default_true() -> bool {
-    true
 }
 
 /// A type that represents a package with an optional version.
@@ -416,30 +415,43 @@ mod tests {
     #[test]
     fn test_locking_mode_cli_flags() {
         // Test default (locked)
-        assert_eq!(locking_mode_to_cli_flags(None).unwrap(), vec!["--locked"]);
+        assert_eq!(
+            locking_mode_to_cli_flags(None, "locked").unwrap(),
+            vec!["--locked"]
+        );
 
         // Test explicit modes
         assert_eq!(
-            locking_mode_to_cli_flags(Some("locked")).unwrap(),
+            locking_mode_to_cli_flags(Some("locked"), "locked").unwrap(),
             vec!["--locked"]
         );
         assert_eq!(
-            locking_mode_to_cli_flags(Some("unlocked")).unwrap(),
+            locking_mode_to_cli_flags(Some("unlocked"), "locked").unwrap(),
             Vec::<&str>::new()
         );
         assert_eq!(
-            locking_mode_to_cli_flags(Some("offline")).unwrap(),
+            locking_mode_to_cli_flags(Some("offline"), "locked").unwrap(),
             vec!["--offline"]
         );
         assert_eq!(
-            locking_mode_to_cli_flags(Some("frozen")).unwrap(),
+            locking_mode_to_cli_flags(Some("frozen"), "locked").unwrap(),
             vec!["--frozen"]
         );
 
         // Test unknown values return error
-        assert!(locking_mode_to_cli_flags(Some("invalid")).is_err());
-        let error = locking_mode_to_cli_flags(Some("invalid")).unwrap_err();
+        assert!(locking_mode_to_cli_flags(Some("invalid"), "locked").is_err());
+        let error = locking_mode_to_cli_flags(Some("invalid"), "locked").unwrap_err();
         assert!(error.to_string().contains("Unknown locking mode: invalid"));
+
+        // Test with unlocked as preferred
+        assert_eq!(
+            locking_mode_to_cli_flags(None, "unlocked").unwrap(),
+            Vec::<&str>::new()
+        );
+        assert_eq!(
+            locking_mode_to_cli_flags(Some("locked"), "unlocked").unwrap(),
+            vec!["--locked"]
+        );
     }
 
     #[test]

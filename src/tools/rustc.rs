@@ -34,6 +34,6 @@ impl RustcExplainTool {
 
         cmd.arg("--explain").arg(&self.error_code);
 
-        execute_command(cmd)
+        execute_command(cmd, &Self::tool_name())
     }
 }

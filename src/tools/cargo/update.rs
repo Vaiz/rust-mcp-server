@@ -30,11 +30,11 @@ pub struct CargoUpdateTool {
 
     /// Don't actually write the lockfile
     #[serde(default)]
-    dry_run: bool,
+    dry_run: Option<bool>,
 
     /// Force updating all dependencies of [SPEC]... as well
     #[serde(default)]
-    recursive: bool,
+    recursive: Option<bool>,
 
     /// Update [SPEC] to exactly PRECISE
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -42,11 +42,11 @@ pub struct CargoUpdateTool {
 
     /// Update [SPEC] to latest SemVer-breaking version (unstable)
     #[serde(default)]
-    breaking: bool,
+    breaking: Option<bool>,
 
     /// Only update the workspace packages
     #[serde(default)]
-    workspace: bool,
+    workspace: Option<bool>,
 
     /// Path to Cargo.toml
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -58,7 +58,7 @@ pub struct CargoUpdateTool {
 
     /// Ignore `rust-version` specification in packages
     #[serde(default)]
-    ignore_rust_version: bool,
+    ignore_rust_version: Option<bool>,
 
     /// Locking mode for dependency resolution.
     ///
@@ -104,11 +104,11 @@ impl CargoUpdateTool {
         }
 
         // Update options
-        if self.dry_run {
+        if self.dry_run.unwrap_or(false) {
             cmd.arg("--dry-run");
         }
 
-        if self.recursive {
+        if self.recursive.unwrap_or(false) {
             cmd.arg("--recursive");
         }
 
@@ -116,11 +116,11 @@ impl CargoUpdateTool {
             cmd.arg("--precise").arg(precise);
         }
 
-        if self.breaking {
+        if self.breaking.unwrap_or(false) {
             cmd.arg("--breaking");
         }
 
-        if self.workspace {
+        if self.workspace.unwrap_or(false) {
             cmd.arg("--workspace");
         }
 
@@ -133,12 +133,12 @@ impl CargoUpdateTool {
             cmd.arg("--lockfile-path").arg(lockfile_path);
         }
 
-        if self.ignore_rust_version {
+        if self.ignore_rust_version.unwrap_or(false) {
             cmd.arg("--ignore-rust-version");
         }
 
         // Apply locking mode flags
-        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref())?;
+        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref(), "locked")?;
         for flag in locking_flags {
             cmd.arg(flag);
         }
@@ -157,6 +157,6 @@ impl CargoUpdateTool {
         let output_flags = output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
         cmd.args(output_flags);
 
-        execute_command(cmd)
+        execute_command(cmd, &Self::tool_name())
     }
 }

@@ -26,7 +26,7 @@ pub struct CargoMetadataTool {
 
     /// Output information only about the workspace members and don't fetch dependencies
     #[serde(default)]
-    no_deps: bool,
+    no_deps: Option<bool>,
 
     /// Use verbose output (-vv very verbose/build.rs output)
     /// Output verbosity level.
@@ -48,11 +48,11 @@ pub struct CargoMetadataTool {
 
     /// Activate all available features
     #[serde(default)]
-    all_features: bool,
+    all_features: Option<bool>,
 
     /// Do not activate the `default` feature
     #[serde(default)]
-    no_default_features: bool,
+    no_default_features: Option<bool>,
 
     /// Path to Cargo.toml
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -87,7 +87,7 @@ impl CargoMetadataTool {
             cmd.arg("--filter-platform").arg(triple);
         }
 
-        if self.no_deps {
+        if self.no_deps.unwrap_or(false) {
             cmd.arg("--no-deps");
         }
 
@@ -104,11 +104,11 @@ impl CargoMetadataTool {
             cmd.arg("--features").arg(features);
         }
 
-        if self.all_features {
+        if self.all_features.unwrap_or(false) {
             cmd.arg("--all-features");
         }
 
-        if self.no_default_features {
+        if self.no_default_features.unwrap_or(false) {
             cmd.arg("--no-default-features");
         }
 
@@ -121,9 +121,9 @@ impl CargoMetadataTool {
             cmd.arg("--lockfile-path").arg(lockfile_path);
         }
 
-        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref())?;
+        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref(), "locked")?;
         cmd.args(locking_flags);
 
-        execute_command(cmd)
+        execute_command(cmd, &Self::tool_name())
     }
 }

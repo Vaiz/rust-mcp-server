@@ -55,7 +55,7 @@ pub struct CargoAddTool {
 
     /// Disable the default features
     #[serde(default)]
-    pub no_default_features: bool,
+    pub no_default_features: Option<bool>,
 
     /// Re-enable the default features
     #[serde(default)]
@@ -69,9 +69,8 @@ pub struct CargoAddTool {
     #[serde(default, deserialize_with = "deserialize_string")]
     pub rename: Option<String>,
 
-    /// Package to modify
-    #[serde(default, deserialize_with = "deserialize_string")]
-    pub target_package: Option<String>,
+    /// Package to modify, must be specified
+    pub target_package: String,
 
     /// Filesystem path to local crate to add
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -103,7 +102,7 @@ pub struct CargoAddTool {
 
     /// Don't actually write the manifest
     #[serde(default)]
-    pub dry_run: bool,
+    pub dry_run: Option<bool>,
 
     /// Path to Cargo.toml
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -115,13 +114,13 @@ pub struct CargoAddTool {
 
     /// Ignore `rust-version` specification in packages
     #[serde(default)]
-    pub ignore_rust_version: bool,
+    pub ignore_rust_version: Option<bool>,
 
     /// Locking mode for dependency resolution.
     ///
     /// Valid options:
-    /// - "locked" (default): Assert that `Cargo.lock` will remain unchanged
-    /// - "unlocked": Allow `Cargo.lock` to be updated
+    /// - "locked": Assert that `Cargo.lock` will remain unchanged
+    /// - "unlocked" (default): Allow `Cargo.lock` to be updated
     /// - "offline": Run without accessing the network
     /// - "frozen": Equivalent to specifying both --locked and --offline
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -157,7 +156,7 @@ impl CargoAddTool {
         }
 
         // Feature selection
-        if self.no_default_features {
+        if self.no_default_features.unwrap_or(false) {
             cmd.arg("--no-default-features");
         }
         if self.default_features {
@@ -168,9 +167,7 @@ impl CargoAddTool {
         }
 
         // Package selection
-        if let Some(target_package) = &self.target_package {
-            cmd.arg("--package").arg(target_package);
-        }
+        cmd.arg("--package").arg(&self.target_package);
 
         // Source options
         if let Some(path) = &self.path {
@@ -205,7 +202,7 @@ impl CargoAddTool {
         }
 
         // Other options
-        if self.dry_run {
+        if self.dry_run.unwrap_or(false) {
             cmd.arg("--dry-run");
         }
 
@@ -216,12 +213,12 @@ impl CargoAddTool {
         if let Some(lockfile_path) = &self.lockfile_path {
             cmd.arg("--lockfile-path").arg(lockfile_path);
         }
-        if self.ignore_rust_version {
+        if self.ignore_rust_version.unwrap_or(false) {
             cmd.arg("--ignore-rust-version");
         }
 
         // Apply locking mode flags
-        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref())?;
+        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref(), "unlocked")?;
         for flag in locking_flags {
             cmd.arg(flag);
         }
@@ -230,7 +227,7 @@ impl CargoAddTool {
         let output_flags = output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
         cmd.args(output_flags);
 
-        execute_command(cmd)
+        execute_command(cmd, &Self::tool_name())
     }
 }
 
@@ -261,13 +258,12 @@ pub struct CargoRemoveTool {
     #[serde(default, deserialize_with = "deserialize_string")]
     pub target: Option<String>,
 
-    /// Package to remove from
-    #[serde(default, deserialize_with = "deserialize_string")]
-    pub package: Option<String>,
+    /// Package to remove from, must be specified
+    pub target_package: String,
 
     /// Don't actually write the manifest
     #[serde(default)]
-    pub dry_run: bool,
+    pub dry_run: Option<bool>,
 
     /// Path to Cargo.toml
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -280,8 +276,8 @@ pub struct CargoRemoveTool {
     /// Locking mode for dependency resolution.
     ///
     /// Valid options:
-    /// - "locked" (default): Assert that `Cargo.lock` will remain unchanged
-    /// - "unlocked": Allow `Cargo.lock` to be updated
+    /// - "locked": Assert that `Cargo.lock` will remain unchanged
+    /// - "unlocked" (default): Allow `Cargo.lock` to be updated
     /// - "offline": Run without accessing the network
     /// - "frozen": Equivalent to specifying both --locked and --offline
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -321,12 +317,10 @@ impl CargoRemoveTool {
         }
 
         // Package selection
-        if let Some(package) = &self.package {
-            cmd.arg("--package").arg(package);
-        }
+        cmd.arg("--package").arg(&self.target_package);
 
         // Other options
-        if self.dry_run {
+        if self.dry_run.unwrap_or(false) {
             cmd.arg("--dry-run");
         }
 
@@ -339,7 +333,7 @@ impl CargoRemoveTool {
         }
 
         // Apply locking mode flags
-        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref())?;
+        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref(), "unlocked")?;
         for flag in locking_flags {
             cmd.arg(flag);
         }
@@ -348,7 +342,7 @@ impl CargoRemoveTool {
         let output_flags = output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
         cmd.args(output_flags);
 
-        execute_command(cmd)
+        execute_command(cmd, &Self::tool_name())
     }
 }
 
@@ -407,7 +401,7 @@ mod tests {
       "type": "string"
     },
     "dry_run": {
-      "default": false,
+      "default": null,
       "description": "Don't actually write the manifest",
       "type": "boolean"
     },
@@ -425,13 +419,13 @@ mod tests {
       "type": "string"
     },
     "ignore_rust_version": {
-      "default": false,
+      "default": null,
       "description": "Ignore `rust-version` specification in packages",
       "type": "boolean"
     },
     "locking_mode": {
       "default": null,
-      "description": "Locking mode for dependency resolution.\n\nValid options:\n- \"locked\" (default): Assert that `Cargo.lock` will remain unchanged\n- \"unlocked\": Allow `Cargo.lock` to be updated\n- \"offline\": Run without accessing the network\n- \"frozen\": Equivalent to specifying both --locked and --offline",
+      "description": "Locking mode for dependency resolution.\n\nValid options:\n- \"locked\": Assert that `Cargo.lock` will remain unchanged\n- \"unlocked\" (default): Allow `Cargo.lock` to be updated\n- \"offline\": Run without accessing the network\n- \"frozen\": Equivalent to specifying both --locked and --offline",
       "type": "string"
     },
     "lockfile_path": {
@@ -445,7 +439,7 @@ mod tests {
       "type": "string"
     },
     "no_default_features": {
-      "default": false,
+      "default": null,
       "description": "Disable the default features",
       "type": "boolean"
     },
@@ -494,8 +488,7 @@ mod tests {
       "type": "string"
     },
     "target_package": {
-      "default": null,
-      "description": "Package to modify",
+      "description": "Package to modify, must be specified",
       "type": "string"
     },
     "toolchain": {
@@ -510,7 +503,8 @@ mod tests {
     }
   },
   "required": [
-    "package"
+    "package",
+    "target_package"
   ],
   "title": "CargoAddTool",
   "type": "object"

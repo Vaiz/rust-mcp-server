@@ -31,7 +31,7 @@ pub struct CargoClippyTool {
 
     /// Check all packages in the workspace
     #[serde(default)]
-    workspace: bool,
+    workspace: Option<bool>,
 
     /// Exclude packages from the check
     #[serde(default, deserialize_with = "deserialize_string_vec")]
@@ -39,31 +39,31 @@ pub struct CargoClippyTool {
 
     /// Run Clippy only on the given crate, without linting the dependencies
     #[serde(default)]
-    no_deps: bool,
+    no_deps: Option<bool>,
 
     /// Allow dirty working directory (unstaged changes). Works only with `fix`.
     #[serde(default)]
-    allow_dirty: bool,
+    allow_dirty: Option<bool>,
 
     /// Automatically apply lint suggestions (implies --no-deps and --all-targets)
     #[serde(default)]
-    fix: bool,
+    fix: Option<bool>,
 
     /// Check artifacts in release mode, with optimizations
     #[serde(default)]
-    release: bool,
+    release: Option<bool>,
 
     /// Check all targets (lib, bins, examples, tests, benches)
     #[serde(default)]
-    all_targets: bool,
+    all_targets: Option<bool>,
 
     /// Check only this package's library
     #[serde(default)]
-    lib: bool,
+    lib: Option<bool>,
 
     /// Check all binaries
     #[serde(default)]
-    bins: bool,
+    bins: Option<bool>,
 
     /// Check only the specified binary
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -71,7 +71,7 @@ pub struct CargoClippyTool {
 
     /// Check all examples
     #[serde(default)]
-    examples: bool,
+    examples: Option<bool>,
 
     /// Check only the specified example
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -79,7 +79,7 @@ pub struct CargoClippyTool {
 
     /// Check all tests
     #[serde(default)]
-    tests: bool,
+    tests: Option<bool>,
 
     /// Check only the specified test target
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -87,7 +87,7 @@ pub struct CargoClippyTool {
 
     /// Check all targets that have `bench = true` set
     #[serde(default)]
-    benches: bool,
+    benches: Option<bool>,
 
     /// Check only the specified bench target
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -99,11 +99,11 @@ pub struct CargoClippyTool {
 
     /// Activate all available features
     #[serde(default)]
-    all_features: bool,
+    all_features: Option<bool>,
 
     /// Do not activate the default feature
     #[serde(default)]
-    no_default_features: bool,
+    no_default_features: Option<bool>,
 
     /// Check artifacts with the specified profile
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -123,7 +123,7 @@ pub struct CargoClippyTool {
 
     /// Ignore `rust-version` specification in packages
     #[serde(default)]
-    ignore_rust_version: bool,
+    ignore_rust_version: Option<bool>,
 
     /// Locking mode for dependency resolution.
     ///
@@ -146,7 +146,7 @@ pub struct CargoClippyTool {
 
     /// Treat warnings as errors
     #[serde(default)]
-    warnings_as_errors: bool,
+    warnings_as_errors: Option<bool>,
 }
 
 impl CargoClippyTool {
@@ -164,7 +164,7 @@ impl CargoClippyTool {
             }
         }
 
-        if self.workspace {
+        if self.workspace.unwrap_or(false) {
             cmd.arg("--workspace");
         }
 
@@ -175,20 +175,20 @@ impl CargoClippyTool {
         }
 
         // Clippy-specific options
-        if self.no_deps {
+        if self.no_deps.unwrap_or(false) {
             cmd.arg("--no-deps");
         }
 
-        if self.fix {
+        if self.fix.unwrap_or(false) {
             cmd.arg("--fix");
         }
 
-        if self.allow_dirty && self.fix {
+        if self.allow_dirty.unwrap_or(false) && self.fix.unwrap_or(false) {
             cmd.arg("--allow-dirty");
         }
 
         // Compilation options
-        if self.release {
+        if self.release.unwrap_or(false) {
             cmd.arg("--release");
         }
 
@@ -205,15 +205,15 @@ impl CargoClippyTool {
         }
 
         // Target selection
-        if self.all_targets {
+        if self.all_targets.unwrap_or(false) {
             cmd.arg("--all-targets");
         }
 
-        if self.lib {
+        if self.lib.unwrap_or(false) {
             cmd.arg("--lib");
         }
 
-        if self.bins {
+        if self.bins.unwrap_or(false) {
             cmd.arg("--bins");
         }
 
@@ -221,7 +221,7 @@ impl CargoClippyTool {
             cmd.arg("--bin").arg(bin);
         }
 
-        if self.examples {
+        if self.examples.unwrap_or(false) {
             cmd.arg("--examples");
         }
 
@@ -229,7 +229,7 @@ impl CargoClippyTool {
             cmd.arg("--example").arg(example);
         }
 
-        if self.tests {
+        if self.tests.unwrap_or(false) {
             cmd.arg("--tests");
         }
 
@@ -237,7 +237,7 @@ impl CargoClippyTool {
             cmd.arg("--test").arg(test);
         }
 
-        if self.benches {
+        if self.benches.unwrap_or(false) {
             cmd.arg("--benches");
         }
 
@@ -250,11 +250,11 @@ impl CargoClippyTool {
             cmd.arg("--features").arg(features.join(","));
         }
 
-        if self.all_features {
+        if self.all_features.unwrap_or(false) {
             cmd.arg("--all-features");
         }
 
-        if self.no_default_features {
+        if self.no_default_features.unwrap_or(false) {
             cmd.arg("--no-default-features");
         }
 
@@ -263,12 +263,12 @@ impl CargoClippyTool {
             cmd.arg("--manifest-path").arg(manifest_path);
         }
 
-        if self.ignore_rust_version {
+        if self.ignore_rust_version.unwrap_or(false) {
             cmd.arg("--ignore-rust-version");
         }
 
         // Apply locking mode flags
-        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref())?;
+        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref(), "locked")?;
         for flag in locking_flags {
             cmd.arg(flag);
         }
@@ -277,11 +277,11 @@ impl CargoClippyTool {
         let output_flags = output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
         cmd.args(output_flags);
 
-        if self.warnings_as_errors {
+        if self.warnings_as_errors.unwrap_or(false) {
             cmd.env("RUSTFLAGS", "-D warnings");
         }
 
-        execute_command(cmd)
+        execute_command(cmd, &Self::tool_name())
     }
 }
 
@@ -319,9 +319,9 @@ mod tests {
             .expect("Deserialization should succeed even if `package` is missing (it's Option)");
 
         assert_eq!(tool.package, None);
-        assert!(tool.workspace);
-        assert!(tool.all_features);
-        assert!(tool.allow_dirty);
+        assert_eq!(tool.workspace, Some(true));
+        assert_eq!(tool.all_features, Some(true));
+        assert_eq!(tool.allow_dirty, Some(true));
     }
 
     #[test]
@@ -335,8 +335,8 @@ mod tests {
         let tool = tool.expect("Deserialization should succeed");
 
         assert_eq!(tool.package.unwrap(), ["my_package".to_owned()]);
-        assert!(!tool.workspace);
-        assert!(!tool.all_features);
-        assert!(!tool.allow_dirty);
+        assert_eq!(tool.workspace, None);
+        assert_eq!(tool.all_features, None);
+        assert_eq!(tool.allow_dirty, None);
     }
 }

@@ -31,7 +31,7 @@ impl RustupShowTool {
             cmd.arg("--verbose");
         }
 
-        execute_command(cmd)
+        execute_command(cmd, &Self::tool_name())
     }
 }
 
@@ -111,7 +111,7 @@ impl RustupToolchainAddTool {
             cmd.arg("--force-non-host");
         }
 
-        execute_command(cmd)
+        execute_command(cmd, &Self::tool_name())
     }
 }
 
@@ -160,6 +160,6 @@ impl RustupUpdateTool {
             cmd.arg("--force-non-host");
         }
 
-        execute_command(cmd)
+        execute_command(cmd, &Self::tool_name())
     }
 }

@@ -29,7 +29,7 @@ pub struct CargoCheckTool {
 
     /// Check all packages in the workspace
     #[serde(default)]
-    workspace: bool,
+    workspace: Option<bool>,
 
     /// Exclude packages from the check
     #[serde(default, deserialize_with = "deserialize_string_vec")]
@@ -37,11 +37,11 @@ pub struct CargoCheckTool {
 
     /// Check only this package's library
     #[serde(default)]
-    lib: bool,
+    lib: Option<bool>,
 
     /// Check all binaries
     #[serde(default)]
-    bins: bool,
+    bins: Option<bool>,
 
     /// Check only the specified binary
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -49,7 +49,7 @@ pub struct CargoCheckTool {
 
     /// Check all examples
     #[serde(default)]
-    examples: bool,
+    examples: Option<bool>,
 
     /// Check only the specified example
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -57,7 +57,7 @@ pub struct CargoCheckTool {
 
     /// Check all tests
     #[serde(default)]
-    tests: bool,
+    tests: Option<bool>,
 
     /// Check only the specified test target
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -65,7 +65,7 @@ pub struct CargoCheckTool {
 
     /// Check all targets that have `bench = true` set
     #[serde(default)]
-    benches: bool,
+    benches: Option<bool>,
 
     /// Check only the specified bench target
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -73,7 +73,7 @@ pub struct CargoCheckTool {
 
     /// Check all targets (lib, bins, examples, tests, benches)
     #[serde(default)]
-    all_targets: bool,
+    all_targets: Option<bool>,
 
     /// Space or comma separated list of features to activate
     #[serde(default, deserialize_with = "deserialize_string_vec")]
@@ -81,11 +81,11 @@ pub struct CargoCheckTool {
 
     /// Activate all available features
     #[serde(default)]
-    all_features: bool,
+    all_features: Option<bool>,
 
     /// Do not activate the default feature
     #[serde(default)]
-    no_default_features: bool,
+    no_default_features: Option<bool>,
 
     /// Number of parallel jobs, defaults to # of CPUs
     #[serde(default)]
@@ -93,11 +93,11 @@ pub struct CargoCheckTool {
 
     /// Do not abort the build as soon as there is an error
     #[serde(default)]
-    keep_going: bool,
+    keep_going: Option<bool>,
 
     /// Check artifacts in release mode, with optimizations
     #[serde(default)]
-    release: bool,
+    release: Option<bool>,
 
     /// Check artifacts with the specified profile
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -121,7 +121,7 @@ pub struct CargoCheckTool {
 
     /// Ignore `rust-version` specification in packages
     #[serde(default)]
-    ignore_rust_version: bool,
+    ignore_rust_version: Option<bool>,
 
     /// Locking mode for dependency resolution.
     ///
@@ -144,7 +144,7 @@ pub struct CargoCheckTool {
 
     /// Treat warnings as errors
     #[serde(default)]
-    warnings_as_errors: bool,
+    warnings_as_errors: Option<bool>,
 }
 
 impl CargoCheckTool {
@@ -162,7 +162,7 @@ impl CargoCheckTool {
             }
         }
 
-        if self.workspace {
+        if self.workspace.unwrap_or(false) {
             cmd.arg("--workspace");
         }
 
@@ -173,11 +173,11 @@ impl CargoCheckTool {
         }
 
         // Target selection
-        if self.lib {
+        if self.lib.unwrap_or(false) {
             cmd.arg("--lib");
         }
 
-        if self.bins {
+        if self.bins.unwrap_or(false) {
             cmd.arg("--bins");
         }
 
@@ -185,7 +185,7 @@ impl CargoCheckTool {
             cmd.arg("--bin").arg(bin);
         }
 
-        if self.examples {
+        if self.examples.unwrap_or(false) {
             cmd.arg("--examples");
         }
 
@@ -193,7 +193,7 @@ impl CargoCheckTool {
             cmd.arg("--example").arg(example);
         }
 
-        if self.tests {
+        if self.tests.unwrap_or(false) {
             cmd.arg("--tests");
         }
 
@@ -201,7 +201,7 @@ impl CargoCheckTool {
             cmd.arg("--test").arg(test);
         }
 
-        if self.benches {
+        if self.benches.unwrap_or(false) {
             cmd.arg("--benches");
         }
 
@@ -209,7 +209,7 @@ impl CargoCheckTool {
             cmd.arg("--bench").arg(bench);
         }
 
-        if self.all_targets {
+        if self.all_targets.unwrap_or(false) {
             cmd.arg("--all-targets");
         }
 
@@ -218,11 +218,11 @@ impl CargoCheckTool {
             cmd.arg("--features").arg(features.join(","));
         }
 
-        if self.all_features {
+        if self.all_features.unwrap_or(false) {
             cmd.arg("--all-features");
         }
 
-        if self.no_default_features {
+        if self.no_default_features.unwrap_or(false) {
             cmd.arg("--no-default-features");
         }
 
@@ -231,11 +231,11 @@ impl CargoCheckTool {
             cmd.arg("--jobs").arg(jobs.to_string());
         }
 
-        if self.keep_going {
+        if self.keep_going.unwrap_or(false) {
             cmd.arg("--keep-going");
         }
 
-        if self.release {
+        if self.release.unwrap_or(false) {
             cmd.arg("--release");
         }
 
@@ -260,12 +260,12 @@ impl CargoCheckTool {
             cmd.arg("--lockfile-path").arg(lockfile_path);
         }
 
-        if self.ignore_rust_version {
+        if self.ignore_rust_version.unwrap_or(false) {
             cmd.arg("--ignore-rust-version");
         }
 
         // Apply locking mode flags
-        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref())?;
+        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref(), "locked")?;
         for flag in locking_flags {
             cmd.arg(flag);
         }
@@ -274,10 +274,10 @@ impl CargoCheckTool {
         let output_flags = output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
         cmd.args(output_flags);
 
-        if self.warnings_as_errors {
+        if self.warnings_as_errors.unwrap_or(false) {
             cmd.env("RUSTFLAGS", "-D warnings");
         }
 
-        execute_command(cmd)
+        execute_command(cmd, &Self::tool_name())
     }
 }

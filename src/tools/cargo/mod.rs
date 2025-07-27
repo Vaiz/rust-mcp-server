@@ -58,7 +58,7 @@ pub struct CargoGenerateLockfileTool {
 
     /// Ignore `rust-version` specification in packages
     #[serde(default)]
-    ignore_rust_version: bool,
+    ignore_rust_version: Option<bool>,
 
     /// Locking mode for dependency resolution.
     ///
@@ -99,18 +99,18 @@ impl CargoGenerateLockfileTool {
             cmd.arg("--lockfile-path").arg(lockfile_path);
         }
 
-        if self.ignore_rust_version {
+        if self.ignore_rust_version.unwrap_or(false) {
             cmd.arg("--ignore-rust-version");
         }
 
-        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref())?;
+        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref(), "locked")?;
         cmd.args(locking_flags);
 
         // Output options
         let output_flags = output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
         cmd.args(output_flags);
 
-        execute_command(cmd)
+        execute_command(cmd, &Self::tool_name())
     }
 }
 
@@ -138,15 +138,15 @@ pub struct CargoCleanTool {
 
     /// Whether or not to clean just the documentation directory
     #[serde(default)]
-    doc: bool,
+    doc: Option<bool>,
 
     /// Display what would be deleted without deleting anything
     #[serde(default)]
-    dry_run: bool,
+    dry_run: Option<bool>,
 
     /// Whether or not to clean release artifacts
     #[serde(default)]
-    release: bool,
+    release: Option<bool>,
 
     /// Target triple to clean output for
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -202,15 +202,15 @@ impl CargoCleanTool {
             cmd.arg("--profile").arg(profile);
         }
 
-        if self.doc {
+        if self.doc.unwrap_or(false) {
             cmd.arg("--doc");
         }
 
-        if self.dry_run {
+        if self.dry_run.unwrap_or(false) {
             cmd.arg("--dry-run");
         }
 
-        if self.release {
+        if self.release.unwrap_or(false) {
             cmd.arg("--release");
         }
 
@@ -231,14 +231,14 @@ impl CargoCleanTool {
             cmd.arg("--lockfile-path").arg(lockfile_path);
         }
 
-        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref())?;
+        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref(), "locked")?;
         cmd.args(locking_flags);
 
         // Output options
         let output_flags = output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
         cmd.args(output_flags);
 
-        execute_command(cmd)
+        execute_command(cmd, &Self::tool_name())
     }
 }
 
@@ -320,7 +320,7 @@ impl CargoFmtTool {
         let output_flags = output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
         cmd.args(output_flags);
 
-        execute_command(cmd)
+        execute_command(cmd, &Self::tool_name())
     }
 }
 
@@ -349,7 +349,7 @@ pub struct CargoNewTool {
 
     /// Use a library template
     #[serde(default)]
-    pub lib: bool,
+    pub lib: Option<bool>,
 
     /// Edition to set for the crate generated. Possible values: 2015, 2018, 2021, 2024
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -399,7 +399,7 @@ impl CargoNewTool {
         if self.bin {
             cmd.arg("--bin");
         }
-        if self.lib {
+        if self.lib.unwrap_or(false) {
             cmd.arg("--lib");
         }
 
@@ -420,14 +420,14 @@ impl CargoNewTool {
         }
 
         // Manifest options
-        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref())?;
+        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref(), "unlocked")?;
         cmd.args(locking_flags);
 
         // Output options
         let output_flags = output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
         cmd.args(output_flags);
 
-        execute_command(cmd)
+        execute_command(cmd, &Self::tool_name())
     }
 }
 
@@ -443,6 +443,6 @@ impl CargoListTool {
     pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
         let mut cmd = Command::new("cargo");
         cmd.arg("--list");
-        execute_command(cmd)
+        execute_command(cmd, &Self::tool_name())
     }
 }

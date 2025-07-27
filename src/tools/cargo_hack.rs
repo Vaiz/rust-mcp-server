@@ -6,7 +6,7 @@ use rust_mcp_sdk::{
 };
 
 use crate::serde_utils::{
-    default_true, deserialize_string, deserialize_string_vec, output_verbosity_to_cli_flags,
+    deserialize_string, deserialize_string_vec, output_verbosity_to_cli_flags,
 };
 use crate::tools::execute_command;
 
@@ -33,7 +33,7 @@ pub struct CargoHackTool {
 
     /// Perform command for all packages in the workspace
     #[serde(default)]
-    workspace: bool,
+    workspace: Option<bool>,
 
     /// Exclude packages from the check
     #[serde(default, deserialize_with = "deserialize_string_vec")]
@@ -44,8 +44,8 @@ pub struct CargoHackTool {
     manifest_path: Option<String>,
 
     /// Require Cargo.lock is up to date
-    #[serde(default = "default_true")]
-    locked: bool,
+    #[serde(default)]
+    locked: Option<bool>,
 
     /// Space or comma separated list of features to activate
     #[serde(default, deserialize_with = "deserialize_string_vec")]
@@ -53,11 +53,11 @@ pub struct CargoHackTool {
 
     /// Perform for each feature of the package
     #[serde(default)]
-    each_feature: bool,
+    each_feature: Option<bool>,
 
     /// Perform for the feature powerset of the package
     #[serde(default)]
-    feature_powerset: bool,
+    feature_powerset: Option<bool>,
 
     /// Use optional dependencies as features
     #[serde(default, deserialize_with = "deserialize_string_vec")]
@@ -69,11 +69,11 @@ pub struct CargoHackTool {
 
     /// Exclude run of just --no-default-features flag
     #[serde(default)]
-    exclude_no_default_features: bool,
+    exclude_no_default_features: Option<bool>,
 
     /// Exclude run of just --all-features flag
     #[serde(default)]
-    exclude_all_features: bool,
+    exclude_all_features: Option<bool>,
 
     /// Specify a max number of simultaneous feature flags of --feature-powerset
     depth: Option<u32>,
@@ -96,27 +96,27 @@ pub struct CargoHackTool {
 
     /// Perform without dev-dependencies
     #[serde(default)]
-    no_dev_deps: bool,
+    no_dev_deps: Option<bool>,
 
     /// Equivalent to --no-dev-deps flag except for does not restore the original Cargo.toml
     #[serde(default)]
-    remove_dev_deps: bool,
+    remove_dev_deps: Option<bool>,
 
     /// Perform without `publish = false` crates
     #[serde(default)]
-    no_private: bool,
+    no_private: Option<bool>,
 
     /// Skip to perform on `publish = false` packages
     #[serde(default)]
-    ignore_private: bool,
+    ignore_private: Option<bool>,
 
     /// Skip passing --features flag to cargo if that feature does not exist
     #[serde(default)]
-    ignore_unknown_features: bool,
+    ignore_unknown_features: Option<bool>,
 
     /// Perform commands on `package.rust-version`
     #[serde(default)]
-    rust_version: bool,
+    rust_version: Option<bool>,
 
     /// Perform commands on a specified (inclusive) range of Rust versions
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -127,15 +127,15 @@ pub struct CargoHackTool {
 
     /// Remove artifacts for that package before running the command
     #[serde(default)]
-    clean_per_run: bool,
+    clean_per_run: Option<bool>,
 
     /// Remove artifacts per Rust version
     #[serde(default)]
-    clean_per_version: bool,
+    clean_per_version: Option<bool>,
 
     /// Keep going on failure
     #[serde(default)]
-    keep_going: bool,
+    keep_going: Option<bool>,
 
     /// Partition runs and execute only its subset according to M/N
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -147,11 +147,11 @@ pub struct CargoHackTool {
 
     /// Print commands without run (Unstable)
     #[serde(default)]
-    print_command_list: bool,
+    print_command_list: Option<bool>,
 
     /// Do not pass --manifest-path option to cargo (Unstable)
     #[serde(default)]
-    no_manifest_path: bool,
+    no_manifest_path: Option<bool>,
 
     /// Output verbosity level.
     ///
@@ -189,7 +189,7 @@ impl CargoHackTool {
             }
         }
 
-        if self.workspace {
+        if self.workspace.unwrap_or(false) {
             cmd.arg("--workspace");
         }
 
@@ -204,7 +204,7 @@ impl CargoHackTool {
             cmd.arg("--manifest-path").arg(manifest_path);
         }
 
-        if self.locked {
+        if self.locked.unwrap_or(true) {
             cmd.arg("--locked");
         }
 
@@ -213,11 +213,11 @@ impl CargoHackTool {
             cmd.arg("--features").arg(features.join(","));
         }
 
-        if self.each_feature {
+        if self.each_feature.unwrap_or(false) {
             cmd.arg("--each-feature");
         }
 
-        if self.feature_powerset {
+        if self.feature_powerset.unwrap_or(false) {
             cmd.arg("--feature-powerset");
         }
 
@@ -234,11 +234,11 @@ impl CargoHackTool {
                 .arg(exclude_features.join(","));
         }
 
-        if self.exclude_no_default_features {
+        if self.exclude_no_default_features.unwrap_or(false) {
             cmd.arg("--exclude-no-default-features");
         }
 
-        if self.exclude_all_features {
+        if self.exclude_all_features.unwrap_or(false) {
             cmd.arg("--exclude-all-features");
         }
 
@@ -269,28 +269,28 @@ impl CargoHackTool {
         }
 
         // Dependency options
-        if self.no_dev_deps {
+        if self.no_dev_deps.unwrap_or(false) {
             cmd.arg("--no-dev-deps");
         }
 
-        if self.remove_dev_deps {
+        if self.remove_dev_deps.unwrap_or(false) {
             cmd.arg("--remove-dev-deps");
         }
 
-        if self.no_private {
+        if self.no_private.unwrap_or(false) {
             cmd.arg("--no-private");
         }
 
-        if self.ignore_private {
+        if self.ignore_private.unwrap_or(false) {
             cmd.arg("--ignore-private");
         }
 
-        if self.ignore_unknown_features {
+        if self.ignore_unknown_features.unwrap_or(false) {
             cmd.arg("--ignore-unknown-features");
         }
 
         // Version options
-        if self.rust_version {
+        if self.rust_version.unwrap_or(false) {
             cmd.arg("--rust-version");
         }
 
@@ -303,16 +303,16 @@ impl CargoHackTool {
         }
 
         // Cleanup options
-        if self.clean_per_run {
+        if self.clean_per_run.unwrap_or(false) {
             cmd.arg("--clean-per-run");
         }
 
-        if self.clean_per_version {
+        if self.clean_per_version.unwrap_or(false) {
             cmd.arg("--clean-per-version");
         }
 
         // Execution options
-        if self.keep_going {
+        if self.keep_going.unwrap_or(false) {
             cmd.arg("--keep-going");
         }
 
@@ -324,11 +324,11 @@ impl CargoHackTool {
             cmd.arg("--log-group").arg(log_group);
         }
 
-        if self.print_command_list {
+        if self.print_command_list.unwrap_or(false) {
             cmd.arg("--print-command-list");
         }
 
-        if self.no_manifest_path {
+        if self.no_manifest_path.unwrap_or(false) {
             cmd.arg("--no-manifest-path");
         }
 
@@ -339,7 +339,7 @@ impl CargoHackTool {
         // Add the cargo command to run (e.g., check, test, build)
         cmd.arg(&self.command);
 
-        execute_command(cmd)
+        execute_command(cmd, &Self::tool_name())
     }
 }
 
@@ -356,6 +356,6 @@ impl CargoHackInstallTool {
         let mut cmd = Command::new("cargo");
         cmd.arg("install").arg("cargo-hack");
 
-        execute_command(cmd)
+        execute_command(cmd, &Self::tool_name())
     }
 }

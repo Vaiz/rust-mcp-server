@@ -19,20 +19,20 @@ use crate::serde_utils::Tool;
 pub struct CargoMacheteTool {
     /// Uses cargo-metadata to figure out the dependencies' names. May be useful if some dependencies are renamed.
     #[serde(default)]
-    with_metadata: bool,
+    with_metadata: Option<bool>,
 
     /// Don't analyze anything contained in any target/ directories encountered.
     #[serde(default)]
-    skip_target_dir: bool,
+    skip_target_dir: Option<bool>,
 
     /// Rewrite the Cargo.toml files to automatically remove unused dependencies.
     /// Note: all dependencies flagged by cargo-machete will be removed, including false positives.
     #[serde(default)]
-    fix: bool,
+    fix: Option<bool>,
 
     /// Also search in ignored files (.gitignore, .ignore, etc.) when searching for files.
     #[serde(default)]
-    no_ignore: bool,
+    no_ignore: Option<bool>,
 
     /// Paths to analyze. If not specified, analyzes the current directory.
     #[serde(default, deserialize_with = "deserialize_string_vec")]
@@ -44,19 +44,19 @@ impl CargoMacheteTool {
         let mut cmd = Command::new("cargo");
         cmd.arg("machete");
 
-        if self.with_metadata {
+        if self.with_metadata.unwrap_or(false) {
             cmd.arg("--with-metadata");
         }
 
-        if self.skip_target_dir {
+        if self.skip_target_dir.unwrap_or(false) {
             cmd.arg("--skip-target-dir");
         }
 
-        if self.fix {
+        if self.fix.unwrap_or(false) {
             cmd.arg("--fix");
         }
 
-        if self.no_ignore {
+        if self.no_ignore.unwrap_or(false) {
             cmd.arg("--no-ignore");
         }
 
@@ -66,7 +66,7 @@ impl CargoMacheteTool {
             }
         }
 
-        execute_command(cmd)
+        execute_command(cmd, &Self::tool_name())
     }
 }
 
@@ -83,6 +83,6 @@ impl CargoMacheteInstallTool {
         let mut cmd = Command::new("cargo");
         cmd.arg("install").arg("cargo-machete");
 
-        execute_command(cmd)
+        execute_command(cmd, &Self::tool_name())
     }
 }

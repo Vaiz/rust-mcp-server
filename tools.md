@@ -375,8 +375,8 @@
       - <code>locking_mode</code> : string<br />
       - <code>manifest_path</code> : string<br />
       - <code>output_verbosity</code> : string<br />
-      - <code>package</code> : string<br />
       - <code>target</code> : string<br />
+      - <code>target_package</code> : string<br />
       - <code>toolchain</code> : string<br />
 
 - **cargo-search**

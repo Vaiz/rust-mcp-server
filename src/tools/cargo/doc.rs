@@ -3,7 +3,7 @@ use std::process::Command;
 
 use crate::{
     serde_utils::{
-        default_true, deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
+        deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
     },
     tools::{WORKSPACE_ROOT, execute_command},
@@ -31,31 +31,31 @@ pub struct CargoDocTool {
 
     /// Document all packages in the workspace
     #[serde(default)]
-    workspace: bool,
+    workspace: Option<bool>,
 
     /// Exclude packages from documentation build
     #[serde(default, deserialize_with = "deserialize_string_vec")]
     exclude: Option<Vec<String>>,
 
     /// Don't build documentation for dependencies (recommended for faster builds)
-    #[serde(default = "default_true")]
-    no_deps: bool,
+    #[serde(default)]
+    no_deps: Option<bool>,
 
     /// Document private items
     #[serde(default)]
-    document_private_items: bool,
+    document_private_items: Option<bool>,
 
     /// Enable docs.rs configuration for additional features (sets RUSTDOCFLAGS="--cfg docsrs")
     #[serde(default)]
-    docsrs_config: bool,
+    docsrs_config: Option<bool>,
 
     /// Document only this package's library
     #[serde(default)]
-    lib: bool,
+    lib: Option<bool>,
 
     /// Document all binaries
     #[serde(default)]
-    bins: bool,
+    bins: Option<bool>,
 
     /// Document only the specified binary
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -63,7 +63,7 @@ pub struct CargoDocTool {
 
     /// Document all examples
     #[serde(default)]
-    examples: bool,
+    examples: Option<bool>,
 
     /// Document only the specified example
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -75,15 +75,15 @@ pub struct CargoDocTool {
 
     /// Activate all available features
     #[serde(default)]
-    all_features: bool,
+    all_features: Option<bool>,
 
     /// Do not activate the `default` feature
     #[serde(default)]
-    no_default_features: bool,
+    no_default_features: Option<bool>,
 
     /// Build artifacts in release mode, with optimizations
     #[serde(default)]
-    release: bool,
+    release: Option<bool>,
 
     /// Build artifacts with the specified profile
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -95,7 +95,7 @@ pub struct CargoDocTool {
 
     /// Do not abort the build as soon as there is an error
     #[serde(default)]
-    keep_going: bool,
+    keep_going: Option<bool>,
 
     /// Build for the target triple
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -115,7 +115,7 @@ pub struct CargoDocTool {
 
     /// Ignore `rust-version` specification in packages
     #[serde(default)]
-    ignore_rust_version: bool,
+    ignore_rust_version: Option<bool>,
 
     /// Locking mode for dependency resolution.
     ///
@@ -156,7 +156,7 @@ impl CargoDocTool {
             }
         }
 
-        if self.workspace {
+        if self.workspace.unwrap_or(false) {
             cmd.arg("--workspace");
         }
 
@@ -167,25 +167,25 @@ impl CargoDocTool {
         }
 
         // Documentation options
-        if self.no_deps {
+        if self.no_deps.unwrap_or(true) {
             cmd.arg("--no-deps");
         }
 
-        if self.document_private_items {
+        if self.document_private_items.unwrap_or(false) {
             cmd.arg("--document-private-items");
         }
 
         // Set RUSTDOCFLAGS for docs.rs configuration if enabled
-        if self.docsrs_config {
+        if self.docsrs_config.unwrap_or(false) {
             cmd.env("RUSTDOCFLAGS", "--cfg docsrs");
         }
 
         // Target selection
-        if self.lib {
+        if self.lib.unwrap_or(false) {
             cmd.arg("--lib");
         }
 
-        if self.bins {
+        if self.bins.unwrap_or(false) {
             cmd.arg("--bins");
         }
 
@@ -193,7 +193,7 @@ impl CargoDocTool {
             cmd.arg("--bin").arg(bin);
         }
 
-        if self.examples {
+        if self.examples.unwrap_or(false) {
             cmd.arg("--examples");
         }
 
@@ -206,16 +206,16 @@ impl CargoDocTool {
             cmd.arg("--features").arg(features.join(","));
         }
 
-        if self.all_features {
+        if self.all_features.unwrap_or(false) {
             cmd.arg("--all-features");
         }
 
-        if self.no_default_features {
+        if self.no_default_features.unwrap_or(false) {
             cmd.arg("--no-default-features");
         }
 
         // Compilation options
-        if self.release {
+        if self.release.unwrap_or(false) {
             cmd.arg("--release");
         }
 
@@ -227,7 +227,7 @@ impl CargoDocTool {
             cmd.arg("--jobs").arg(jobs.to_string());
         }
 
-        if self.keep_going {
+        if self.keep_going.unwrap_or(false) {
             cmd.arg("--keep-going");
         }
 
@@ -248,12 +248,12 @@ impl CargoDocTool {
             cmd.arg("--lockfile-path").arg(lockfile_path);
         }
 
-        if self.ignore_rust_version {
+        if self.ignore_rust_version.unwrap_or(false) {
             cmd.arg("--ignore-rust-version");
         }
 
         // Apply locking mode flags
-        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref())?;
+        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref(), "locked")?;
         for flag in locking_flags {
             cmd.arg(flag);
         }
@@ -267,7 +267,7 @@ impl CargoDocTool {
         }
 
         // Execute the command and get the result
-        let mut result = execute_command(cmd)?;
+        let mut result = execute_command(cmd, &Self::tool_name())?;
 
         // Add documentation path information only if the command was successful
         if result.is_error != Some(true) {
