@@ -1,4 +1,3 @@
-use std::path::Path;
 use std::process::Command;
 
 use crate::{
@@ -6,7 +5,7 @@ use crate::{
         default_true, deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
     },
-    tools::{WORKSPACE_ROOT, execute_command},
+    tools::execute_command,
 };
 use rust_mcp_sdk::{
     macros::{JsonSchema, mcp_tool},
@@ -15,7 +14,7 @@ use rust_mcp_sdk::{
 
 #[mcp_tool(
     name = "cargo-doc",
-    description = "Build documentation for a Rust package using Cargo. Recommended to use with no_deps and specific package for faster builds. Returns path to generated documentation index.",
+    description = "Build documentation for a Rust package using Cargo. Recommended to use with --no-deps and specific --package for faster builds. Returns path to generated documentation index.",
     openWorldHint = false
 )]
 #[derive(Debug, ::serde::Deserialize, JsonSchema)]
@@ -269,89 +268,34 @@ impl CargoDocTool {
         // Execute the command and get the result
         let mut result = execute_command(cmd)?;
 
-        // Add documentation path information only if the command was successful
-        if result.is_error != Some(true) {
-            let doc_path = self.get_doc_path();
-            let doc_info = if let Some(doc_path) = doc_path {
-                format!(
-                    "\n📚 Documentation generated successfully!\n📄 Documentation file: {doc_path}\n💡 Open this file in your browser to view the docs"
-                )
-            } else {
-                "\n📚 Documentation generated successfully!".to_owned()
-            };
+        // Add documentation path information
+        let doc_path = self.get_doc_path();
+        let doc_info = format!(
+            "\n📚 Documentation generated successfully!\n📁 Documentation index: {doc_path}"
+        );
 
-            let annotations = Some(Annotations {
-                audience: vec![Role::User, Role::Assistant],
-                last_modified: None,
-                priority: Some(0.5),
-            });
+        let annotations = Some(Annotations {
+            audience: vec![Role::User, Role::Assistant],
+            last_modified: None,
+            priority: Some(0.5),
+        });
 
-            result
-                .content
-                .push(TextContent::new(doc_info, annotations, None).into());
-        }
+        result
+            .content
+            .push(TextContent::new(doc_info, annotations, None).into());
 
         Ok(result)
     }
 
-    fn get_doc_path(&self) -> Option<String> {
+    fn get_doc_path(&self) -> String {
         let base_dir = self.target_dir.as_deref().unwrap_or("target");
+        let profile = if self.release { "release" } else { "debug" };
 
-        // Get the base documentation directory
-        let doc_dir = if let Some(target) = &self.target {
-            format!("{base_dir}/{target}/doc")
+        // If a specific target is set, include it in the path
+        if let Some(target) = &self.target {
+            format!("{base_dir}/{target}/doc/index.html")
         } else {
-            format!("{base_dir}/doc")
-        };
-
-        // Get the absolute path using workspace root
-        let absolute_doc_dir = if let Some(workspace_root) = WORKSPACE_ROOT.get() {
-            Path::new(workspace_root).join(&doc_dir)
-        } else {
-            Path::new(&doc_dir).to_path_buf()
-        };
-
-        // Strategy 1: If package(s) specified, try to find documentation for the first package
-        if let Some(packages) = &self.package
-            && let Some(first_package) = packages.first()
-        {
-            // Convert package name to the format used in file paths (hyphens to underscores)
-            let package_path_name = first_package.replace('-', "_");
-            let package_index = absolute_doc_dir.join(&package_path_name).join("index.html");
-            if package_index.exists() {
-                return Some(Self::normalize_path(&package_index));
-            }
+            format!("{base_dir}/{profile}/doc/index.html")
         }
-
-        // Strategy 2: Look for any index.html file under the doc directory
-        if absolute_doc_dir.exists() {
-            if let Ok(entries) = std::fs::read_dir(&absolute_doc_dir) {
-                for entry in entries.flatten() {
-                    if entry.file_type().is_ok_and(|ft| ft.is_dir()) {
-                        let index_path = entry.path().join("index.html");
-                        if index_path.exists() {
-                            return Some(Self::normalize_path(&index_path));
-                        }
-                    }
-                }
-            }
-
-            // Check for a top-level index.html
-            let top_index = absolute_doc_dir.join("index.html");
-            if top_index.exists() {
-                return Some(Self::normalize_path(&top_index));
-            }
-        }
-
-        None
-    }
-
-    fn normalize_path(path: &Path) -> String {
-        let absolute_path = match path.canonicalize() {
-            Ok(canonical) => canonical,
-            Err(_) => path.to_path_buf(),
-        };
-
-        absolute_path.to_string_lossy().into_owned()
     }
 }
