@@ -306,6 +306,6 @@ impl CargoTestTool {
             }
         }
 
-        execute_command(cmd)
+        execute_command(cmd, &Self::tool_name())
     }
 }

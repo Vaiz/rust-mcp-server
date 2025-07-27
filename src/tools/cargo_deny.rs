@@ -236,7 +236,7 @@ impl CargoDenyCheckTool {
             }
         }
 
-        execute_command(cmd)
+        execute_command(cmd, &Self::tool_name())
     }
 }
 
@@ -261,7 +261,7 @@ impl CargoDenyInitTool {
             cmd.arg(config);
         }
 
-        execute_command(cmd)
+        execute_command(cmd, &Self::tool_name())
     }
 }
 
@@ -309,7 +309,7 @@ impl CargoDenyListTool {
             cmd.arg("--layout").arg(layout);
         }
 
-        execute_command(cmd)
+        execute_command(cmd, &Self::tool_name())
     }
 }
 
@@ -326,6 +326,6 @@ impl CargoDenyInstallTool {
         let mut cmd = Command::new("cargo");
         cmd.arg("install").arg("cargo-deny");
 
-        execute_command(cmd)
+        execute_command(cmd, &Self::tool_name())
     }
 }

@@ -278,6 +278,6 @@ impl CargoCheckTool {
             cmd.env("RUSTFLAGS", "-D warnings");
         }
 
-        execute_command(cmd)
+        execute_command(cmd, &Self::tool_name())
     }
 }

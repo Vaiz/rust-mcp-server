@@ -66,7 +66,7 @@ impl CargoMacheteTool {
             }
         }
 
-        execute_command(cmd)
+        execute_command(cmd, &Self::tool_name())
     }
 }
 
@@ -83,6 +83,6 @@ impl CargoMacheteInstallTool {
         let mut cmd = Command::new("cargo");
         cmd.arg("install").arg("cargo-machete");
 
-        execute_command(cmd)
+        execute_command(cmd, &Self::tool_name())
     }
 }

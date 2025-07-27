@@ -84,7 +84,7 @@ impl CargoInfoTool {
         let output_flags = output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
         cmd.args(output_flags);
 
-        execute_command(cmd)
+        execute_command(cmd, &Self::tool_name())
     }
 }
 

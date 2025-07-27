@@ -124,6 +124,6 @@ impl CargoMetadataTool {
         let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref(), "locked")?;
         cmd.args(locking_flags);
 
-        execute_command(cmd)
+        execute_command(cmd, &Self::tool_name())
     }
 }

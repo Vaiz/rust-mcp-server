@@ -267,7 +267,7 @@ impl CargoDocTool {
         }
 
         // Execute the command and get the result
-        let mut result = execute_command(cmd)?;
+        let mut result = execute_command(cmd, &Self::tool_name())?;
 
         // Add documentation path information only if the command was successful
         if result.is_error != Some(true) {

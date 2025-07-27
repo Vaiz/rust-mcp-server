@@ -339,7 +339,7 @@ impl CargoHackTool {
         // Add the cargo command to run (e.g., check, test, build)
         cmd.arg(&self.command);
 
-        execute_command(cmd)
+        execute_command(cmd, &Self::tool_name())
     }
 }
 
@@ -356,6 +356,6 @@ impl CargoHackInstallTool {
         let mut cmd = Command::new("cargo");
         cmd.arg("install").arg("cargo-hack");
 
-        execute_command(cmd)
+        execute_command(cmd, &Self::tool_name())
     }
 }

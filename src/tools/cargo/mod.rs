@@ -110,7 +110,7 @@ impl CargoGenerateLockfileTool {
         let output_flags = output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
         cmd.args(output_flags);
 
-        execute_command(cmd)
+        execute_command(cmd, &Self::tool_name())
     }
 }
 
@@ -238,7 +238,7 @@ impl CargoCleanTool {
         let output_flags = output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
         cmd.args(output_flags);
 
-        execute_command(cmd)
+        execute_command(cmd, &Self::tool_name())
     }
 }
 
@@ -320,7 +320,7 @@ impl CargoFmtTool {
         let output_flags = output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
         cmd.args(output_flags);
 
-        execute_command(cmd)
+        execute_command(cmd, &Self::tool_name())
     }
 }
 
@@ -427,7 +427,7 @@ impl CargoNewTool {
         let output_flags = output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
         cmd.args(output_flags);
 
-        execute_command(cmd)
+        execute_command(cmd, &Self::tool_name())
     }
 }
 
@@ -443,6 +443,6 @@ impl CargoListTool {
     pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
         let mut cmd = Command::new("cargo");
         cmd.arg("--list");
-        execute_command(cmd)
+        execute_command(cmd, &Self::tool_name())
     }
 }

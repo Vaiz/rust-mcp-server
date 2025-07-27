@@ -35,10 +35,14 @@ fn apply_workspace_root(cmd: &mut std::process::Command) {
     }
 }
 
-fn execute_command(mut cmd: std::process::Command) -> Result<CallToolResult, CallToolError> {
+fn execute_command(
+    mut cmd: std::process::Command,
+    tool_name: &str,
+) -> Result<CallToolResult, CallToolError> {
     apply_workspace_root(&mut cmd);
     tracing::info!(
         command = ?cmd,
+        tool_name = tool_name,
         "Executing command"
     );
     let output = cmd.output();
@@ -53,6 +57,7 @@ fn execute_command(mut cmd: std::process::Command) -> Result<CallToolResult, Cal
                 tracing::info!(
                     stdout = ?stdout,
                     stderr = ?stderr,
+                    tool_name = tool_name,
                     "Command executed successfully"
                 );
                 let annotations = Some(Annotations {
@@ -60,12 +65,15 @@ fn execute_command(mut cmd: std::process::Command) -> Result<CallToolResult, Cal
                     last_modified: None,
                     priority: Some(0.3),
                 });
-                content.push(TextContent::new("✅ Success".to_owned(), annotations, None).into());
+                content.push(
+                    TextContent::new(format!("✅ {tool_name}: Success"), annotations, None).into(),
+                );
             } else {
                 tracing::warn!(
                     stdout = ?stdout,
                     stderr = ?stderr,
                     status = ?output.status,
+                    tool_name = tool_name,
                     "Command execution failed",
                 );
                 let annotations = Some(Annotations {
@@ -73,7 +81,9 @@ fn execute_command(mut cmd: std::process::Command) -> Result<CallToolResult, Cal
                     last_modified: None,
                     priority: Some(0.3),
                 });
-                content.push(TextContent::new("❌ Failure".to_owned(), annotations, None).into());
+                content.push(
+                    TextContent::new(format!("❌ {tool_name}: Failure"), annotations, None).into(),
+                );
             }
 
             if !stdout.is_empty() {
@@ -235,7 +245,7 @@ mod tests {
         let mut cmd = Command::new("this_tool_does_not_exist");
         cmd.args(["--arg1", "value1", "--arg2", "value2"]);
 
-        let result = execute_command(cmd).expect("Command execution should not panic");
+        let result = execute_command(cmd, "test-tool").expect("Command execution should not panic");
         let text = &result.content[0]
             .as_text_content()
             .expect("First content item should be text")
