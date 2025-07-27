@@ -1,7 +1,7 @@
 ## Rust MCP Server 0.2.1
-| 🟢 Tools (28) | 🟢 Prompts (1) | 🟢 Resources (95) | <span style="opacity:0.6">🔴 Logging</span> | <span style="opacity:0.6">🔴 Experimental</span> |
+| 🟢 Tools (29) | 🟢 Prompts (1) | 🟢 Resources (95) | <span style="opacity:0.6">🔴 Logging</span> | <span style="opacity:0.6">🔴 Experimental</span> |
 | --- | --- | --- | --- | --- |
-## 🛠️ Tools (28)
+## 🛠️ Tools (29)
 
 
 - **cargo-add**
@@ -189,6 +189,37 @@
       - <code>format</code> : string<br />
       - <code>layout</code> : string<br />
       - <code>threshold</code> : number<br />
+
+- **cargo-doc**
+  - Build documentation for a Rust package using Cargo. Recommended to use with --no-deps and specific --package for faster builds. Returns path to generated documentation index.
+  - **Inputs:**
+      - <code>all_features</code> : boolean<br />
+      - <code>bin</code> : string<br />
+      - <code>bins</code> : boolean<br />
+      - <code>docsrs_config</code> : boolean<br />
+      - <code>document_private_items</code> : boolean<br />
+      - <code>example</code> : string<br />
+      - <code>examples</code> : boolean<br />
+      - <code>exclude</code> : string [ ]<br />
+      - <code>features</code> : string [ ]<br />
+      - <code>ignore_rust_version</code> : boolean<br />
+      - <code>jobs</code> : number<br />
+      - <code>keep_going</code> : boolean<br />
+      - <code>lib</code> : boolean<br />
+      - <code>lockfile_path</code> : string<br />
+      - <code>locking_mode</code> : string<br />
+      - <code>manifest_path</code> : string<br />
+      - <code>message_format</code> : string<br />
+      - <code>no_default_features</code> : boolean<br />
+      - <code>no_deps</code> : boolean<br />
+      - <code>output_verbosity</code> : string<br />
+      - <code>package</code> : string [ ]<br />
+      - <code>profile</code> : string<br />
+      - <code>release</code> : boolean<br />
+      - <code>target</code> : string<br />
+      - <code>target_dir</code> : string<br />
+      - <code>toolchain</code> : string<br />
+      - <code>workspace</code> : boolean<br />
 
 - **cargo-fmt**
   - Formats Rust code using rustfmt. Usually, run without any additional arguments.

@@ -268,34 +268,37 @@ impl CargoDocTool {
         // Execute the command and get the result
         let mut result = execute_command(cmd)?;
 
-        // Add documentation path information
-        let doc_path = self.get_doc_path();
-        let doc_info = format!(
-            "\n📚 Documentation generated successfully!\n📁 Documentation index: {doc_path}"
-        );
+        // Add documentation path information only if the command was successful
+        if result.is_error != Some(true) {
+            let doc_path = self.get_doc_path();
+            let doc_info = format!(
+                "\n📚 Documentation generated successfully!\n📁 Documentation directory: {doc_path}\n💡 Open any index.html file in the directory to view the docs"
+            );
 
-        let annotations = Some(Annotations {
-            audience: vec![Role::User, Role::Assistant],
-            last_modified: None,
-            priority: Some(0.5),
-        });
+            let annotations = Some(Annotations {
+                audience: vec![Role::User, Role::Assistant],
+                last_modified: None,
+                priority: Some(0.5),
+            });
 
-        result
-            .content
-            .push(TextContent::new(doc_info, annotations, None).into());
+            result
+                .content
+                .push(TextContent::new(doc_info, annotations, None).into());
+        }
 
         Ok(result)
     }
 
     fn get_doc_path(&self) -> String {
         let base_dir = self.target_dir.as_deref().unwrap_or("target");
-        let profile = if self.release { "release" } else { "debug" };
-
-        // If a specific target is set, include it in the path
+        
+        // For cross-compilation targets, the docs are in target/{target}/doc/
+        // For regular builds, docs are in target/doc/
+        // Return the doc directory path where users can find the generated documentation
         if let Some(target) = &self.target {
-            format!("{base_dir}/{target}/doc/index.html")
+            format!("{base_dir}/{target}/doc/")
         } else {
-            format!("{base_dir}/{profile}/doc/index.html")
+            format!("{base_dir}/doc/")
         }
     }
 }
