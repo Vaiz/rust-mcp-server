@@ -120,8 +120,8 @@ pub struct CargoAddTool {
     /// Locking mode for dependency resolution.
     ///
     /// Valid options:
-    /// - "locked" (default): Assert that `Cargo.lock` will remain unchanged
-    /// - "unlocked": Allow `Cargo.lock` to be updated
+    /// - "locked": Assert that `Cargo.lock` will remain unchanged
+    /// - "unlocked" (default): Allow `Cargo.lock` to be updated
     /// - "offline": Run without accessing the network
     /// - "frozen": Equivalent to specifying both --locked and --offline
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -221,7 +221,7 @@ impl CargoAddTool {
         }
 
         // Apply locking mode flags
-        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref())?;
+        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref(), "unlocked")?;
         for flag in locking_flags {
             cmd.arg(flag);
         }
@@ -280,8 +280,8 @@ pub struct CargoRemoveTool {
     /// Locking mode for dependency resolution.
     ///
     /// Valid options:
-    /// - "locked" (default): Assert that `Cargo.lock` will remain unchanged
-    /// - "unlocked": Allow `Cargo.lock` to be updated
+    /// - "locked": Assert that `Cargo.lock` will remain unchanged
+    /// - "unlocked" (default): Allow `Cargo.lock` to be updated
     /// - "offline": Run without accessing the network
     /// - "frozen": Equivalent to specifying both --locked and --offline
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -339,7 +339,7 @@ impl CargoRemoveTool {
         }
 
         // Apply locking mode flags
-        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref())?;
+        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref(), "unlocked")?;
         for flag in locking_flags {
             cmd.arg(flag);
         }
@@ -431,7 +431,7 @@ mod tests {
     },
     "locking_mode": {
       "default": null,
-      "description": "Locking mode for dependency resolution.\n\nValid options:\n- \"locked\" (default): Assert that `Cargo.lock` will remain unchanged\n- \"unlocked\": Allow `Cargo.lock` to be updated\n- \"offline\": Run without accessing the network\n- \"frozen\": Equivalent to specifying both --locked and --offline",
+      "description": "Locking mode for dependency resolution.\n\nValid options:\n- \"locked\": Assert that `Cargo.lock` will remain unchanged\n- \"unlocked\" (default): Allow `Cargo.lock` to be updated\n- \"offline\": Run without accessing the network\n- \"frozen\": Equivalent to specifying both --locked and --offline",
       "type": "string"
     },
     "lockfile_path": {

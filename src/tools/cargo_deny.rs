@@ -164,7 +164,7 @@ impl CargoDenyCheckTool {
             cmd.arg("--features").arg(features.join(","));
         }
 
-        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref())?;
+        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref(), "locked")?;
         cmd.args(locking_flags);
 
         if self.allow_git_index {

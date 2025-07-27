@@ -121,7 +121,7 @@ impl CargoMetadataTool {
             cmd.arg("--lockfile-path").arg(lockfile_path);
         }
 
-        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref())?;
+        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref(), "locked")?;
         cmd.args(locking_flags);
 
         execute_command(cmd)

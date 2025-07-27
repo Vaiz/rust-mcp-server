@@ -77,7 +77,7 @@ impl CargoInfoTool {
         }
 
         // Manifest options
-        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref())?;
+        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref(), "locked")?;
         cmd.args(locking_flags);
 
         // Output options

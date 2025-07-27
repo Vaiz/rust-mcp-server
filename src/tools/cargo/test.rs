@@ -289,7 +289,7 @@ impl CargoTestTool {
         }
 
         // Apply locking mode flags
-        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref())?;
+        let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref(), "locked")?;
         for flag in locking_flags {
             cmd.arg(flag);
         }
