@@ -209,10 +209,10 @@ impl CargoPackageTool {
         }
 
         // Feature selection
-        if let Some(features) = &self.features {
-            if !features.is_empty() {
-                cmd.arg("--features").arg(features.join(","));
-            }
+        if let Some(features) = &self.features
+            && !features.is_empty()
+        {
+            cmd.arg("--features").arg(features.join(","));
         }
 
         if self.all_features {

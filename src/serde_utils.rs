@@ -148,15 +148,15 @@ pub trait Tool: schemars::JsonSchema {
             let null_string = Value::String("null".to_string());
             if let Some(Value::Object(props_map)) = map.get_mut("properties") {
                 for value in props_map.values_mut() {
-                    if let Value::Object(prop_obj) = value {
-                        if let Some(Value::Array(ty)) = prop_obj.get("type") {
-                            if ty.len() == 2 && ty.contains(&null_string) {
-                                let new_ty = ty.iter().find(|v| v != &&null_string).cloned();
+                    if let Value::Object(prop_obj) = value
+                        && let Some(Value::Array(ty)) = prop_obj.get("type")
+                        && ty.len() == 2
+                        && ty.contains(&null_string)
+                    {
+                        let new_ty = ty.iter().find(|v| v != &&null_string).cloned();
 
-                                if let Some(new_ty) = new_ty {
-                                    prop_obj.insert("type".to_string(), new_ty);
-                                }
-                            }
+                        if let Some(new_ty) = new_ty {
+                            prop_obj.insert("type".to_string(), new_ty);
                         }
                     }
                 }

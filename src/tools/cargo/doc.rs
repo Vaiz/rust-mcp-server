@@ -312,14 +312,14 @@ impl CargoDocTool {
         };
 
         // Strategy 1: If package(s) specified, try to find documentation for the first package
-        if let Some(packages) = &self.package {
-            if let Some(first_package) = packages.first() {
-                // Convert package name to the format used in file paths (hyphens to underscores)
-                let package_path_name = first_package.replace('-', "_");
-                let package_index = absolute_doc_dir.join(&package_path_name).join("index.html");
-                if package_index.exists() {
-                    return Some(package_index.to_string_lossy().to_string());
-                }
+        if let Some(packages) = &self.package
+            && let Some(first_package) = packages.first()
+        {
+            // Convert package name to the format used in file paths (hyphens to underscores)
+            let package_path_name = first_package.replace('-', "_");
+            let package_index = absolute_doc_dir.join(&package_path_name).join("index.html");
+            if package_index.exists() {
+                return Some(package_index.to_string_lossy().to_string());
             }
         }
 
