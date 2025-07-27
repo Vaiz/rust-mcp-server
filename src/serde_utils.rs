@@ -94,10 +94,6 @@ pub fn output_verbosity_to_cli_flags(
     })
 }
 
-pub const fn default_true() -> bool {
-    true
-}
-
 /// A type that represents a package with an optional version.
 /// When calling cargo commands, use `to_spec()` to get "package" or "package@version" format.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, serde::Deserialize, schemars::JsonSchema)]

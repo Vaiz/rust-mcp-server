@@ -29,7 +29,7 @@ pub struct CargoBuildTool {
 
     /// Build all packages in the workspace
     #[serde(default)]
-    workspace: bool,
+    workspace: Option<bool>,
 
     /// Exclude packages from the build
     #[serde(default, deserialize_with = "deserialize_string_vec")]
@@ -37,11 +37,11 @@ pub struct CargoBuildTool {
 
     /// Build only this package's library
     #[serde(default)]
-    lib: bool,
+    lib: Option<bool>,
 
     /// Build all binaries
     #[serde(default)]
-    bins: bool,
+    bins: Option<bool>,
 
     /// Build only the specified binary
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -49,7 +49,7 @@ pub struct CargoBuildTool {
 
     /// Build all examples
     #[serde(default)]
-    examples: bool,
+    examples: Option<bool>,
 
     /// Build only the specified example
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -57,7 +57,7 @@ pub struct CargoBuildTool {
 
     /// Build all targets that have `test = true` set
     #[serde(default)]
-    tests: bool,
+    tests: Option<bool>,
 
     /// Build only the specified test target
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -65,7 +65,7 @@ pub struct CargoBuildTool {
 
     /// Build all targets that have `bench = true` set
     #[serde(default)]
-    benches: bool,
+    benches: Option<bool>,
 
     /// Build only the specified bench target
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -73,7 +73,7 @@ pub struct CargoBuildTool {
 
     /// Build all targets
     #[serde(default)]
-    all_targets: bool,
+    all_targets: Option<bool>,
 
     /// Space or comma separated list of features to activate
     #[serde(default, deserialize_with = "deserialize_string_vec")]
@@ -81,15 +81,15 @@ pub struct CargoBuildTool {
 
     /// Activate all available features
     #[serde(default)]
-    all_features: bool,
+    all_features: Option<bool>,
 
     /// Do not activate the `default` feature
     #[serde(default)]
-    no_default_features: bool,
+    no_default_features: Option<bool>,
 
     /// Build artifacts in release mode, with optimizations
     #[serde(default)]
-    release: bool,
+    release: Option<bool>,
 
     /// Build artifacts with the specified profile
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -101,7 +101,7 @@ pub struct CargoBuildTool {
 
     /// Do not abort the build as soon as there is an error
     #[serde(default)]
-    keep_going: bool,
+    keep_going: Option<bool>,
 
     /// Build for the target triple
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -121,7 +121,7 @@ pub struct CargoBuildTool {
 
     /// Ignore `rust-version` specification in packages
     #[serde(default)]
-    ignore_rust_version: bool,
+    ignore_rust_version: Option<bool>,
 
     /// Locking mode for dependency resolution.
     ///
@@ -144,7 +144,7 @@ pub struct CargoBuildTool {
 
     /// Treat warnings as errors
     #[serde(default)]
-    warnings_as_errors: bool,
+    warnings_as_errors: Option<bool>,
 }
 
 impl CargoBuildTool {
@@ -162,7 +162,7 @@ impl CargoBuildTool {
             }
         }
 
-        if self.workspace {
+        if self.workspace.unwrap_or(false) {
             cmd.arg("--workspace");
         }
 
@@ -173,11 +173,11 @@ impl CargoBuildTool {
         }
 
         // Target selection
-        if self.lib {
+        if self.lib.unwrap_or(false) {
             cmd.arg("--lib");
         }
 
-        if self.bins {
+        if self.bins.unwrap_or(false) {
             cmd.arg("--bins");
         }
 
@@ -185,7 +185,7 @@ impl CargoBuildTool {
             cmd.arg("--bin").arg(bin);
         }
 
-        if self.examples {
+        if self.examples.unwrap_or(false) {
             cmd.arg("--examples");
         }
 
@@ -193,7 +193,7 @@ impl CargoBuildTool {
             cmd.arg("--example").arg(example);
         }
 
-        if self.tests {
+        if self.tests.unwrap_or(false) {
             cmd.arg("--tests");
         }
 
@@ -201,7 +201,7 @@ impl CargoBuildTool {
             cmd.arg("--test").arg(test);
         }
 
-        if self.benches {
+        if self.benches.unwrap_or(false) {
             cmd.arg("--benches");
         }
 
@@ -209,7 +209,7 @@ impl CargoBuildTool {
             cmd.arg("--bench").arg(bench);
         }
 
-        if self.all_targets {
+        if self.all_targets.unwrap_or(false) {
             cmd.arg("--all-targets");
         }
 
@@ -218,16 +218,16 @@ impl CargoBuildTool {
             cmd.arg("--features").arg(features.join(","));
         }
 
-        if self.all_features {
+        if self.all_features.unwrap_or(false) {
             cmd.arg("--all-features");
         }
 
-        if self.no_default_features {
+        if self.no_default_features.unwrap_or(false) {
             cmd.arg("--no-default-features");
         }
 
         // Compilation options
-        if self.release {
+        if self.release.unwrap_or(false) {
             cmd.arg("--release");
         }
 
@@ -239,7 +239,7 @@ impl CargoBuildTool {
             cmd.arg("--jobs").arg(jobs.to_string());
         }
 
-        if self.keep_going {
+        if self.keep_going.unwrap_or(false) {
             cmd.arg("--keep-going");
         }
 
@@ -260,7 +260,7 @@ impl CargoBuildTool {
             cmd.arg("--lockfile-path").arg(lockfile_path);
         }
 
-        if self.ignore_rust_version {
+        if self.ignore_rust_version.unwrap_or(false) {
             cmd.arg("--ignore-rust-version");
         }
 
@@ -274,7 +274,7 @@ impl CargoBuildTool {
         let output_flags = output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
         cmd.args(output_flags);
 
-        if self.warnings_as_errors {
+        if self.warnings_as_errors.unwrap_or(false) {
             cmd.env("RUSTFLAGS", "-D warnings");
         }
 

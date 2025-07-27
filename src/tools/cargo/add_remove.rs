@@ -55,7 +55,7 @@ pub struct CargoAddTool {
 
     /// Disable the default features
     #[serde(default)]
-    pub no_default_features: bool,
+    pub no_default_features: Option<bool>,
 
     /// Re-enable the default features
     #[serde(default)]
@@ -102,7 +102,7 @@ pub struct CargoAddTool {
 
     /// Don't actually write the manifest
     #[serde(default)]
-    pub dry_run: bool,
+    pub dry_run: Option<bool>,
 
     /// Path to Cargo.toml
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -114,7 +114,7 @@ pub struct CargoAddTool {
 
     /// Ignore `rust-version` specification in packages
     #[serde(default)]
-    pub ignore_rust_version: bool,
+    pub ignore_rust_version: Option<bool>,
 
     /// Locking mode for dependency resolution.
     ///
@@ -156,7 +156,7 @@ impl CargoAddTool {
         }
 
         // Feature selection
-        if self.no_default_features {
+        if self.no_default_features.unwrap_or(false) {
             cmd.arg("--no-default-features");
         }
         if self.default_features {
@@ -202,7 +202,7 @@ impl CargoAddTool {
         }
 
         // Other options
-        if self.dry_run {
+        if self.dry_run.unwrap_or(false) {
             cmd.arg("--dry-run");
         }
 
@@ -213,7 +213,7 @@ impl CargoAddTool {
         if let Some(lockfile_path) = &self.lockfile_path {
             cmd.arg("--lockfile-path").arg(lockfile_path);
         }
-        if self.ignore_rust_version {
+        if self.ignore_rust_version.unwrap_or(false) {
             cmd.arg("--ignore-rust-version");
         }
 
@@ -263,7 +263,7 @@ pub struct CargoRemoveTool {
 
     /// Don't actually write the manifest
     #[serde(default)]
-    pub dry_run: bool,
+    pub dry_run: Option<bool>,
 
     /// Path to Cargo.toml
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -320,7 +320,7 @@ impl CargoRemoveTool {
         cmd.arg("--package").arg(&self.target_package);
 
         // Other options
-        if self.dry_run {
+        if self.dry_run.unwrap_or(false) {
             cmd.arg("--dry-run");
         }
 
@@ -401,7 +401,7 @@ mod tests {
       "type": "string"
     },
     "dry_run": {
-      "default": false,
+      "default": null,
       "description": "Don't actually write the manifest",
       "type": "boolean"
     },
@@ -419,7 +419,7 @@ mod tests {
       "type": "string"
     },
     "ignore_rust_version": {
-      "default": false,
+      "default": null,
       "description": "Ignore `rust-version` specification in packages",
       "type": "boolean"
     },
@@ -439,7 +439,7 @@ mod tests {
       "type": "string"
     },
     "no_default_features": {
-      "default": false,
+      "default": null,
       "description": "Disable the default features",
       "type": "boolean"
     },

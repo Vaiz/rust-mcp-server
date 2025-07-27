@@ -46,7 +46,7 @@ pub struct CargoPackageTool {
     /// [Optional] Assemble all packages in the workspace into separate tarballs.
     /// Useful for workspaces with multiple publishable crates.
     #[serde(default)]
-    workspace: bool,
+    workspace: Option<bool>,
 
     /// [Optional] Don't assemble specified packages when using --workspace.
     /// Allows selective packaging of workspace members.
@@ -89,12 +89,12 @@ pub struct CargoPackageTool {
     /// [Optional] Activate all available features during verification build.
     /// Ensures the package builds correctly with all feature combinations.
     #[serde(default)]
-    all_features: bool,
+    all_features: Option<bool>,
 
     /// [Optional] Do not activate the `default` feature during verification build.
     /// Useful for testing minimal builds or when default features are problematic.
     #[serde(default)]
-    no_default_features: bool,
+    no_default_features: Option<bool>,
 
     /// [Optional] Build for the specified target triple during verification.
     /// Useful for cross-compilation testing or platform-specific packages.
@@ -115,7 +115,7 @@ pub struct CargoPackageTool {
     /// [Optional] Do not abort the verification build as soon as there is an error.
     /// Continues building other targets even if some fail, useful for debugging.
     #[serde(default)]
-    keep_going: bool,
+    keep_going: Option<bool>,
 
     /// [Optional] Path to the Cargo.toml file to package.
     /// Useful when running from a different directory or with non-standard layouts.
@@ -177,7 +177,7 @@ impl CargoPackageTool {
             }
         }
 
-        if self.workspace {
+        if self.workspace.unwrap_or(false) {
             cmd.arg("--workspace");
         }
 
@@ -215,11 +215,11 @@ impl CargoPackageTool {
             cmd.arg("--features").arg(features.join(","));
         }
 
-        if self.all_features {
+        if self.all_features.unwrap_or(false) {
             cmd.arg("--all-features");
         }
 
-        if self.no_default_features {
+        if self.no_default_features.unwrap_or(false) {
             cmd.arg("--no-default-features");
         }
 
@@ -236,7 +236,7 @@ impl CargoPackageTool {
             cmd.arg("--jobs").arg(jobs.to_string());
         }
 
-        if self.keep_going {
+        if self.keep_going.unwrap_or(false) {
             cmd.arg("--keep-going");
         }
 

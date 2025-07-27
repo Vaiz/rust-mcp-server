@@ -58,7 +58,7 @@ pub struct CargoGenerateLockfileTool {
 
     /// Ignore `rust-version` specification in packages
     #[serde(default)]
-    ignore_rust_version: bool,
+    ignore_rust_version: Option<bool>,
 
     /// Locking mode for dependency resolution.
     ///
@@ -99,7 +99,7 @@ impl CargoGenerateLockfileTool {
             cmd.arg("--lockfile-path").arg(lockfile_path);
         }
 
-        if self.ignore_rust_version {
+        if self.ignore_rust_version.unwrap_or(false) {
             cmd.arg("--ignore-rust-version");
         }
 
@@ -138,15 +138,15 @@ pub struct CargoCleanTool {
 
     /// Whether or not to clean just the documentation directory
     #[serde(default)]
-    doc: bool,
+    doc: Option<bool>,
 
     /// Display what would be deleted without deleting anything
     #[serde(default)]
-    dry_run: bool,
+    dry_run: Option<bool>,
 
     /// Whether or not to clean release artifacts
     #[serde(default)]
-    release: bool,
+    release: Option<bool>,
 
     /// Target triple to clean output for
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -202,15 +202,15 @@ impl CargoCleanTool {
             cmd.arg("--profile").arg(profile);
         }
 
-        if self.doc {
+        if self.doc.unwrap_or(false) {
             cmd.arg("--doc");
         }
 
-        if self.dry_run {
+        if self.dry_run.unwrap_or(false) {
             cmd.arg("--dry-run");
         }
 
-        if self.release {
+        if self.release.unwrap_or(false) {
             cmd.arg("--release");
         }
 
@@ -349,7 +349,7 @@ pub struct CargoNewTool {
 
     /// Use a library template
     #[serde(default)]
-    pub lib: bool,
+    pub lib: Option<bool>,
 
     /// Edition to set for the crate generated. Possible values: 2015, 2018, 2021, 2024
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -399,7 +399,7 @@ impl CargoNewTool {
         if self.bin {
             cmd.arg("--bin");
         }
-        if self.lib {
+        if self.lib.unwrap_or(false) {
             cmd.arg("--lib");
         }
 
