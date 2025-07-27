@@ -13,7 +13,7 @@ use crate::tools::execute_command;
     description = "Search packages in the registry. Default registry is crates.io. Equivalent to 'cargo search [QUERY]'.",
     openWorldHint = false
 )]
-#[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
+#[derive(Debug, ::serde::Deserialize, JsonSchema)]
 pub struct CargoSearchTool {
     /// The query to search for. Generally, this is a substring of the package name or description.
     pub query: String,
