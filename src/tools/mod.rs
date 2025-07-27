@@ -2,6 +2,7 @@ pub mod cargo;
 pub mod cargo_deny;
 pub mod cargo_hack;
 pub mod cargo_machete;
+pub mod rustc;
 pub mod rustup;
 
 use rust_mcp_sdk::schema::{
@@ -16,6 +17,7 @@ use cargo::{
 use cargo_deny::{CargoDenyCheckTool, CargoDenyInitTool, CargoDenyInstallTool, CargoDenyListTool};
 use cargo_hack::{CargoHackInstallTool, CargoHackTool};
 use cargo_machete::{CargoMacheteInstallTool, CargoMacheteTool};
+use rustc::RustcExplainTool;
 use rustup::{RustupShowTool, RustupToolchainAddTool, RustupUpdateTool};
 
 static WORKSPACE_ROOT: std::sync::OnceLock<String> = std::sync::OnceLock::new();
@@ -143,6 +145,7 @@ rust_mcp_sdk::tool_box!(
         CargoUpdateTool,
         CargoTestTool,
         CargoMetadataTool,
+        RustcExplainTool,
         RustupShowTool,
         RustupToolchainAddTool,
         RustupUpdateTool,
@@ -196,6 +199,7 @@ pub fn handle_request(
         AllTools::CargoUpdateTool(tool) => tool.call_tool(),
         AllTools::CargoTestTool(tool) => tool.call_tool(),
         AllTools::CargoMetadataTool(tool) => tool.call_tool(),
+        AllTools::RustcExplainTool(tool) => tool.call_tool(),
         AllTools::RustupShowTool(tool) => tool.call_tool(),
         AllTools::RustupToolchainAddTool(tool) => tool.call_tool(),
         AllTools::RustupUpdateTool(tool) => tool.call_tool(),

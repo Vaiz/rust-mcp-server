@@ -71,6 +71,7 @@ rust-mcp-server exposes a comprehensive set of Rust development tools to the LLM
 *   **`cargo-hack-install`**: Install cargo-hack tool
 
 ### Rust Toolchain Management
+*   **`rustc-explain`**: Provide detailed explanations of Rust compiler error codes
 *   **`rustup-show`**: Show the active and installed toolchains
 *   **`rustup-toolchain-add`**: Install or update toolchains
 *   **`rustup-update`**: Update Rust toolchains and rustup
