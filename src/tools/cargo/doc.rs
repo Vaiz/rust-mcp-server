@@ -1,3 +1,4 @@
+use std::path::Path;
 use std::process::Command;
 
 use crate::{
@@ -5,7 +6,7 @@ use crate::{
         default_true, deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
     },
-    tools::execute_command,
+    tools::{WORKSPACE_ROOT, execute_command},
 };
 use rust_mcp_sdk::{
     macros::{JsonSchema, mcp_tool},
@@ -271,9 +272,13 @@ impl CargoDocTool {
         // Add documentation path information only if the command was successful
         if result.is_error != Some(true) {
             let doc_path = self.get_doc_path();
-            let doc_info = format!(
-                "\n📚 Documentation generated successfully!\n📁 Documentation directory: {doc_path}\n💡 Open any index.html file in the directory to view the docs"
-            );
+            let doc_info = if let Some(doc_path) = doc_path {
+                format!(
+                    "\n📚 Documentation generated successfully!\n📄 Documentation file: {doc_path}\n💡 Open this file in your browser to view the docs"
+                )
+            } else {
+                "\n📚 Documentation generated successfully!".to_owned()
+            };
 
             let annotations = Some(Annotations {
                 audience: vec![Role::User, Role::Assistant],
@@ -289,16 +294,55 @@ impl CargoDocTool {
         Ok(result)
     }
 
-    fn get_doc_path(&self) -> String {
+    fn get_doc_path(&self) -> Option<String> {
         let base_dir = self.target_dir.as_deref().unwrap_or("target");
-        
-        // For cross-compilation targets, the docs are in target/{target}/doc/
-        // For regular builds, docs are in target/doc/
-        // Return the doc directory path where users can find the generated documentation
-        if let Some(target) = &self.target {
-            format!("{base_dir}/{target}/doc/")
+
+        // Get the base documentation directory
+        let doc_dir = if let Some(target) = &self.target {
+            format!("{base_dir}/{target}/doc")
         } else {
-            format!("{base_dir}/doc/")
+            format!("{base_dir}/doc")
+        };
+
+        // Get the absolute path using workspace root
+        let absolute_doc_dir = if let Some(workspace_root) = WORKSPACE_ROOT.get() {
+            Path::new(workspace_root).join(&doc_dir)
+        } else {
+            Path::new(&doc_dir).to_path_buf()
+        };
+
+        // Strategy 1: If package(s) specified, try to find documentation for the first package
+        if let Some(packages) = &self.package {
+            if let Some(first_package) = packages.first() {
+                // Convert package name to the format used in file paths (hyphens to underscores)
+                let package_path_name = first_package.replace('-', "_");
+                let package_index = absolute_doc_dir.join(&package_path_name).join("index.html");
+                if package_index.exists() {
+                    return Some(package_index.to_string_lossy().to_string());
+                }
+            }
         }
+
+        // Strategy 2: Look for any index.html file under the doc directory
+        if absolute_doc_dir.exists() {
+            if let Ok(entries) = std::fs::read_dir(&absolute_doc_dir) {
+                for entry in entries.flatten() {
+                    if entry.file_type().is_ok_and(|ft| ft.is_dir()) {
+                        let index_path = entry.path().join("index.html");
+                        if index_path.exists() {
+                            return Some(index_path.to_string_lossy().to_string());
+                        }
+                    }
+                }
+            }
+
+            // Check for a top-level index.html
+            let top_index = absolute_doc_dir.join("index.html");
+            if top_index.exists() {
+                return Some(top_index.to_string_lossy().to_string());
+            }
+        }
+
+        None
     }
 }
