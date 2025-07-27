@@ -17,7 +17,7 @@ use rust_mcp_sdk::{
     description = "Builds a Rust project using Cargo. Usually, run without any additional arguments.",
     openWorldHint = false
 )]
-#[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
+#[derive(Debug, ::serde::Deserialize, JsonSchema)]
 pub struct CargoBuildTool {
     /// The toolchain to use, e.g., "stable" or "nightly".
     #[serde(default, deserialize_with = "deserialize_string")]

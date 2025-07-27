@@ -13,7 +13,7 @@ use crate::tools::execute_command;
     description = "Provide a detailed explanation of a Rust compiler error code. This tool allows AI agents to request more information about compilation errors by providing the error code (e.g., E0001, E0308, etc.). Very useful for understanding and resolving Rust compilation errors.",
     openWorldHint = false
 )]
-#[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
+#[derive(Debug, ::serde::Deserialize, JsonSchema)]
 pub struct RustcExplainTool {
     /// The Rust compiler error code to explain (e.g., "E0001", "E0308", "E0432")
     pub error_code: String,
