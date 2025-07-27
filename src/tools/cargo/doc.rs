@@ -351,7 +351,7 @@ impl CargoDocTool {
             Ok(canonical) => canonical,
             Err(_) => path.to_path_buf(),
         };
-        
+
         absolute_path.to_string_lossy().into_owned()
     }
 }
