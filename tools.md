@@ -1,7 +1,7 @@
 ## Rust MCP Server 0.2.1
-| 🟢 Tools (27) | 🟢 Prompts (1) | 🟢 Resources (95) | <span style="opacity:0.6">🔴 Logging</span> | <span style="opacity:0.6">🔴 Experimental</span> |
+| 🟢 Tools (28) | 🟢 Prompts (1) | 🟢 Resources (95) | <span style="opacity:0.6">🔴 Logging</span> | <span style="opacity:0.6">🔴 Experimental</span> |
 | --- | --- | --- | --- | --- |
-## 🛠️ Tools (27)
+## 🛠️ Tools (28)
 
 
 - **cargo-add**
@@ -409,6 +409,12 @@
       - <code>toolchain</code> : string<br />
       - <code>unstable_flags</code> : string [ ]<br />
       - <code>workspace</code> : boolean<br />
+
+- **rustc-explain**
+  - Provide a detailed explanation of a Rust compiler error code. This tool allows AI agents to request more information about compilation errors by providing the error code (e.g., E0001, E0308, etc.). Very useful for understanding and resolving Rust compilation errors.
+  - **Inputs:**
+      - <code>error_code</code> : string<br />
+      - <code>toolchain</code> : string<br />
 
 - **rustup-show**
   - Show the active and installed toolchains or profiles. Shows the name of the active toolchain and the version of rustc. If the active toolchain has installed support for additional compilation targets, then they are listed as well.
