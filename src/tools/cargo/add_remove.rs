@@ -488,8 +488,7 @@ mod tests {
       "type": "string"
     },
     "target_package": {
-      "default": null,
-      "description": "Package to modify",
+      "description": "Package to modify, must be specified",
       "type": "string"
     },
     "toolchain": {
@@ -504,7 +503,8 @@ mod tests {
     }
   },
   "required": [
-    "package"
+    "package",
+    "target_package"
   ],
   "title": "CargoAddTool",
   "type": "object"
