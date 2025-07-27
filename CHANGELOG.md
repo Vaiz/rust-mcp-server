@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.2](https://github.com/Vaiz/rust-mcp-server/compare/v0.2.1...v0.2.2) - 2025-07-27
+
+### Added
+
+- improve UX ([#47](https://github.com/Vaiz/rust-mcp-server/pull/47))
+- add cargo-doc tool ([#46](https://github.com/Vaiz/rust-mcp-server/pull/46))
+- add rustc-explain tool ([#44](https://github.com/Vaiz/rust-mcp-server/pull/44))
+
 ## [0.2.1](https://github.com/Vaiz/rust-mcp-server/compare/v0.2.0...v0.2.1) - 2025-07-06
 
 ### Changes
