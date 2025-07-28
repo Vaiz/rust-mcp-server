@@ -44,10 +44,6 @@ use crate::serde_utils::Tool;
 )]
 #[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
 pub struct CargoGenerateLockfileTool {
-    /// The name of the package to generate lockfile for. If not specified, generates for the current package/workspace.
-    #[serde(default, deserialize_with = "deserialize_string")]
-    package: Option<String>,
-
     /// Path to Cargo.toml
     #[serde(default, deserialize_with = "deserialize_string")]
     manifest_path: Option<String>,
@@ -85,11 +81,6 @@ impl CargoGenerateLockfileTool {
         let mut cmd = Command::new("cargo");
         cmd.arg("generate-lockfile");
 
-        // Package selection
-        if let Some(package) = &self.package {
-            cmd.arg("--package").arg(package);
-        }
-
         // Manifest options
         if let Some(manifest_path) = &self.manifest_path {
             cmd.arg("--manifest-path").arg(manifest_path);
@@ -125,9 +116,9 @@ pub struct CargoCleanTool {
     #[serde(default, deserialize_with = "deserialize_string")]
     toolchain: Option<String>,
 
-    /// The name of the package to clean. If not specified, cleans the entire workspace.
-    #[serde(default, deserialize_with = "deserialize_string")]
-    package: Option<String>,
+    /// Package(s) to clean artifacts for. If not specified, cleans the entire workspace.
+    #[serde(default, deserialize_with = "deserialize_string_vec")]
+    package: Option<Vec<String>>,
 
     /// Clean artifacts of the specified profile. If not specified, cleans everything.
     /// Default rust profiles:
@@ -193,8 +184,10 @@ impl CargoCleanTool {
         cmd.arg("clean");
 
         // Package selection
-        if let Some(package) = &self.package {
-            cmd.arg("--package").arg(package);
+        if let Some(packages) = &self.package {
+            for package in packages {
+                cmd.arg("--package").arg(package);
+            }
         }
 
         // Compilation options

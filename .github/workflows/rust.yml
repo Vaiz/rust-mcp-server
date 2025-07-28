@@ -37,7 +37,7 @@ jobs:
     - uses: Swatinem/rust-cache@v2
 
     - name: Install rustup
-      if: ${{ matrix.os == 'windows-11-arm' }}
+      if: ${{ matrix.os == 'windows-11-arm' || matrix.os == 'ubuntu-24.04-arm' }}
       uses: dtolnay/rust-toolchain@stable
 
     - name: Add target
