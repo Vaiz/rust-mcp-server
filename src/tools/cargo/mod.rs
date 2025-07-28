@@ -44,10 +44,6 @@ use crate::serde_utils::Tool;
 )]
 #[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
 pub struct CargoGenerateLockfileTool {
-    /// The name of the package to generate lockfile for. If not specified, generates for the current package/workspace.
-    #[serde(default, deserialize_with = "deserialize_string")]
-    package: Option<String>,
-
     /// Path to Cargo.toml
     #[serde(default, deserialize_with = "deserialize_string")]
     manifest_path: Option<String>,
@@ -84,11 +80,6 @@ impl CargoGenerateLockfileTool {
     pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
         let mut cmd = Command::new("cargo");
         cmd.arg("generate-lockfile");
-
-        // Package selection
-        if let Some(package) = &self.package {
-            cmd.arg("--package").arg(package);
-        }
 
         // Manifest options
         if let Some(manifest_path) = &self.manifest_path {
