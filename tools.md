@@ -1,4 +1,4 @@
-## Rust MCP Server 0.2.1
+## Rust MCP Server 0.2.2
 | 🟢 Tools (29) | 🟢 Prompts (1) | 🟢 Resources (95) | <span style="opacity:0.6">🔴 Logging</span> | <span style="opacity:0.6">🔴 Experimental</span> |
 | --- | --- | --- | --- | --- |
 ## 🛠️ Tools (29)
@@ -106,7 +106,7 @@
       - <code>locking_mode</code> : string<br />
       - <code>manifest_path</code> : string<br />
       - <code>output_verbosity</code> : string<br />
-      - <code>package</code> : string<br />
+      - <code>package</code> : string [ ]<br />
       - <code>profile</code> : string<br />
       - <code>release</code> : boolean<br />
       - <code>target</code> : string<br />
@@ -240,7 +240,6 @@
       - <code>locking_mode</code> : string<br />
       - <code>manifest_path</code> : string<br />
       - <code>output_verbosity</code> : string<br />
-      - <code>package</code> : string<br />
 
 - **cargo-hack**
   - Cargo subcommand to provide various options useful for testing and continuous integration, including feature testing and multi-version compatibility. Available commands: check, test, build, clippy. Recommend using <code>check</code> for fast validation. Example: cargo-hack with "feature_powerset": true, "depth": 3, "keep_going": true
@@ -411,7 +410,7 @@
       - <code>no_fail_fast</code> : boolean<br />
       - <code>no_run</code> : boolean<br />
       - <code>output_verbosity</code> : string<br />
-      - <code>package</code> : string<br />
+      - <code>package</code> : string [ ]<br />
       - <code>profile</code> : string<br />
       - <code>release</code> : boolean<br />
       - <code>target</code> : string<br />
