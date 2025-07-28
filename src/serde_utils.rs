@@ -1,3 +1,5 @@
+use std::vec;
+
 use rust_mcp_sdk::schema::schema_utils::CallToolError;
 
 /// Utility function for parsing Option<String> fields in serde,
@@ -27,6 +29,7 @@ where
     let value = Value::deserialize(deserializer)?;
     match value {
         Value::String(s) if s.to_lowercase() == "null" => Ok(None),
+        Value::String(s) => Ok(Some(vec![s])),
         Value::Null => Ok(None),
         Value::Array(arr) => {
             let strings: Result<Vec<String>, _> = arr

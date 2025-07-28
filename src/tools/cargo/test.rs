@@ -39,9 +39,9 @@ pub struct CargoTestTool {
     #[serde(default)]
     no_fail_fast: Option<bool>,
 
-    /// Package to run tests for
-    #[serde(default, deserialize_with = "deserialize_string")]
-    package: Option<String>,
+    /// Package(s) to run tests for
+    #[serde(default, deserialize_with = "deserialize_string_vec")]
+    package: Option<Vec<String>>,
 
     /// Test all packages in the workspace
     #[serde(default)]
@@ -182,8 +182,10 @@ impl CargoTestTool {
         }
 
         // Package selection
-        if let Some(package) = &self.package {
-            cmd.arg("--package").arg(package);
+        if let Some(packages) = &self.package {
+            for package in packages {
+                cmd.arg("--package").arg(package);
+            }
         }
 
         if self.workspace.unwrap_or(false) {
@@ -307,5 +309,77 @@ impl CargoTestTool {
         }
 
         execute_command(cmd, &Self::tool_name())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    fn test_deserialize_with_missing_package_field() {
+        // Simulate a JSON input missing the `package` field (should be Option)
+        let input = json!({
+            "toolchain": null,
+            "workspace": true,
+            "all_features": true,
+            "no_default_features": false,
+            "release": false,
+            "all_targets": true
+        });
+
+        let tool: Result<CargoTestTool, _> = serde_json::from_value(input);
+        let tool = tool
+            .expect("Deserialization should succeed even if `package` is missing (it's Option)");
+
+        assert_eq!(tool.package, None);
+        assert_eq!(tool.workspace, Some(true));
+        assert_eq!(tool.all_features, Some(true));
+        assert_eq!(tool.all_targets, Some(true));
+    }
+
+    #[test]
+    fn test_deserialize_with_package_field_array() {
+        // Test that package field accepts array format like other cargo tools
+        let input = json!({
+            "package": ["my_package", "another_package"],
+        });
+
+        let tool: Result<CargoTestTool, _> = serde_json::from_value(input);
+        let tool = tool.expect("Deserialization should succeed with package array");
+
+        assert_eq!(
+            tool.package.unwrap(),
+            ["my_package".to_owned(), "another_package".to_owned()]
+        );
+        assert_eq!(tool.workspace, None);
+        assert_eq!(tool.all_features, None);
+    }
+
+    #[test]
+    fn test_deserialize_with_single_package_array() {
+        // Test the specific case mentioned in the issue: package: ["name"]
+        let input = json!({
+            "package": ["single_package"],
+        });
+
+        let tool: Result<CargoTestTool, _> = serde_json::from_value(input);
+        let tool = tool.expect("Deserialization should succeed with single-item package array");
+
+        assert_eq!(tool.package.unwrap(), ["single_package".to_owned()]);
+    }
+
+    #[test]
+    fn test_deserialize_with_single_package() {
+        // Test the specific case mentioned in the issue: package: ["name"]
+        let input = json!({
+            "package": "single_package",
+        });
+
+        let tool: Result<CargoTestTool, _> = serde_json::from_value(input);
+        let tool = tool.expect("Deserialization should succeed with single-item package array");
+
+        assert_eq!(tool.package.unwrap(), ["single_package".to_owned()]);
     }
 }

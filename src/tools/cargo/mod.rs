@@ -125,9 +125,9 @@ pub struct CargoCleanTool {
     #[serde(default, deserialize_with = "deserialize_string")]
     toolchain: Option<String>,
 
-    /// The name of the package to clean. If not specified, cleans the entire workspace.
-    #[serde(default, deserialize_with = "deserialize_string")]
-    package: Option<String>,
+    /// Package(s) to clean artifacts for. If not specified, cleans the entire workspace.
+    #[serde(default, deserialize_with = "deserialize_string_vec")]
+    package: Option<Vec<String>>,
 
     /// Clean artifacts of the specified profile. If not specified, cleans everything.
     /// Default rust profiles:
@@ -193,8 +193,10 @@ impl CargoCleanTool {
         cmd.arg("clean");
 
         // Package selection
-        if let Some(package) = &self.package {
-            cmd.arg("--package").arg(package);
+        if let Some(packages) = &self.package {
+            for package in packages {
+                cmd.arg("--package").arg(package);
+            }
         }
 
         // Compilation options
