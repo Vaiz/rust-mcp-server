@@ -319,7 +319,6 @@ mod tests {
 
     #[test]
     fn test_deserialize_with_missing_package_field() {
-        // Simulate a JSON input missing the `package` field (should be Option)
         let input = json!({
             "toolchain": null,
             "workspace": true,
@@ -341,7 +340,6 @@ mod tests {
 
     #[test]
     fn test_deserialize_with_package_field_array() {
-        // Test that package field accepts array format like other cargo tools
         let input = json!({
             "package": ["my_package", "another_package"],
         });
@@ -359,7 +357,6 @@ mod tests {
 
     #[test]
     fn test_deserialize_with_single_package_array() {
-        // Test the specific case mentioned in the issue: package: ["name"]
         let input = json!({
             "package": ["single_package"],
         });
@@ -372,7 +369,6 @@ mod tests {
 
     #[test]
     fn test_deserialize_with_single_package() {
-        // Test the specific case mentioned in the issue: package: ["name"]
         let input = json!({
             "package": "single_package",
         });

@@ -1,5 +1,3 @@
-use std::vec;
-
 use rust_mcp_sdk::schema::schema_utils::CallToolError;
 
 /// Utility function for parsing Option<String> fields in serde,
