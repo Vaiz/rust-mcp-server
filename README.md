@@ -14,15 +14,9 @@ By exposing local tools and project context to the LLM, rust-mcp-server allows t
   - [Code Quality & Security](#code-quality--security)
   - [Rust Toolchain Management](#rust-toolchain-management)
   - [Experimental Features](#experimental-features)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Building the Server](#building-the-server)
-  - [Command Line Arguments](#command-line-arguments)
-  - [Configuring with VS Code](#configuring-with-vs-code)
+- [Command Line Arguments](#command-line-arguments)
+- [Configuring with VS Code](#configuring-with-vs-code)
 - [GitHub Copilot Coding Agent Integration](#github-copilot-coding-agent-integration)
-- [Documentation Generation](#documentation-generation)
-  - [Prerequisites](#prerequisites-1)
-  - [Generating Documentation](#generating-documentation)
 
 ## Why use `rust-mcp-server`?
 
