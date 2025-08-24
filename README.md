@@ -80,7 +80,7 @@ rust-mcp-server exposes a comprehensive set of Rust development tools to the LLM
 ### Experimental Features
 The server provides **experimental** access to the official [Cargo Book](https://doc.rust-lang.org/cargo/) documentation through MCP resources. This feature allows LLMs to fetch and reference about 95 pages of Cargo documentation directly from the official repository, including command references, guides, and technical specifications. Resources are accessible using the `cargo-book://` URI scheme and require network connectivity.
 
-For a complete list with detailed descriptions and parameters, see [tools.md](https://github.com/Vaiz/rust-mcp-server/blob/master/tools.md).
+For a complete list with detailed descriptions and parameters, see [tools.md](tools.md).
 
 ## Getting Started
 
@@ -183,13 +183,13 @@ To make GitHub Copilot in VS Code use this MCP server, you need to update your V
     }
     ```
 1. Start the server
-   ![mcp.json](https://github.com/Vaiz/rust-mcp-server/blob/master/docs/mcp.json.png)
+   ![mcp.json](docs/mcp.json.png)
 
 More information you can find by this [link](https://code.visualstudio.com/docs/copilot/chat/mcp-servers).
 
 ## GitHub Copilot Coding Agent Integration
 
-The Rust MCP Server can be integrated with GitHub Copilot's coding agent to create a powerful autonomous development workflow. For detailed setup instructions for using the Rust MCP Server with GitHub Copilot's coding agent, see [copilot-coding-agent.md](https://github.com/Vaiz/rust-mcp-server/blob/master/docs/copilot-coding-agent.md).
+The Rust MCP Server can be integrated with GitHub Copilot's coding agent to create a powerful autonomous development workflow. For detailed setup instructions for using the Rust MCP Server with GitHub Copilot's coding agent, see [copilot-coding-agent.md](docs/copilot-coding-agent.md).
 
 
 ## Documentation Generation
