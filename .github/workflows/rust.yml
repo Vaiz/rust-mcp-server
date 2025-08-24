@@ -33,7 +33,7 @@ jobs:
     name: ${{ matrix.target }}
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - uses: Swatinem/rust-cache@v2
 
     - name: Install rustup
@@ -60,7 +60,7 @@ jobs:
     name: Code guidelines
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
     - name: Update Rust
       run: |
@@ -94,6 +94,6 @@ jobs:
     name: Linelint
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: fernandrone/linelint@0.0.6
         id: linelint
