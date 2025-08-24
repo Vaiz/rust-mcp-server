@@ -82,92 +82,51 @@ The server provides **experimental** access to the official [Cargo Book](https:/
 
 For a complete list with detailed descriptions and parameters, see [tools.md](tools.md).
 
-## Getting Started
-
-### Prerequisites
-
-1.  **Rust**: You need the Rust toolchain installed. You can get it from [rustup.rs](https://rustup.rs/).
-2.  [*Optional*] **cargo-deny**: Install with `cargo install cargo-deny`.
-3.  [*Optional*] **cargo-machete**: Install with `cargo install cargo-machete`.
-
-### Building the Server
-
-1.  Clone this repository.
-2.  Build the server in release mode:
-    ```sh
-    cargo build --release
-    ```
-    The executable will be located at `target/release/rust-mcp-server.exe`.
-
-### Command Line Arguments
+## Command Line Arguments
 
 The rust-mcp-server supports several command line arguments to customize its behavior:
 
-#### `--timeout <TIMEOUT>`
-- **Description**: Sets the timeout for processing a request in seconds
-- **Type**: Integer
+### `--timeout <TIMEOUT>`
+- **Description**: Sets the timeout for processing a request in seconds. It might be useful to change this option depending on
+  the size of your project.
 - **Default**: 600 (10 minutes)
 - **Example**: `--timeout 300` (5 minutes)
 
-#### `--log-level <LOG_LEVEL>`
+### `--log-level <LOG_LEVEL>`
 - **Description**: Sets the logging level for the server
-- **Type**: String
 - **Options**: `error`, `warn`, `info`, `debug`, `trace`
 - **Default**: `info`
 - **Example**: `--log-level debug`
 
-#### `--log-file <LOG_FILE>`
+### `--log-file <LOG_FILE>`
 - **Description**: Specifies a file path for logging output. If not provided, logs are written to stderr
-- **Type**: String (file path)
 - **Default**: None (logs to stderr)
 - **Example**: `--log-file /var/log/rust-mcp-server.log`
 
-#### `--disable-tool <TOOL_NAME>`
+### `--disable-tool <TOOL_NAME>`
 - **Description**: Disables a specific tool by name. Can be specified multiple times to disable multiple tools
-- **Type**: String (tool name)
 - **Default**: None (all tools enabled)
 - **Example**: `--disable-tool cargo-test --disable-tool cargo-clippy`
 
-#### `--workspace <WORKSPACE>`
+### `--workspace <WORKSPACE>`
 - **Description**: Specifies the Rust project workspace path for the server to operate in
-- **Type**: String (directory path)
 - **Default**: Current directory
 - **Example**: `--workspace /path/to/rust/project`
 
-#### `-h, --help`
+### `-h, --help`
 - **Description**: Displays help information about available command line arguments
 - **Example**: `rust-mcp-server --help`
 
-#### `-V, --version`
+### `-V, --version`
 - **Description**: Displays the version information of the server
 - **Example**: `rust-mcp-server --version`
 
-#### Usage Examples
-
-Basic usage with default settings:
-```sh
-rust-mcp-server
-```
-
-With custom timeout and debug logging:
-```sh
-rust-mcp-server --timeout 300 --log-level debug
-```
-
-With file logging and disabled tools:
-```sh
-rust-mcp-server --log-file /tmp/mcp-server.log --disable-tool cargo-test
-```
-
-With custom workspace directory:
-```sh
-rust-mcp-server --workspace /path/to/rust/project
-```
-
-### Configuring with VS Code
+## Configuring with VS Code
 
 To make GitHub Copilot in VS Code use this MCP server, you need to update your VS Code settings.
 
+1.  Install `rust-mcp-server`</br>
+    `cargo install rust-mcp-server`
 1.  Enable MCP server in VS Code settings - [⚙️chat.mcp.enabled](vscode://settings/chat.mcp.enabled)
 1.  Add new MCP server into `.vscode/mcp.json`.
 
@@ -190,25 +149,3 @@ More information you can find by this [link](https://code.visualstudio.com/docs/
 ## GitHub Copilot Coding Agent Integration
 
 The Rust MCP Server can be integrated with GitHub Copilot's coding agent to create a powerful autonomous development workflow. For detailed setup instructions for using the Rust MCP Server with GitHub Copilot's coding agent, see [copilot-coding-agent.md](docs/copilot-coding-agent.md).
-
-
-## Documentation Generation
-
-This project uses [mcp-discovery](https://rust-mcp-stack.github.io/mcp-discovery) to automatically generate comprehensive documentation of all available MCP tools and capabilities.
-
-### Prerequisites
-
-Install mcp-discovery:
-```bash
-cargo install mcp-discovery
-```
-
-### Generating Documentation
-
-Run the documentation generation script to update the tools documentation:
-
-```bash
-python scripts/generate-docs.py
-```
-
-This will regenerate `tools.md` with the latest tool descriptions and capabilities.
