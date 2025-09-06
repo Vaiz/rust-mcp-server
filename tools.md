@@ -313,7 +313,7 @@
   - **Inputs:**
       - <code>all_features</code> : boolean<br />
       - <code>config</code> : string<br />
-      - <code>features</code> : string<br />
+      - <code>features</code> : string [ ]<br />
       - <code>filter_platform</code> : string<br />
       - <code>lockfile_path</code> : string<br />
       - <code>locking_mode</code> : string<br />
@@ -399,7 +399,7 @@
       - <code>example</code> : string<br />
       - <code>examples</code> : boolean<br />
       - <code>exclude</code> : string [ ]<br />
-      - <code>features</code> : string<br />
+      - <code>features</code> : string [ ]<br />
       - <code>ignore_rust_version</code> : boolean<br />
       - <code>jobs</code> : number<br />
       - <code>lib</code> : boolean<br />

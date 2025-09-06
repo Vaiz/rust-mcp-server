@@ -1,7 +1,8 @@
 use std::process::Command;
 
 use crate::serde_utils::{
-    deserialize_string, locking_mode_to_cli_flags, output_verbosity_to_cli_flags,
+    deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
+    output_verbosity_to_cli_flags,
 };
 use crate::tools::execute_command;
 use rust_mcp_sdk::{
@@ -43,8 +44,8 @@ pub struct CargoMetadataTool {
     config: Option<String>,
 
     /// Space or comma separated list of features to activate
-    #[serde(default, deserialize_with = "deserialize_string")]
-    features: Option<String>,
+    #[serde(default, deserialize_with = "deserialize_string_vec")]
+    features: Option<Vec<String>>,
 
     /// Activate all available features
     #[serde(default)]
@@ -100,8 +101,10 @@ impl CargoMetadataTool {
         }
 
         // Feature selection
-        if let Some(features) = &self.features {
-            cmd.arg("--features").arg(features);
+        if let Some(features) = &self.features
+            && !features.is_empty()
+        {
+            cmd.arg("--features").arg(features.join(","));
         }
 
         if self.all_features.unwrap_or(false) {
@@ -125,5 +128,51 @@ impl CargoMetadataTool {
         cmd.args(locking_flags);
 
         execute_command(cmd, &Self::tool_name())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    fn test_deserialize_with_features_array() {
+        let input = json!({
+            "features": ["serde", "tokio"],
+        });
+
+        let tool: Result<CargoMetadataTool, _> = serde_json::from_value(input);
+        let tool = tool.expect("Deserialization should succeed with features array");
+
+        assert_eq!(
+            tool.features.unwrap(),
+            ["serde".to_owned(), "tokio".to_owned()]
+        );
+    }
+
+    #[test]
+    fn test_deserialize_with_single_feature_string() {
+        let input = json!({
+            "features": "serde",
+        });
+
+        let tool: Result<CargoMetadataTool, _> = serde_json::from_value(input);
+        let tool = tool.expect("Deserialization should succeed with single feature string");
+
+        assert_eq!(tool.features.unwrap(), ["serde".to_owned()]);
+    }
+
+    #[test]
+    fn test_deserialize_with_features_string_array() {
+        let input = json!({
+            "features": "[\"serde\",\"tokio\"]",
+        });
+
+        let tool: Result<CargoMetadataTool, _> = serde_json::from_value(input);
+        let tool = tool
+            .expect("Deserialization should succeed with features string that looks like array");
+
+        assert_eq!(tool.features.unwrap(), ["[\"serde\",\"tokio\"]".to_owned()]);
     }
 }

@@ -96,8 +96,8 @@ pub struct CargoTestTool {
     doc: Option<bool>,
 
     /// Space or comma separated list of features to activate
-    #[serde(default, deserialize_with = "deserialize_string")]
-    features: Option<String>,
+    #[serde(default, deserialize_with = "deserialize_string_vec")]
+    features: Option<Vec<String>>,
 
     /// Activate all available features
     #[serde(default)]
@@ -244,8 +244,10 @@ impl CargoTestTool {
         }
 
         // Feature selection
-        if let Some(features) = &self.features {
-            cmd.arg("--features").arg(features);
+        if let Some(features) = &self.features
+            && !features.is_empty()
+        {
+            cmd.arg("--features").arg(features.join(","));
         }
 
         if self.all_features.unwrap_or(false) {
@@ -377,5 +379,45 @@ mod tests {
         let tool = tool.expect("Deserialization should succeed with single-item package array");
 
         assert_eq!(tool.package.unwrap(), ["single_package".to_owned()]);
+    }
+
+    #[test]
+    fn test_deserialize_with_features_array() {
+        let input = json!({
+            "features": ["serde", "tokio"],
+        });
+
+        let tool: Result<CargoTestTool, _> = serde_json::from_value(input);
+        let tool = tool.expect("Deserialization should succeed with features array");
+
+        assert_eq!(
+            tool.features.unwrap(),
+            ["serde".to_owned(), "tokio".to_owned()]
+        );
+    }
+
+    #[test]
+    fn test_deserialize_with_single_feature_string() {
+        let input = json!({
+            "features": "serde",
+        });
+
+        let tool: Result<CargoTestTool, _> = serde_json::from_value(input);
+        let tool = tool.expect("Deserialization should succeed with single feature string");
+
+        assert_eq!(tool.features.unwrap(), ["serde".to_owned()]);
+    }
+
+    #[test]
+    fn test_deserialize_with_features_string_array() {
+        let input = json!({
+            "features": "[\"serde\",\"tokio\"]",
+        });
+
+        let tool: Result<CargoTestTool, _> = serde_json::from_value(input);
+        let tool = tool
+            .expect("Deserialization should succeed with features string that looks like array");
+
+        assert_eq!(tool.features.unwrap(), ["[\"serde\",\"tokio\"]".to_owned()]);
     }
 }
