@@ -3,7 +3,7 @@ name: Build & Upload Release Binaries
 on:
   push:
     tags:
-    - "v*.*.*"
+    - "v*"
   workflow_dispatch:
     inputs:
       tag_name:
