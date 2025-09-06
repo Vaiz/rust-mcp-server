@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.5](https://github.com/Vaiz/rust-mcp-server/compare/v0.2.4...v0.2.5) - 2025-09-06
+
+### Fixed
+
+- features parsing in cargo-test ([#57](https://github.com/Vaiz/rust-mcp-server/pull/57))
+
 ## [0.2.4](https://github.com/Vaiz/rust-mcp-server/compare/v0.2.3...v0.2.4) - 2025-08-24
 
 ### Changes
