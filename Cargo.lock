@@ -1111,9 +1111,9 @@ dependencies = [
 
 [[package]]
 name = "rust-mcp-macros"
-version = "0.5.1"
+version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f2079014c2b3dfa82a2dafd203121d5a28929102c5e003bf8d8019a60fc17e0d"
+checksum = "b647a85c9da2eaf14e67d39cb067a8157a66bd2c0dc53ef1051a84f45edfae24"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1134,11 +1134,12 @@ dependencies = [
 
 [[package]]
 name = "rust-mcp-sdk"
-version = "0.6.3"
+version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "40acb5c1ee4f48c371dd35cef775b267eabc634573f053919eec0c34afc18bfe"
+checksum = "961ec01d0bedecf488388e6b1cf04170f9badab4927061c6592ffa385c02c6c9"
 dependencies = [
  "async-trait",
+ "base64",
  "futures",
  "rust-mcp-macros",
  "rust-mcp-schema",
@@ -1148,6 +1149,7 @@ dependencies = [
  "thiserror 2.0.16",
  "tokio",
  "tracing",
+ "uuid",
 ]
 
 [[package]]
@@ -1171,9 +1173,9 @@ dependencies = [
 
 [[package]]
 name = "rust-mcp-transport"
-version = "0.5.1"
+version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "307ca48118e5525e3a08785b8e41901bedfd02ecf7d67beeb2d4ab9384d27a7e"
+checksum = "35feabc5e4667019dc262178724c94cbced6f43959af15e214b52f79243f55ed"
 dependencies = [
  "async-trait",
  "bytes",
@@ -1821,6 +1823,17 @@ name = "utf8_iter"
 version = "1.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b6c140620e7ffbb22c2dee59cafe6084a59b5ffc27a8859a5f0d494b5d52b6be"
+
+[[package]]
+name = "uuid"
+version = "1.18.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2f87b8aa10b915a06587d0dec516c282ff295b475d94abf425d62b57710070a2"
+dependencies = [
+ "getrandom 0.3.3",
+ "js-sys",
+ "wasm-bindgen",
+]
 
 [[package]]
 name = "valuable"
