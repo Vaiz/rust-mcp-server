@@ -6,6 +6,7 @@ use rust_mcp_sdk::schema::{
 };
 use rust_mcp_sdk::schema::{GetPromptRequest, GetPromptResult};
 use rust_mcp_sdk::{McpServer, mcp_server::ServerHandler};
+use std::sync::Arc;
 
 use crate::resources::ResourceHandler;
 use crate::tools::AllTools;
@@ -46,7 +47,7 @@ impl ServerHandler for McpServerHandler {
     async fn handle_list_tools_request(
         &self,
         _request: ListToolsRequest,
-        _runtime: &dyn McpServer,
+        _runtime: Arc<dyn McpServer>,
     ) -> Result<ListToolsResult, RpcError> {
         let mut tools = AllTools::tools();
         tools.retain(|t| !self.disabled_tools.contains(&t.name));
@@ -61,7 +62,7 @@ impl ServerHandler for McpServerHandler {
     async fn handle_call_tool_request(
         &self,
         request: CallToolRequest,
-        _runtime: &dyn McpServer,
+        _runtime: Arc<dyn McpServer>,
     ) -> Result<CallToolResult, CallToolError> {
         crate::tools::handle_request(request, &self.disabled_tools)
     }
@@ -69,7 +70,7 @@ impl ServerHandler for McpServerHandler {
     async fn handle_list_prompts_request(
         &self,
         _request: ListPromptsRequest,
-        _runtime: &dyn McpServer,
+        _runtime: Arc<dyn McpServer>,
     ) -> Result<ListPromptsResult, RpcError> {
         Ok(ListPromptsResult {
             meta: None,
@@ -81,7 +82,7 @@ impl ServerHandler for McpServerHandler {
     async fn handle_get_prompt_request(
         &self,
         request: GetPromptRequest,
-        runtime: &dyn McpServer,
+        runtime: Arc<dyn McpServer>,
     ) -> std::result::Result<GetPromptResult, RpcError> {
         let name = &request.params.name;
         tracing::info!(name, "Handling get prompt request");
@@ -98,7 +99,7 @@ impl ServerHandler for McpServerHandler {
     async fn handle_list_resources_request(
         &self,
         request: ListResourcesRequest,
-        _runtime: &dyn McpServer,
+        _runtime: Arc<dyn McpServer>,
     ) -> Result<ListResourcesResult, RpcError> {
         self.resource_handler
             .handle_list_resources_request(request)
@@ -108,7 +109,7 @@ impl ServerHandler for McpServerHandler {
     async fn handle_read_resource_request(
         &self,
         request: ReadResourceRequest,
-        _runtime: &dyn McpServer,
+        _runtime: Arc<dyn McpServer>,
     ) -> Result<ReadResourceResult, RpcError> {
         self.resource_handler
             .handle_read_resource_request(request)
