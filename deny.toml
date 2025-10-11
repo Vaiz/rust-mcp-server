@@ -211,6 +211,8 @@ skip = [
     { crate = "thiserror-impl@1.0.69", reason = "thiserror v1.0.69 dependency" },
     # Windows crates can have multiple versions for different targets
     { crate = "wasi@0.11.1+wasi-snapshot-preview1", reason = "mio requires older WASI version for compatibility" },
+    { crate = "windows-link@0.1.3", reason = "multiple Windows link compatibility versions needed" },
+    { crate = "windows-link@0.2.1", reason = "multiple Windows link compatibility versions needed" },
     { crate = "windows-sys@0.52.0", reason = "multiple Windows target compatibility versions needed" },
     { crate = "windows-sys@0.59.0", reason = "multiple Windows target compatibility versions needed" },
     { crate = "windows-targets@0.52.6", reason = "windows-sys compatibility requirement" },
