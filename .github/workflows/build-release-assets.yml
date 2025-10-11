@@ -4,9 +4,6 @@ on:
   push:
     tags:
     - "v*"
-  create:
-    tags:
-    - "v*"
   workflow_dispatch:
     inputs:
       tag_name:
@@ -41,6 +38,15 @@ jobs:
     steps:
     - name: Checkout source
       uses: actions/checkout@v5
+
+    - name: Verify tag is on master
+      run: |
+        BASE_BRANCH=$(git branch -r --contains ${{ github.ref }} | grep "origin/master" || true)
+        if [ -z "$BASE_BRANCH" ]; then
+          echo "❌ Tag is not on master. Skipping release."
+          exit 1
+        fi
+      shell: bash
 
     - name: Install rustup
       if: ${{ matrix.os == 'windows-11-arm' }}
