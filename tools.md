@@ -1,6 +1,7 @@
-## Rust MCP Server 0.2.4
-| 🟢 Tools (29) | 🟢 Prompts (1) | 🟢 Resources (95) | <span style="opacity:0.6">🔴 Logging</span> | <span style="opacity:0.6">🔴 Experimental</span> |
-| --- | --- | --- | --- | --- |
+## Rust MCP Server 0.2.5
+| 🟢 Tools (29) | 🟢 Prompts (1) | 🟢 Resources (95) | <span style="opacity:0.6">🔴 Logging</span> | <span style="opacity:0.6">🔴 Completions</span> | <span style="opacity:0.6">🔴 Experimental</span> |
+| --- | --- | --- | --- | --- | --- |
+
 ## 🛠️ Tools (29)
 
 
@@ -45,7 +46,7 @@
       - <code>exclude</code> : string [ ]<br />
       - <code>features</code> : string [ ]<br />
       - <code>ignore_rust_version</code> : boolean<br />
-      - <code>jobs</code> : number<br />
+      - <code>jobs</code> : integer<br />
       - <code>keep_going</code> : boolean<br />
       - <code>lib</code> : boolean<br />
       - <code>lockfile_path</code> : string<br />
@@ -78,7 +79,7 @@
       - <code>exclude</code> : string [ ]<br />
       - <code>features</code> : string [ ]<br />
       - <code>ignore_rust_version</code> : boolean<br />
-      - <code>jobs</code> : number<br />
+      - <code>jobs</code> : integer<br />
       - <code>keep_going</code> : boolean<br />
       - <code>lib</code> : boolean<br />
       - <code>lockfile_path</code> : string<br />
@@ -203,7 +204,7 @@
       - <code>exclude</code> : string [ ]<br />
       - <code>features</code> : string [ ]<br />
       - <code>ignore_rust_version</code> : boolean<br />
-      - <code>jobs</code> : number<br />
+      - <code>jobs</code> : integer<br />
       - <code>keep_going</code> : boolean<br />
       - <code>lib</code> : boolean<br />
       - <code>lockfile_path</code> : string<br />
@@ -381,7 +382,7 @@
 - **cargo-search**
   - Search packages in the registry. Default registry is crates.io. Equivalent to 'cargo search <code>QUERY</code>'.
   - **Inputs:**
-      - <code>limit</code> : number<br />
+      - <code>limit</code> : integer<br />
       - <code>output_verbosity</code> : string<br />
       - <code>query</code> : string<br />
       - <code>registry</code> : string<br />
@@ -401,7 +402,7 @@
       - <code>exclude</code> : string [ ]<br />
       - <code>features</code> : string [ ]<br />
       - <code>ignore_rust_version</code> : boolean<br />
-      - <code>jobs</code> : number<br />
+      - <code>jobs</code> : integer<br />
       - <code>lib</code> : boolean<br />
       - <code>lockfile_path</code> : string<br />
       - <code>locking_mode</code> : string<br />

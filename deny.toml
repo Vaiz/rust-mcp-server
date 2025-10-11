@@ -204,24 +204,16 @@ deny = [
 
 # Certain crates/versions that will be skipped when doing duplicate detection.
 skip = [
-    # These duplicates are acceptable for compatibility reasons
-    { crate = "regex-automata@0.1.10", reason = "tracing-subscriber requires older version for compatibility" },
-    { crate = "regex-syntax@0.6.29", reason = "tracing-subscriber requires older version for compatibility" },
+    # thiserror v1.0.69 is required by tracing-appender, while v2.0.17 is used by rust-mcp-sdk
     { crate = "thiserror@1.0.69", reason = "tracing-appender requires older version for compatibility" },
     { crate = "thiserror-impl@1.0.69", reason = "thiserror v1.0.69 dependency" },
-    # Windows crates can have multiple versions for different targets
+    # wasi duplicates for different snapshot versions
     { crate = "wasi@0.11.1+wasi-snapshot-preview1", reason = "mio requires older WASI version for compatibility" },
-    { crate = "windows-sys@0.52.0", reason = "multiple Windows target compatibility versions needed" },
-    { crate = "windows-sys@0.59.0", reason = "multiple Windows target compatibility versions needed" },
-    { crate = "windows-targets@0.52.6", reason = "windows-sys compatibility requirement" },
-    { crate = "windows_aarch64_gnullvm@0.52.6", reason = "windows-targets compatibility requirement" },
-    { crate = "windows_aarch64_msvc@0.52.6", reason = "windows-targets compatibility requirement" },
-    { crate = "windows_i686_gnu@0.52.6", reason = "windows-targets compatibility requirement" },
-    { crate = "windows_i686_gnullvm@0.52.6", reason = "windows-targets compatibility requirement" },
-    { crate = "windows_i686_msvc@0.52.6", reason = "windows-targets compatibility requirement" },
-    { crate = "windows_x86_64_gnu@0.52.6", reason = "windows-targets compatibility requirement" },
-    { crate = "windows_x86_64_gnullvm@0.52.6", reason = "windows-targets compatibility requirement" },
-    { crate = "windows_x86_64_msvc@0.52.6", reason = "windows-targets compatibility requirement" },
+    # Windows crates have multiple versions for different dependencies
+    { crate = "windows-link@0.1.3", reason = "windows-registry compatibility requirement" },
+    { crate = "windows-link@0.2.1", reason = "backtrace and parking_lot_core compatibility requirement" },
+    { crate = "windows-sys@0.59.0", reason = "mio, socket2, and tokio compatibility requirement" },
+    { crate = "windows-sys@0.61.2", reason = "errno, nu-ansi-term, rustix, schannel, and tempfile compatibility requirement" },
 ]
 # Similarly to `skip` allows you to skip certain crates during duplicate
 # detection. Unlike skip, it also includes the entire tree of transitive

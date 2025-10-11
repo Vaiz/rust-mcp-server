@@ -17,6 +17,7 @@ Thumbs.db
 # Environment files
 .env
 .env.local
+.vscode/settings.json
 
 # Temporary files
 /tmp
