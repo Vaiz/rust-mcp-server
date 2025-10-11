@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.6](https://github.com/Vaiz/rust-mcp-server/compare/v0.2.5...v0.2.6) - 2025-10-11
+
+### Other
+
+- update rust-mcp-sdk to 0.7 ([#62](https://github.com/Vaiz/rust-mcp-server/pull/62))
+
 ## [0.2.5](https://github.com/Vaiz/rust-mcp-server/compare/v0.2.4...v0.2.5) - 2025-09-06
 
 ### Fixed
