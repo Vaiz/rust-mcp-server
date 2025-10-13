@@ -10,13 +10,13 @@ where
 
     let opt = Option::<String>::deserialize(deserializer)?;
     match opt.as_deref() {
-        Some("null") => Ok(None),
+        Some("null") | Some("") => Ok(None),
         _ => Ok(opt),
     }
 }
 
 /// Utility function for parsing Option<Vec<String>> fields in serde,
-/// returning None if the value is a string "null" (case-insensitive).
+/// returning None if the value is a string "null" (case-insensitive) or empty.
 pub fn deserialize_string_vec<'de, D>(deserializer: D) -> Result<Option<Vec<String>>, D::Error>
 where
     D: serde::Deserializer<'de>,
@@ -26,9 +26,9 @@ where
 
     let value = Value::deserialize(deserializer)?;
     match value {
-        Value::String(s) if s.to_lowercase() == "null" => Ok(None),
-        Value::String(s) => Ok(Some(vec![s])),
         Value::Null => Ok(None),
+        Value::String(s) if s.to_lowercase() == "null" || s.is_empty() => Ok(None),
+        Value::String(s) => Ok(Some(vec![s])),
         Value::Array(arr) => {
             let strings: Result<Vec<String>, _> = arr
                 .into_iter()
@@ -209,6 +209,13 @@ mod tests {
     }
 
     #[test]
+    fn test_deserialize_string_empty_string() {
+        let json = r#"{ "value": "" }"#;
+        let result: TestString = serde_json::from_str(json).unwrap();
+        assert_eq!(result.value, None);
+    }
+
+    #[test]
     fn test_deserialize_string_vec_some() {
         let json = r#"{ "value": ["a", "b", "c"] }"#;
         let result: TestStringVec = serde_json::from_str(json).unwrap();
@@ -228,6 +235,13 @@ mod tests {
     #[test]
     fn test_deserialize_string_vec_null_value() {
         let json = r#"{ "value": null }"#;
+        let result: TestStringVec = serde_json::from_str(json).unwrap();
+        assert_eq!(result.value, None);
+    }
+
+    #[test]
+    fn test_deserialize_string_vec_empty_string() {
+        let json = r#"{ "value": "" }"#;
         let result: TestStringVec = serde_json::from_str(json).unwrap();
         assert_eq!(result.value, None);
     }
