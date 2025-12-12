@@ -1,8 +1,12 @@
 mod handler;
 mod prompts;
 mod resources;
+mod rmcp_server;
 pub(crate) mod serde_utils;
+mod tool;
 mod tools;
+
+pub(crate) use tool::{Tool, ToolImpl, execute_rmcp_command};
 
 use clap::Parser;
 use rust_mcp_sdk::McpServer;

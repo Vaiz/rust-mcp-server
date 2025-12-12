@@ -1,12 +1,14 @@
 use std::process::Command;
 
 use crate::{
+    ToolImpl, execute_rmcp_command,
     serde_utils::{
         deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
     },
     tools::execute_command,
 };
+use rmcp::ErrorData;
 use rust_mcp_sdk::{
     macros::{JsonSchema, mcp_tool},
     schema::{CallToolResult, schema_utils::CallToolError},
@@ -17,7 +19,7 @@ use rust_mcp_sdk::{
     description = "Checks a Rust package and all of its dependencies for errors. Usually, run without any additional arguments.",
     openWorldHint = false
 )]
-#[derive(Debug, ::serde::Deserialize, JsonSchema)]
+#[derive(Debug, ::serde::Deserialize, JsonSchema, ::schemars::JsonSchema)]
 pub struct CargoCheckTool {
     /// The toolchain to use, e.g., "stable" or "nightly".
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -147,8 +149,29 @@ pub struct CargoCheckTool {
     warnings_as_errors: Option<bool>,
 }
 
+impl ToolImpl for CargoCheckTool {
+    const NAME: &'static str = "cargo-check";
+    type RequestArgs = Self;
+
+    fn call_rmcp_tool(
+        &self,
+        request: Self::RequestArgs,
+    ) -> Result<rmcp::model::CallToolResult, ErrorData> {
+        let cmd = match request.build_cmd() {
+            Ok(cmd) => cmd,
+            Err(e) => {
+                return Err(ErrorData::invalid_params(
+                    format!("Failed to build command: {e}"),
+                    None,
+                ));
+            }
+        };
+        execute_rmcp_command(cmd, &Self::NAME)
+    }
+}
+
 impl CargoCheckTool {
-    pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
+    pub fn build_cmd(&self) -> Result<Command, CallToolError> {
         let mut cmd = Command::new("cargo");
         if let Some(toolchain) = &self.toolchain {
             cmd.arg(format!("+{toolchain}"));
@@ -277,7 +300,11 @@ impl CargoCheckTool {
         if self.warnings_as_errors.unwrap_or(false) {
             cmd.env("RUSTFLAGS", "-D warnings");
         }
+        Ok(cmd)
+    }
 
-        execute_command(cmd, &Self::tool_name())
+    pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
+        let cmd = self.build_cmd()?;
+        execute_command(cmd, &Self::NAME)
     }
 }

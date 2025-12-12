@@ -110,7 +110,7 @@ fn execute_command(
             })
         }
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-            tracing::error!(error = ?e, "Command not found");
+            tracing::error!(error = %e, "Command not found");
             let annotations = Some(Annotations {
                 audience: vec![Role::User, Role::Assistant],
                 last_modified: None,
@@ -137,7 +137,7 @@ fn execute_command(
             })
         }
         Err(e) => {
-            tracing::error!(error = ?e, "Failed to execute command");
+            tracing::error!(error = %e, "Failed to execute command");
             Err(CallToolError::new(e))
         }
     }
