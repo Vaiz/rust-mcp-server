@@ -11,16 +11,16 @@ mod test;
 mod update;
 
 pub use add_remove::{CargoAddTool, CargoRemoveTool};
-pub use build::CargoBuildTool;
+pub use build::CargoBuildRmcpTool;
 pub use check::{CargoCheckRequest, CargoCheckRmcpTool};
-pub use clippy::CargoClippyTool;
-pub use doc::CargoDocTool;
-pub use info::CargoInfoTool;
-pub use metadata::CargoMetadataTool;
-pub use package::CargoPackageTool;
-pub use search::CargoSearchTool;
-pub use test::CargoTestTool;
-pub use update::CargoUpdateTool;
+pub use clippy::CargoClippyRmcpTool;
+pub use doc::CargoDocRmcpTool;
+pub use info::CargoInfoRmcpTool;
+pub use metadata::CargoMetadataRmcpTool;
+pub use package::CargoPackageRmcpTool;
+pub use search::CargoSearchRmcpTool;
+pub use test::CargoTestRmcpTool;
+pub use update::CargoUpdateRmcpTool;
 
 use std::process::Command;
 
@@ -33,7 +33,6 @@ use crate::serde_utils::{
     deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
     output_verbosity_to_cli_flags,
 };
-use crate::tools::execute_command;
 
 use crate::serde_utils::Tool;
 

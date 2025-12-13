@@ -1,26 +1,17 @@
 use std::process::Command;
 
-use crate::serde_utils::Tool;
 use crate::{
+    ToolImpl, execute_rmcp_command,
     serde_utils::{
         PackageWithVersion, deserialize_string, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
     },
-    tools::execute_command,
 };
-use rust_mcp_sdk::{
-    macros::mcp_tool,
-    schema::{CallToolResult, schema_utils::CallToolError},
-};
+use rmcp::ErrorData;
 
 /// Display information about a package. Information includes package description, list of available features, etc. Equivalent to 'cargo info <SPEC>'.
-#[mcp_tool(
-    name = "cargo-info",
-    description = "Display information about a package. Information includes package description, list of available features, etc. Equivalent to 'cargo info <SPEC>'.",
-    openWorldHint = false
-)]
 #[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
-pub struct CargoInfoTool {
+pub struct CargoInfoRequest {
     /// Package with optional version (e.g., {"package": "serde", "version": "1.0.0"})
     #[serde(flatten)]
     pub package_spec: PackageWithVersion,
@@ -56,9 +47,8 @@ pub struct CargoInfoTool {
     #[serde(default, deserialize_with = "deserialize_string")]
     pub locking_mode: Option<String>,
 }
-
-impl CargoInfoTool {
-    pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
+impl CargoInfoRequest {
+    pub fn build_cmd(&self) -> Result<Command, ErrorData> {
         let mut cmd = Command::new("cargo");
         cmd.arg("info");
 
@@ -84,13 +74,33 @@ impl CargoInfoTool {
         let output_flags = output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
         cmd.args(output_flags);
 
-        execute_command(cmd, &Self::tool_name())
+        Ok(cmd)
     }
 }
 
+pub struct CargoInfoRmcpTool;
+
+impl ToolImpl for CargoInfoRmcpTool {
+    const NAME: &'static str = "cargo-info";
+    const TITLE: &'static str = "cargo info";
+    const DESCRIPTION: &'static str = "Display information about a package. Information includes package description, list of available features, etc.";
+    type RequestArgs = CargoInfoRequest;
+
+    fn call_rmcp_tool(
+        &self,
+        request: Self::RequestArgs,
+    ) -> Result<rmcp::model::CallToolResult, ErrorData> {
+        let cmd = request.build_cmd()?;
+        execute_rmcp_command(cmd, &Self::NAME)
+    }
+}
 #[cfg(test)]
 mod tests {
+    use crate::tool::Tool;
+
     use super::*;
+
+    use rmcp::ErrorData;
 
     #[test]
     fn test_cargo_info_schema() {
@@ -138,7 +148,7 @@ mod tests {
   "title": "CargoInfoTool",
   "type": "object"
 }"##;
-        let schema = serde_json::Value::from(CargoInfoTool::json_schema());
+        let schema = serde_json::Value::from(CargoInfoRmcpTool {}.json_schema());
         println!(
             "CargoInfoTool schema: {}",
             serde_json::to_string_pretty(&schema).unwrap()

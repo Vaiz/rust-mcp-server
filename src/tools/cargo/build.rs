@@ -1,12 +1,16 @@
 use std::process::Command;
 
-use crate::serde_utils::{
-    deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
-    output_verbosity_to_cli_flags,
+use crate::{
+    ToolImpl, execute_rmcp_command,
+    serde_utils::{
+        deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
+        output_verbosity_to_cli_flags,
+    },
 };
+use rmcp::ErrorData;
 
 #[derive(Debug, ::serde::Deserialize, ::schemars::JsonSchema)]
-pub struct CargoBuildTool {
+pub struct CargoBuildRequest {
     /// The toolchain to use, e.g., "stable" or "nightly".
     #[serde(default, deserialize_with = "deserialize_string")]
     toolchain: Option<String>,
@@ -135,8 +139,8 @@ pub struct CargoBuildTool {
     warnings_as_errors: Option<bool>,
 }
 
-impl CargoBuildTool {
-    pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
+impl CargoBuildRequest {
+    pub fn build_cmd(&self) -> Result<Command, ErrorData> {
         let mut cmd = Command::new("cargo");
         if let Some(toolchain) = &self.toolchain {
             cmd.arg(format!("+{toolchain}"));
@@ -265,7 +269,24 @@ impl CargoBuildTool {
         if self.warnings_as_errors.unwrap_or(false) {
             cmd.env("RUSTFLAGS", "-D warnings");
         }
+        Ok(cmd)
+    }
+}
 
-        execute_command(cmd, &Self::tool_name())
+pub struct CargoBuildRmcpTool;
+
+impl ToolImpl for CargoBuildRmcpTool {
+    const NAME: &'static str = "cargo-build";
+    const TITLE: &'static str = "cargo build";
+    const DESCRIPTION: &'static str =
+        "Builds a Rust project using Cargo. Usually, run without any additional arguments.";
+    type RequestArgs = CargoBuildRequest;
+
+    fn call_rmcp_tool(
+        &self,
+        request: Self::RequestArgs,
+    ) -> Result<rmcp::model::CallToolResult, ErrorData> {
+        let cmd = request.build_cmd()?;
+        execute_rmcp_command(cmd, &Self::NAME)
     }
 }

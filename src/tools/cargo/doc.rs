@@ -1,18 +1,22 @@
 use std::path::Path;
 use std::process::Command;
 
-use crate::tools::{CallToolError, CallToolResult};
+use rmcp::{
+    ErrorData,
+    model::{Annotations, CallToolResult, RawContent, Role},
+};
+
 use crate::{
+    ToolImpl, execute_rmcp_command,
     serde_utils::{
         deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
     },
-    tools::{WORKSPACE_ROOT, execute_command},
+    tools::WORKSPACE_ROOT,
 };
-use schemars::JsonSchema;
 
 #[derive(Debug, ::serde::Deserialize, ::schemars::JsonSchema)]
-pub struct CargoDocTool {
+pub struct CargoDocRequest {
     /// The toolchain to use, e.g., "stable" or "nightly".
     #[serde(default, deserialize_with = "deserialize_string")]
     toolchain: Option<String>,
@@ -134,8 +138,8 @@ pub struct CargoDocTool {
     message_format: Option<String>,
 }
 
-impl CargoDocTool {
-    pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
+impl CargoDocRequest {
+    pub fn build_cmd(&self) -> Result<Command, ErrorData> {
         let mut cmd = Command::new("cargo");
         if let Some(toolchain) = &self.toolchain {
             cmd.arg(format!("+{toolchain}"));
@@ -259,32 +263,7 @@ impl CargoDocTool {
             cmd.arg("--message-format").arg(message_format);
         }
 
-        // Execute the command and get the result
-        let mut result = execute_command(cmd, "cargo-doc")?;
-
-        // Add documentation path information only if the command was successful
-        if result.is_error != Some(true) {
-            let doc_path = self.get_doc_path();
-            let doc_info = if let Some(doc_path) = doc_path {
-                format!(
-                    "\n📚 Documentation generated successfully!\n📄 Documentation file: {doc_path}\n💡 Open this file in your browser to view the docs"
-                )
-            } else {
-                "\n📚 Documentation generated successfully!".to_owned()
-            };
-
-            let annotations = Some(Annotations {
-                audience: vec![Role::User, Role::Assistant],
-                last_modified: None,
-                priority: Some(0.5),
-            });
-
-            result
-                .content
-                .push(TextContent::new(doc_info, annotations, None).into());
-        }
-
-        Ok(result)
+        Ok(cmd)
     }
 
     fn get_doc_path(&self) -> Option<String> {
@@ -346,5 +325,47 @@ impl CargoDocTool {
         };
 
         absolute_path.to_string_lossy().into_owned()
+    }
+}
+
+pub struct CargoDocRmcpTool;
+
+impl ToolImpl for CargoDocRmcpTool {
+    const NAME: &'static str = "cargo-doc";
+    const TITLE: &'static str = "Build Rust documentation";
+    const DESCRIPTION: &'static str = "Build documentation for a Rust package using Cargo. Recommended to use with no_deps and specific package for faster builds. Returns path to generated documentation index.";
+    type RequestArgs = CargoDocRequest;
+
+    fn call_rmcp_tool(
+        &self,
+        request: Self::RequestArgs,
+    ) -> Result<rmcp::model::CallToolResult, ErrorData> {
+        let cmd = request.build_cmd()?;
+        let mut result = execute_rmcp_command(cmd, Self::NAME)?;
+
+        // Add documentation path information only if the command was successful
+        if result.is_error != Some(true) {
+            let doc_path = request.get_doc_path();
+            let doc_info = if let Some(doc_path) = doc_path {
+                format!(
+                    "\n📚 Documentation generated successfully!\n📄 Documentation file: {doc_path}\n💡 Open this file in your browser to view the docs"
+                )
+            } else {
+                "\n📚 Documentation generated successfully!".to_owned()
+            };
+
+            use rmcp::model::{AnnotateAble, Annotations, RawTextContent, Role};
+            let annotations = Annotations {
+                audience: Some(vec![Role::User, Role::Assistant]),
+                last_modified: None,
+                priority: Some(0.5),
+            };
+
+            result
+                .content
+                .push(RawContent::text(doc_info).annotate(annotations));
+        }
+
+        Ok(result)
     }
 }

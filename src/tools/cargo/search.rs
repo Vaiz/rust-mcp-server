@@ -1,20 +1,13 @@
 use std::process::Command;
 
-use rust_mcp_sdk::{
-    macros::{JsonSchema, mcp_tool},
-    schema::{CallToolResult, schema_utils::CallToolError},
+use crate::{
+    ToolImpl, execute_rmcp_command,
+    serde_utils::{deserialize_string, output_verbosity_to_cli_flags},
 };
+use rmcp::ErrorData;
 
-use crate::serde_utils::{deserialize_string, output_verbosity_to_cli_flags};
-use crate::tools::execute_command;
-
-#[mcp_tool(
-    name = "cargo-search",
-    description = "Search packages in the registry. Default registry is crates.io. Equivalent to 'cargo search [QUERY]'.",
-    openWorldHint = false
-)]
 #[derive(Debug, ::serde::Deserialize, ::schemars::JsonSchema)]
-pub struct CargoSearchTool {
+pub struct CargoSearchRequest {
     /// The query to search for. Generally, this is a substring of the package name or description.
     pub query: String,
     /// Limit the number of results (default: 10, max: 100)
@@ -31,9 +24,8 @@ pub struct CargoSearchTool {
     #[serde(default, deserialize_with = "deserialize_string")]
     output_verbosity: Option<String>,
 }
-
-impl CargoSearchTool {
-    pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
+impl CargoSearchRequest {
+    pub fn build_cmd(&self) -> Result<Command, ErrorData> {
         let mut cmd = Command::new("cargo");
         cmd.arg("search");
         cmd.arg(&self.query);
@@ -45,6 +37,24 @@ impl CargoSearchTool {
         }
         let output_flags = output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
         cmd.args(output_flags);
-        execute_command(cmd, &Self::tool_name())
+        Ok(cmd)
+    }
+}
+
+pub struct CargoSearchRmcpTool;
+
+impl ToolImpl for CargoSearchRmcpTool {
+    const NAME: &'static str = "cargo-search";
+    const TITLE: &'static str = "cargo search";
+    const DESCRIPTION: &'static str =
+        "Search packages in the registry. Default registry is crates.io.";
+    type RequestArgs = CargoSearchRequest;
+
+    fn call_rmcp_tool(
+        &self,
+        request: Self::RequestArgs,
+    ) -> Result<rmcp::model::CallToolResult, ErrorData> {
+        let cmd = request.build_cmd()?;
+        execute_rmcp_command(cmd, &Self::NAME)
     }
 }

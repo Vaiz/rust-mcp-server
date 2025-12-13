@@ -1,24 +1,16 @@
 use std::process::Command;
 
 use crate::{
+    ToolImpl, execute_rmcp_command,
     serde_utils::{
         deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
     },
-    tools::execute_command,
 };
-use rust_mcp_sdk::{
-    macros::{JsonSchema, mcp_tool},
-    schema::{CallToolResult, schema_utils::CallToolError},
-};
+use rmcp::ErrorData;
 
-#[mcp_tool(
-    name = "cargo-update",
-    description = "Update dependencies as recorded in the local lock file. Updates the dependencies in Cargo.lock to their latest compatible versions.",
-    openWorldHint = false
-)]
 #[derive(Debug, ::serde::Deserialize, ::schemars::JsonSchema)]
-pub struct CargoUpdateTool {
+pub struct CargoUpdateRequest {
     /// The toolchain to use, e.g., "stable" or "nightly".
     #[serde(default, deserialize_with = "deserialize_string")]
     toolchain: Option<String>,
@@ -87,9 +79,8 @@ pub struct CargoUpdateTool {
     #[serde(default, deserialize_with = "deserialize_string")]
     output_verbosity: Option<String>,
 }
-
-impl CargoUpdateTool {
-    pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
+impl CargoUpdateRequest {
+    pub fn build_cmd(&self) -> Result<Command, ErrorData> {
         let mut cmd = Command::new("cargo");
         if let Some(toolchain) = &self.toolchain {
             cmd.arg(format!("+{toolchain}"));
@@ -157,6 +148,23 @@ impl CargoUpdateTool {
         let output_flags = output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
         cmd.args(output_flags);
 
-        execute_command(cmd, &Self::tool_name())
+        Ok(cmd)
+    }
+}
+
+pub struct CargoUpdateRmcpTool;
+
+impl ToolImpl for CargoUpdateRmcpTool {
+    const NAME: &'static str = "cargo-update";
+    const TITLE: &'static str = "cargo update";
+    const DESCRIPTION: &'static str = "Update dependencies as recorded in the local lock file. Updates the dependencies in Cargo.lock to their latest compatible versions.";
+    type RequestArgs = CargoUpdateRequest;
+
+    fn call_rmcp_tool(
+        &self,
+        request: Self::RequestArgs,
+    ) -> Result<rmcp::model::CallToolResult, ErrorData> {
+        let cmd = request.build_cmd()?;
+        execute_rmcp_command(cmd, &Self::NAME)
     }
 }
