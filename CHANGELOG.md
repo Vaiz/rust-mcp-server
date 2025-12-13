@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0](https://github.com/Vaiz/rust-mcp-server/compare/v0.2.7...v0.3.0) - 2025-12-13
+
+### Added
+
+- [**breaking**] switch to MCP 2025-11-25 ([#72](https://github.com/Vaiz/rust-mcp-server/pull/72))
+
+### Other
+
+- bump schemars from 1.0.4 to 1.1.0 ([#68](https://github.com/Vaiz/rust-mcp-server/pull/68))
+
 ## [0.2.7](https://github.com/Vaiz/rust-mcp-server/compare/v0.2.6...v0.2.7) - 2025-10-13
 
 ### Fixed
