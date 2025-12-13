@@ -361,8 +361,9 @@ impl Tool for CargoRemoveRmcpTool {
 
 #[cfg(test)]
 mod tests {
+    use crate::tool::DynTool;
+
     use super::*;
-    use schemars::{JsonSchema, SchemaGenerator};
 
     #[test]
     fn test_dependency_type_helper() {
@@ -523,8 +524,7 @@ mod tests {
   "title": "CargoAddRequest",
   "type": "object"
 }"##;
-        let mut schema_gen = SchemaGenerator::default();
-        let schema = serde_json::Value::from(CargoAddRequest::json_schema(&mut schema_gen));
+        let schema = serde_json::Value::from(CargoRemoveRmcpTool {}.json_schema());
         println!(
             "CargoAddRequest schema: {}",
             serde_json::to_string_pretty(&schema).unwrap()
