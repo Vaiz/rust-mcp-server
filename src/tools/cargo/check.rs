@@ -140,7 +140,7 @@ pub struct CargoCheckRequest {
 }
 
 impl CargoCheckRequest {
-    pub fn build_cmd(&self) -> Result<Command, CallToolError> {
+    pub fn build_cmd(&self) -> Result<Command, ErrorData> {
         let mut cmd = Command::new("cargo");
         if let Some(toolchain) = &self.toolchain {
             cmd.arg(format!("+{toolchain}"));
@@ -271,11 +271,6 @@ impl CargoCheckRequest {
         }
         Ok(cmd)
     }
-
-    pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
-        let cmd = self.build_cmd()?;
-        execute_command(cmd, &CargoCheckRmcpTool::NAME)
-    }
 }
 
 pub struct CargoCheckRmcpTool;
@@ -290,15 +285,7 @@ impl ToolImpl for CargoCheckRmcpTool {
         &self,
         request: Self::RequestArgs,
     ) -> Result<rmcp::model::CallToolResult, ErrorData> {
-        let cmd = match request.build_cmd() {
-            Ok(cmd) => cmd,
-            Err(e) => {
-                return Err(ErrorData::invalid_params(
-                    format!("Failed to build command: {e}"),
-                    None,
-                ));
-            }
-        };
+        let cmd = request.build_cmd()?;
         execute_rmcp_command(cmd, &Self::NAME)
     }
 }
