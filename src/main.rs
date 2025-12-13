@@ -85,8 +85,7 @@ async fn main() -> anyhow::Result<()> {
         tracing::info!("No workspace root specified, using current directory");
     }
 
-    /// FIXME: Pass configuration to Server
-    let server = rmcp_server::Server::new();
+    let server = rmcp_server::Server::new(&args.disabled_tools);
 
     /// FIXME: How to pass timeout to StdioTransport?
     let service = server

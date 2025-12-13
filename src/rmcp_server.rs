@@ -7,7 +7,8 @@ use rmcp::{
 };
 
 use crate::{
-    ToolImpl, tool::Tool, version::AppVersion,
+    ToolImpl,
+    tool::Tool,
     tools::{
         cargo::{
             CargoAddRmcpTool, CargoBuildRmcpTool, CargoCheckRmcpTool, CargoCleanRmcpTool,
@@ -16,12 +17,16 @@ use crate::{
             CargoPackageRmcpTool, CargoRemoveRmcpTool, CargoSearchRmcpTool, CargoTestRmcpTool,
             CargoUpdateRmcpTool,
         },
-        cargo_deny::{CargoDenyCheckRmcpTool, CargoDenyInitRmcpTool, CargoDenyInstallRmcpTool, CargoDenyListRmcpTool},
+        cargo_deny::{
+            CargoDenyCheckRmcpTool, CargoDenyInitRmcpTool, CargoDenyInstallRmcpTool,
+            CargoDenyListRmcpTool,
+        },
         cargo_hack::{CargoHackInstallRmcpTool, CargoHackRmcpTool},
         cargo_machete::{CargoMacheteInstallRmcpTool, CargoMacheteRmcpTool},
         rustc::RustcExplainRmcpTool,
         rustup::{RustupShowRmcpTool, RustupToolchainAddRmcpTool, RustupUpdateRmcpTool},
     },
+    version::AppVersion,
 };
 
 pub struct Server {
@@ -29,9 +34,9 @@ pub struct Server {
 }
 
 impl Server {
-    pub fn new() -> Self {
+    pub fn new(disabled_tools: &[String]) -> Self {
         let mut tools: HashMap<&'static str, Box<dyn Tool + Send + Sync>> = HashMap::new();
-        
+
         // Cargo tools
         tools.insert(CargoAddRmcpTool::NAME, Box::new(CargoAddRmcpTool));
         tools.insert(CargoBuildRmcpTool::NAME, Box::new(CargoBuildRmcpTool));
@@ -40,7 +45,10 @@ impl Server {
         tools.insert(CargoClippyRmcpTool::NAME, Box::new(CargoClippyRmcpTool));
         tools.insert(CargoDocRmcpTool::NAME, Box::new(CargoDocRmcpTool));
         tools.insert(CargoFmtRmcpTool::NAME, Box::new(CargoFmtRmcpTool));
-        tools.insert(CargoGenerateLockfileRmcpTool::NAME, Box::new(CargoGenerateLockfileRmcpTool));
+        tools.insert(
+            CargoGenerateLockfileRmcpTool::NAME,
+            Box::new(CargoGenerateLockfileRmcpTool),
+        );
         tools.insert(CargoInfoRmcpTool::NAME, Box::new(CargoInfoRmcpTool));
         tools.insert(CargoListRmcpTool::NAME, Box::new(CargoListRmcpTool));
         tools.insert(CargoMetadataRmcpTool::NAME, Box::new(CargoMetadataRmcpTool));
@@ -50,29 +58,53 @@ impl Server {
         tools.insert(CargoSearchRmcpTool::NAME, Box::new(CargoSearchRmcpTool));
         tools.insert(CargoTestRmcpTool::NAME, Box::new(CargoTestRmcpTool));
         tools.insert(CargoUpdateRmcpTool::NAME, Box::new(CargoUpdateRmcpTool));
-        
+
         // Cargo-deny tools
-        tools.insert(CargoDenyCheckRmcpTool::NAME, Box::new(CargoDenyCheckRmcpTool));
+        tools.insert(
+            CargoDenyCheckRmcpTool::NAME,
+            Box::new(CargoDenyCheckRmcpTool),
+        );
         tools.insert(CargoDenyInitRmcpTool::NAME, Box::new(CargoDenyInitRmcpTool));
-        tools.insert(CargoDenyInstallRmcpTool::NAME, Box::new(CargoDenyInstallRmcpTool));
+        tools.insert(
+            CargoDenyInstallRmcpTool::NAME,
+            Box::new(CargoDenyInstallRmcpTool),
+        );
         tools.insert(CargoDenyListRmcpTool::NAME, Box::new(CargoDenyListRmcpTool));
-        
+
         // Cargo-hack tools
         tools.insert(CargoHackRmcpTool::NAME, Box::new(CargoHackRmcpTool));
-        tools.insert(CargoHackInstallRmcpTool::NAME, Box::new(CargoHackInstallRmcpTool));
-        
+        tools.insert(
+            CargoHackInstallRmcpTool::NAME,
+            Box::new(CargoHackInstallRmcpTool),
+        );
+
         // Cargo-machete tools
         tools.insert(CargoMacheteRmcpTool::NAME, Box::new(CargoMacheteRmcpTool));
-        tools.insert(CargoMacheteInstallRmcpTool::NAME, Box::new(CargoMacheteInstallRmcpTool));
-        
+        tools.insert(
+            CargoMacheteInstallRmcpTool::NAME,
+            Box::new(CargoMacheteInstallRmcpTool),
+        );
+
         // Rustc tools
         tools.insert(RustcExplainRmcpTool::NAME, Box::new(RustcExplainRmcpTool));
-        
+
         // Rustup tools
         tools.insert(RustupShowRmcpTool::NAME, Box::new(RustupShowRmcpTool));
-        tools.insert(RustupToolchainAddRmcpTool::NAME, Box::new(RustupToolchainAddRmcpTool));
+        tools.insert(
+            RustupToolchainAddRmcpTool::NAME,
+            Box::new(RustupToolchainAddRmcpTool),
+        );
         tools.insert(RustupUpdateRmcpTool::NAME, Box::new(RustupUpdateRmcpTool));
-        
+
+        if !disabled_tools.is_empty() {
+            tracing::info!("Disabled tools: {}", disabled_tools.join(", "));
+            for tool_name in disabled_tools {
+                if !tools.remove(tool_name.as_str()).is_some() {
+                    tracing::warn!("Tool not found: {tool_name}");
+                }
+            }
+        }
+
         Self { tools }
     }
 }
