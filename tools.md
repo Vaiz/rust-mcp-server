@@ -243,7 +243,7 @@
       - <code>output_verbosity</code> : string<br />
 
 - **cargo-hack**
-  - Cargo subcommand to provide various options useful for testing and continuous integration, including feature testing and multi-version compatibility. Available commands: check, test, build, clippy. Recommend using <code>check</code> for fast validation. Example: cargo-hack with "feature_powerset": true, "depth": 3, "keep_going": true
+  - Cargo subcommand to provide various options useful for testing and continuous integration, including feature testing and multi-version compatibility. Available commands: check, test, build, clippy. Recommend using 'check' for fast validation. Example: cargo-hack with "feature_powerset": true, "depth": 3, "keep_going": true
   - **Inputs:**
       - <code>clean_per_run</code> : boolean<br />
       - <code>clean_per_version</code> : boolean<br />
@@ -453,7 +453,7 @@
       - <code>verbose</code> : boolean<br />
 
 - **rustup-toolchain-add**
-  - Install or update the given toolchains, or by default the active toolchain. Toolchain name can be <code>stable</code>, <code>nightly</code>, or a specific version like '1.8.0'.
+  - Install or update the given toolchains, or by default the active toolchain. Toolchain name can be 'stable', 'nightly', or a specific version like '1.8.0'.
   - **Inputs:**
       - <code>allow_downgrade</code> : boolean<br />
       - <code>components</code> : string [ ]<br />
