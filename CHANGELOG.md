@@ -9,9 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.3.0](https://github.com/Vaiz/rust-mcp-server/compare/v0.2.7...v0.3.0) - 2025-12-13
 
-### Added
+### Breaking
 
-- [**breaking**] switch to MCP 2025-11-25 ([#72](https://github.com/Vaiz/rust-mcp-server/pull/72))
+- switch to MCP 2025-11-25 by moving to `rmcp` crate ([#72](https://github.com/Vaiz/rust-mcp-server/pull/72))
+- remove timeout option (`rmcp` doesn't support it)
+- remove `update-crates` prompt
+- remove Cargo Book documentation from resources
+- add built-in documentation generation capability (replacing external mcp-discovery tool)
 
 ### Other
 
