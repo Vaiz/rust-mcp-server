@@ -1,6 +1,5 @@
 #![allow(unused, dead_code)] // FIXME: Remove this when the codebase is more complete.
 
-mod handler;
 mod prompts;
 mod resources;
 mod rmcp_server;

@@ -20,7 +20,7 @@ use rust_mcp_sdk::{
     openWorldHint = false
 )]
 #[derive(Debug, ::serde::Deserialize, JsonSchema, ::schemars::JsonSchema)]
-pub struct CargoCheckTool {
+pub struct CargoCheckRequest {
     /// The toolchain to use, e.g., "stable" or "nightly".
     #[serde(default, deserialize_with = "deserialize_string")]
     toolchain: Option<String>,
@@ -149,7 +149,7 @@ pub struct CargoCheckTool {
     warnings_as_errors: Option<bool>,
 }
 
-impl CargoCheckTool {
+impl CargoCheckRequest {
     pub fn build_cmd(&self) -> Result<Command, CallToolError> {
         let mut cmd = Command::new("cargo");
         if let Some(toolchain) = &self.toolchain {
@@ -294,7 +294,7 @@ impl ToolImpl for CargoCheckRmcpTool {
     const NAME: &'static str = "cargo-check";
     const TITLE: &'static str = "cargo check";
     const DESCRIPTION: &'static str = "Checks a Rust package and all of its dependencies for errors. Usually, run without any additional arguments.";
-    type RequestArgs = CargoCheckTool;
+    type RequestArgs = CargoCheckRequest;
 
     fn call_rmcp_tool(
         &self,

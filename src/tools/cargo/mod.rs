@@ -12,7 +12,7 @@ mod update;
 
 pub use add_remove::{CargoAddTool, CargoRemoveTool};
 pub use build::CargoBuildTool;
-pub use check::{CargoCheckRmcpTool, CargoCheckTool};
+pub use check::{CargoCheckRequest, CargoCheckRmcpTool};
 pub use clippy::CargoClippyTool;
 pub use doc::CargoDocTool;
 pub use info::CargoInfoTool;
