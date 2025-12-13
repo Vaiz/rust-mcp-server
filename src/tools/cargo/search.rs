@@ -46,8 +46,7 @@ pub struct CargoSearchRmcpTool;
 impl ToolImpl for CargoSearchRmcpTool {
     const NAME: &'static str = "cargo-search";
     const TITLE: &'static str = "cargo search";
-    const DESCRIPTION: &'static str =
-        "Search packages in the registry. Default registry is crates.io.";
+    const DESCRIPTION: &'static str = "Search packages in the registry. Default registry is crates.io. Equivalent to 'cargo search <code>QUERY</code>'.";
     type RequestArgs = CargoSearchRequest;
 
     fn call_rmcp_tool(

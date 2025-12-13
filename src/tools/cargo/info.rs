@@ -83,7 +83,7 @@ pub struct CargoInfoRmcpTool;
 impl ToolImpl for CargoInfoRmcpTool {
     const NAME: &'static str = "cargo-info";
     const TITLE: &'static str = "cargo info";
-    const DESCRIPTION: &'static str = "Display information about a package. Information includes package description, list of available features, etc.";
+    const DESCRIPTION: &'static str = "Display information about a package. Information includes package description, list of available features, etc. Equivalent to 'cargo info <SPEC>'.";
     type RequestArgs = CargoInfoRequest;
 
     fn call_rmcp_tool(

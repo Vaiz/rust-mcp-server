@@ -311,7 +311,7 @@ impl ToolImpl for CargoTestRmcpTool {
     const NAME: &'static str = "cargo-test";
     const TITLE: &'static str = "cargo test";
     const DESCRIPTION: &'static str =
-        "Run cargo test to execute Rust tests in the current project.";
+        "Run `cargo test` to execute Rust tests in the current project.";
     type RequestArgs = CargoTestRequest;
 
     fn call_rmcp_tool(
