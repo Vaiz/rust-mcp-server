@@ -9,6 +9,7 @@ use rust_mcp_sdk::schema::{
     Annotations, CallToolRequest, CallToolResult, Role, TextContent, schema_utils::CallToolError,
 };
 
+use cargo::CargoCheckRmcpTool;
 use cargo::{
     CargoAddTool, CargoBuildTool, CargoCheckTool, CargoCleanTool, CargoClippyTool, CargoDocTool,
     CargoFmtTool, CargoGenerateLockfileTool, CargoInfoTool, CargoListTool, CargoMetadataTool,

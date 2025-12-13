@@ -149,27 +149,6 @@ pub struct CargoCheckTool {
     warnings_as_errors: Option<bool>,
 }
 
-impl ToolImpl for CargoCheckTool {
-    const NAME: &'static str = "cargo-check";
-    type RequestArgs = Self;
-
-    fn call_rmcp_tool(
-        &self,
-        request: Self::RequestArgs,
-    ) -> Result<rmcp::model::CallToolResult, ErrorData> {
-        let cmd = match request.build_cmd() {
-            Ok(cmd) => cmd,
-            Err(e) => {
-                return Err(ErrorData::invalid_params(
-                    format!("Failed to build command: {e}"),
-                    None,
-                ));
-            }
-        };
-        execute_rmcp_command(cmd, &Self::NAME)
-    }
-}
-
 impl CargoCheckTool {
     pub fn build_cmd(&self) -> Result<Command, CallToolError> {
         let mut cmd = Command::new("cargo");
@@ -305,6 +284,31 @@ impl CargoCheckTool {
 
     pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
         let cmd = self.build_cmd()?;
-        execute_command(cmd, &Self::NAME)
+        execute_command(cmd, &CargoCheckRmcpTool::NAME)
+    }
+}
+
+pub struct CargoCheckRmcpTool;
+
+impl ToolImpl for CargoCheckRmcpTool {
+    const NAME: &'static str = "cargo-check";
+    const TITLE: &'static str = "cargo check";
+    const DESCRIPTION: &'static str = "Checks a Rust package and all of its dependencies for errors. Usually, run without any additional arguments.";
+    type RequestArgs = CargoCheckTool;
+
+    fn call_rmcp_tool(
+        &self,
+        request: Self::RequestArgs,
+    ) -> Result<rmcp::model::CallToolResult, ErrorData> {
+        let cmd = match request.build_cmd() {
+            Ok(cmd) => cmd,
+            Err(e) => {
+                return Err(ErrorData::invalid_params(
+                    format!("Failed to build command: {e}"),
+                    None,
+                ));
+            }
+        };
+        execute_rmcp_command(cmd, &Self::NAME)
     }
 }

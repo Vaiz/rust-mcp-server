@@ -1,12 +1,13 @@
 use rmcp::ErrorData;
 use rmcp::model::{
-    AnnotateAble, Annotated, Annotations, CallToolRequestParam, CallToolResult, RawContent,
-    RawTextContent, Role, TextContent,
+    AnnotateAble, Annotated, Annotations, CallToolRequestParam, CallToolResult, RawContent, Role,
 };
 
 /// Dyn compatible Tool trait
 pub(crate) trait Tool {
     fn name(&self) -> &'static str;
+    fn title(&self) -> &'static str;
+    fn description(&self) -> &'static str;
     fn json_schema(&self) -> serde_json::Map<String, serde_json::Value>;
     fn call_rmcp_tool(&self, request: CallToolRequestParam) -> Result<CallToolResult, ErrorData>;
 }
@@ -14,6 +15,8 @@ pub(crate) trait Tool {
 /// Actual trait that all tools must implement
 pub(crate) trait ToolImpl {
     const NAME: &'static str;
+    const TITLE: &'static str;
+    const DESCRIPTION: &'static str;
     type RequestArgs: serde::de::DeserializeOwned + schemars::JsonSchema;
 
     fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData>;
@@ -25,6 +28,14 @@ where
 {
     fn name(&self) -> &'static str {
         T::NAME
+    }
+
+    fn title(&self) -> &'static str {
+        T::TITLE
+    }
+
+    fn description(&self) -> &'static str {
+        T::DESCRIPTION
     }
 
     fn json_schema(&self) -> serde_json::Map<String, serde_json::Value> {
