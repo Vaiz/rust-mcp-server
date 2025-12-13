@@ -2,7 +2,7 @@
 name = "rust-mcp-server"
 version = "0.2.7"
 edition = "2024"
-rust-version = "1.88"
+rust-version = "1.92"
 description = "An MCP server for Rust development"
 authors = ["Vaiz"]
 license = "Unlicense"
