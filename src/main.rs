@@ -37,6 +37,10 @@ struct Args {
     /// Rust project workspace path. By default, uses the current directory.
     #[arg(long)]
     workspace: Option<String>,
+
+    /// Generate tools.md documentation file and exit
+    #[arg(long)]
+    generate_docs: Option<String>,
 }
 
 #[tokio::main]
@@ -86,6 +90,15 @@ async fn main() -> anyhow::Result<()> {
     }
 
     let server = rmcp_server::Server::new(&args.disabled_tools);
+
+    // Handle documentation generation mode
+    if let Some(output_file) = args.generate_docs {
+        tracing::info!("Generating documentation to: {}", output_file);
+        let docs = server.generate_markdown_docs();
+        std::fs::write(&output_file, docs).context("Failed to write documentation file")?;
+        println!("Documentation generated successfully: {}", output_file);
+        return Ok(());
+    }
 
     /// FIXME: How to pass timeout to StdioTransport?
     let service = server

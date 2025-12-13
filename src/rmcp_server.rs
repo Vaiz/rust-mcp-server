@@ -107,6 +107,71 @@ impl Server {
 
         Self { tools }
     }
+
+    /// Generate markdown documentation for all tools
+    pub fn generate_markdown_docs(&self) -> String {
+        let mut output = String::new();
+
+        // Header
+        output.push_str(&format!("## Rust MCP Server\n"));
+        output.push_str(&format!("| 🟢 Tools ({}) | 🟢 Prompts (0) | 🟢 Resources (0) | <span style=\"opacity:0.6\">🔴 Logging</span> | <span style=\"opacity:0.6\">🔴 Completions</span> | <span style=\"opacity:0.6\">🔴 Experimental</span> |\n", self.tools.len()));
+        output.push_str("| --- | --- | --- | --- | --- | --- |\n\n");
+
+        // Tools section
+        output.push_str(&format!("## 🛠️ Tools ({})\n\n\n", self.tools.len()));
+
+        // Sort tools by name for consistent output
+        let mut tool_names: Vec<&str> = self.tools.keys().copied().collect();
+        tool_names.sort();
+
+        for tool_name in tool_names {
+            let tool = &self.tools[tool_name];
+            output.push_str(&format!("- **{}**\n", tool.name()));
+            output.push_str(&format!("  - {}\n", tool.description()));
+
+            let schema = tool.json_schema();
+            if let Some(serde_json::Value::Object(properties)) = schema.get("properties") {
+                if !properties.is_empty() {
+                    output.push_str("  - **Inputs:**\n");
+
+                    // Sort properties for consistent output
+                    let mut prop_names: Vec<&String> = properties.keys().collect();
+                    prop_names.sort();
+
+                    for prop_name in prop_names {
+                        let prop = &properties[prop_name];
+                        let type_str = self.format_property_type(prop);
+                        output.push_str(&format!(
+                            "      - <code>{}</code> : {}<br />\n",
+                            prop_name, type_str
+                        ));
+                    }
+                }
+            }
+            output.push_str("\n");
+        }
+
+        output
+    }
+
+    fn format_property_type(&self, prop: &serde_json::Value) -> String {
+        if let Some(type_val) = prop.get("type") {
+            match type_val.as_str() {
+                Some("array") => {
+                    if let Some(items) = prop.get("items") {
+                        if let Some(item_type) = items.get("type") {
+                            return format!("{} [ ]", item_type.as_str().unwrap_or("unknown"));
+                        }
+                    }
+                    "array".to_string()
+                }
+                Some(type_str) => type_str.to_string(),
+                None => "unknown".to_string(),
+            }
+        } else {
+            "unknown".to_string()
+        }
+    }
 }
 
 impl rmcp::ServerHandler for Server {
@@ -143,7 +208,7 @@ impl rmcp::ServerHandler for Server {
             tools.push(rmcp::model::Tool {
                 name: tool.name().into(),
                 title: Some(tool.title().into()),
-                description: Some(tool.description().into()),
+                description: Some(tool.description().trim().trim_matches('\n').into()),
                 input_schema: schema,
                 output_schema: None,
                 annotations: None,
