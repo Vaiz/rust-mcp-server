@@ -6,7 +6,23 @@ use rmcp::{
     service::RequestContext,
 };
 
-use crate::{ToolImpl, tool::Tool, tools::cargo::CargoCheckRmcpTool, version::AppVersion};
+use crate::{
+    ToolImpl, tool::Tool, version::AppVersion,
+    tools::{
+        cargo::{
+            CargoAddRmcpTool, CargoBuildRmcpTool, CargoCheckRmcpTool, CargoCleanRmcpTool,
+            CargoClippyRmcpTool, CargoDocRmcpTool, CargoFmtRmcpTool, CargoGenerateLockfileRmcpTool,
+            CargoInfoRmcpTool, CargoListRmcpTool, CargoMetadataRmcpTool, CargoNewRmcpTool,
+            CargoPackageRmcpTool, CargoRemoveRmcpTool, CargoSearchRmcpTool, CargoTestRmcpTool,
+            CargoUpdateRmcpTool,
+        },
+        cargo_deny::{CargoDenyCheckRmcpTool, CargoDenyInitRmcpTool, CargoDenyInstallRmcpTool, CargoDenyListRmcpTool},
+        cargo_hack::{CargoHackInstallRmcpTool, CargoHackRmcpTool},
+        cargo_machete::{CargoMacheteInstallRmcpTool, CargoMacheteRmcpTool},
+        rustc::RustcExplainRmcpTool,
+        rustup::{RustupShowRmcpTool, RustupToolchainAddRmcpTool, RustupUpdateRmcpTool},
+    },
+};
 
 pub struct Server {
     tools: HashMap<&'static str, Box<dyn Tool + Send + Sync>>,
@@ -15,7 +31,48 @@ pub struct Server {
 impl Server {
     pub fn new() -> Self {
         let mut tools: HashMap<&'static str, Box<dyn Tool + Send + Sync>> = HashMap::new();
+        
+        // Cargo tools
+        tools.insert(CargoAddRmcpTool::NAME, Box::new(CargoAddRmcpTool));
+        tools.insert(CargoBuildRmcpTool::NAME, Box::new(CargoBuildRmcpTool));
         tools.insert(CargoCheckRmcpTool::NAME, Box::new(CargoCheckRmcpTool));
+        tools.insert(CargoCleanRmcpTool::NAME, Box::new(CargoCleanRmcpTool));
+        tools.insert(CargoClippyRmcpTool::NAME, Box::new(CargoClippyRmcpTool));
+        tools.insert(CargoDocRmcpTool::NAME, Box::new(CargoDocRmcpTool));
+        tools.insert(CargoFmtRmcpTool::NAME, Box::new(CargoFmtRmcpTool));
+        tools.insert(CargoGenerateLockfileRmcpTool::NAME, Box::new(CargoGenerateLockfileRmcpTool));
+        tools.insert(CargoInfoRmcpTool::NAME, Box::new(CargoInfoRmcpTool));
+        tools.insert(CargoListRmcpTool::NAME, Box::new(CargoListRmcpTool));
+        tools.insert(CargoMetadataRmcpTool::NAME, Box::new(CargoMetadataRmcpTool));
+        tools.insert(CargoNewRmcpTool::NAME, Box::new(CargoNewRmcpTool));
+        tools.insert(CargoPackageRmcpTool::NAME, Box::new(CargoPackageRmcpTool));
+        tools.insert(CargoRemoveRmcpTool::NAME, Box::new(CargoRemoveRmcpTool));
+        tools.insert(CargoSearchRmcpTool::NAME, Box::new(CargoSearchRmcpTool));
+        tools.insert(CargoTestRmcpTool::NAME, Box::new(CargoTestRmcpTool));
+        tools.insert(CargoUpdateRmcpTool::NAME, Box::new(CargoUpdateRmcpTool));
+        
+        // Cargo-deny tools
+        tools.insert(CargoDenyCheckRmcpTool::NAME, Box::new(CargoDenyCheckRmcpTool));
+        tools.insert(CargoDenyInitRmcpTool::NAME, Box::new(CargoDenyInitRmcpTool));
+        tools.insert(CargoDenyInstallRmcpTool::NAME, Box::new(CargoDenyInstallRmcpTool));
+        tools.insert(CargoDenyListRmcpTool::NAME, Box::new(CargoDenyListRmcpTool));
+        
+        // Cargo-hack tools
+        tools.insert(CargoHackRmcpTool::NAME, Box::new(CargoHackRmcpTool));
+        tools.insert(CargoHackInstallRmcpTool::NAME, Box::new(CargoHackInstallRmcpTool));
+        
+        // Cargo-machete tools
+        tools.insert(CargoMacheteRmcpTool::NAME, Box::new(CargoMacheteRmcpTool));
+        tools.insert(CargoMacheteInstallRmcpTool::NAME, Box::new(CargoMacheteInstallRmcpTool));
+        
+        // Rustc tools
+        tools.insert(RustcExplainRmcpTool::NAME, Box::new(RustcExplainRmcpTool));
+        
+        // Rustup tools
+        tools.insert(RustupShowRmcpTool::NAME, Box::new(RustupShowRmcpTool));
+        tools.insert(RustupToolchainAddRmcpTool::NAME, Box::new(RustupToolchainAddRmcpTool));
+        tools.insert(RustupUpdateRmcpTool::NAME, Box::new(RustupUpdateRmcpTool));
+        
         Self { tools }
     }
 }

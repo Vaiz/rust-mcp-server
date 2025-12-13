@@ -5,18 +5,18 @@ pub mod cargo_machete;
 pub mod rustc;
 pub mod rustup;
 
-use cargo::CargoCheckRmcpTool;
 use cargo::{
-    CargoAddTool, CargoBuildTool, CargoCheckRequest, CargoCleanTool, CargoClippyTool, CargoDocTool,
-    CargoFmtTool, CargoGenerateLockfileTool, CargoInfoTool, CargoListTool, CargoMetadataTool,
-    CargoNewTool, CargoPackageTool, CargoRemoveTool, CargoSearchTool, CargoTestTool,
-    CargoUpdateTool,
+    CargoAddRmcpTool, CargoBuildRmcpTool, CargoCheckRmcpTool, CargoCleanRmcpTool, 
+    CargoClippyRmcpTool, CargoDocRmcpTool, CargoFmtRmcpTool, CargoGenerateLockfileRmcpTool,
+    CargoInfoRmcpTool, CargoListRmcpTool, CargoMetadataRmcpTool, CargoNewRmcpTool, 
+    CargoPackageRmcpTool, CargoRemoveRmcpTool, CargoSearchRmcpTool, CargoTestRmcpTool,
+    CargoUpdateRmcpTool,
 };
-use cargo_deny::{CargoDenyCheckTool, CargoDenyInitTool, CargoDenyInstallTool, CargoDenyListTool};
-use cargo_hack::{CargoHackInstallTool, CargoHackTool};
-use cargo_machete::{CargoMacheteInstallTool, CargoMacheteTool};
-use rustc::RustcExplainTool;
-use rustup::{RustupShowTool, RustupToolchainAddTool, RustupUpdateTool};
+use cargo_deny::{CargoDenyCheckRmcpTool, CargoDenyInitRmcpTool, CargoDenyInstallRmcpTool, CargoDenyListRmcpTool};
+use cargo_hack::{CargoHackInstallRmcpTool, CargoHackRmcpTool};
+use cargo_machete::{CargoMacheteInstallRmcpTool, CargoMacheteRmcpTool};
+use rustc::RustcExplainRmcpTool;
+use rustup::{RustupShowRmcpTool, RustupToolchainAddRmcpTool, RustupUpdateRmcpTool};
 
 static WORKSPACE_ROOT: std::sync::OnceLock<String> = std::sync::OnceLock::new();
 

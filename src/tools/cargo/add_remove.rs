@@ -1,13 +1,13 @@
 use std::process::Command;
 
-use crate::serde_utils::Tool;
-use crate::serde_utils::{
-    PackageWithVersion, deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
-    output_verbosity_to_cli_flags,
+use crate::{
+    ToolImpl, execute_rmcp_command,
+    serde_utils::{
+        PackageWithVersion, deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
+        output_verbosity_to_cli_flags,
+    },
 };
-use anyhow::Error;
-use rmcp::ErrorData;
-use schemars::JsonSchema;
+use rmcp::{ErrorData, model::CallToolResult};
 
 fn dependency_type_to_cli_flag(
     dependency_type: Option<&str>,
@@ -28,7 +28,7 @@ fn dependency_type_to_cli_flag(
 
 /// Adds a dependency to a Rust project using cargo add.
 #[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
-pub struct CargoAddTool {
+pub struct CargoAddRequest {
     /// The toolchain to use, e.g., "stable" or "nightly".
     #[serde(default, deserialize_with = "deserialize_string")]
     toolchain: Option<String>,
@@ -128,8 +128,8 @@ pub struct CargoAddTool {
     pub output_verbosity: Option<String>,
 }
 
-impl CargoAddTool {
-    pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
+impl CargoAddRequest {
+    pub fn build_cmd(&self) -> Result<Command, ErrorData> {
         let mut cmd = Command::new("cargo");
         if let Some(toolchain) = &self.toolchain {
             cmd.arg(format!("+{toolchain}"));
@@ -219,13 +219,26 @@ impl CargoAddTool {
         let output_flags = output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
         cmd.args(output_flags);
 
-        execute_command(cmd, "cargo-add")
+        Ok(cmd)
+    }
+}
+
+pub struct CargoAddRmcpTool;
+
+impl ToolImpl for CargoAddRmcpTool {
+    const NAME: &'static str = "cargo-add";
+    const TITLE: &'static str = "Add Rust dependency";
+    const DESCRIPTION: &'static str = "Adds a dependency to a Rust project using cargo add.";
+    type RequestArgs = CargoAddRequest;
+
+    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
+        execute_rmcp_command(request.build_cmd()?, Self::NAME)
     }
 }
 
 /// Remove dependencies from a Cargo.toml manifest file.
 #[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
-pub struct CargoRemoveTool {
+pub struct CargoRemoveRequest {
     /// The toolchain to use, e.g., "stable" or "nightly".
     #[serde(default, deserialize_with = "deserialize_string")]
     toolchain: Option<String>,
@@ -280,8 +293,8 @@ pub struct CargoRemoveTool {
     pub output_verbosity: Option<String>,
 }
 
-impl CargoRemoveTool {
-    pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
+impl CargoRemoveRequest {
+    pub fn build_cmd(&self) -> Result<Command, ErrorData> {
         let mut cmd = Command::new("cargo");
         if let Some(toolchain) = &self.toolchain {
             cmd.arg(format!("+{toolchain}"));
@@ -329,13 +342,27 @@ impl CargoRemoveTool {
         let output_flags = output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
         cmd.args(output_flags);
 
-        execute_command(cmd, "cargo-add")
+        Ok(cmd)
+    }
+}
+
+pub struct CargoRemoveRmcpTool;
+
+impl ToolImpl for CargoRemoveRmcpTool {
+    const NAME: &'static str = "cargo-remove";
+    const TITLE: &'static str = "Remove Rust dependency";
+    const DESCRIPTION: &'static str = "Remove dependencies from a Cargo.toml manifest file.";
+    type RequestArgs = CargoRemoveRequest;
+
+    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
+        execute_rmcp_command(request.build_cmd()?, Self::NAME)
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use schemars::{JsonSchema, SchemaGenerator};
 
     #[test]
     fn test_dependency_type_helper() {
@@ -493,19 +520,20 @@ mod tests {
     "package",
     "target_package"
   ],
-  "title": "CargoAddTool",
+  "title": "CargoAddRequest",
   "type": "object"
 }"##;
-        let schema = serde_json::Value::from(CargoAddTool::json_schema());
+        let mut schema_gen = SchemaGenerator::default();
+        let schema = serde_json::Value::from(CargoAddRequest::json_schema(&mut schema_gen));
         println!(
-            "CargoAddTool schema: {}",
+            "CargoAddRequest schema: {}",
             serde_json::to_string_pretty(&schema).unwrap()
         );
 
         let expected_schema: serde_json::Value = serde_json::from_str(EXPECTED_SCHEMA).unwrap();
         assert_eq!(
             schema, expected_schema,
-            "CargoAddTool schema should match expected structure"
+            "CargoAddRequest schema should match expected structure"
         );
     }
 }
