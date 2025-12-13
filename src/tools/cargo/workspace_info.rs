@@ -48,7 +48,7 @@ impl Tool for CargoWorkspaceInfoRmcpTool {
     const NAME: &'static str = "workspace-info";
     const TITLE: &'static str = "workspace info";
     const DESCRIPTION: &'static str = "Get information about crates in the current workspace, including package names, target \
-         types, manifest paths, descriptions, features, and optionally dependencies.";
+         types, manifest paths, descriptions, features, and optionally dependencies. This is a cut down version of cargo metadata with the goal of saving tokens.";
     type RequestArgs = CargoWorkspaceInfoRequest;
 
     fn call_rmcp_tool(
