@@ -524,7 +524,7 @@ mod tests {
   "title": "CargoAddRequest",
   "type": "object"
 }"##;
-        let schema = serde_json::Value::from(CargoRemoveRmcpTool {}.json_schema());
+        let schema = serde_json::Value::from(CargoAddRmcpTool {}.json_schema());
         println!(
             "CargoAddRequest schema: {}",
             serde_json::to_string_pretty(&schema).unwrap()
