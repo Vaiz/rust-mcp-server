@@ -84,7 +84,7 @@ async fn main() -> anyhow::Result<()> {
         .await
         .context("Failed to start server")?;
 
-    eprintln!("Precisely File Editor MCP Server started on stdio");
+    eprintln!("Rust MCP Server started on stdio");
 
     let result = service.waiting().await;
 
