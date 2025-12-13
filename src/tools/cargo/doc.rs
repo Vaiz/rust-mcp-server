@@ -3,7 +3,7 @@ use std::process::Command;
 
 use rmcp::{
     ErrorData,
-    model::{Annotations, CallToolResult, RawContent, Role},
+    model::RawContent,
 };
 
 use crate::{
@@ -354,7 +354,7 @@ impl Tool for CargoDocRmcpTool {
                 "\n📚 Documentation generated successfully!".to_owned()
             };
 
-            use rmcp::model::{AnnotateAble, Annotations, RawTextContent, Role};
+            use rmcp::model::{AnnotateAble, Annotations, Role};
             let annotations = Annotations {
                 audience: Some(vec![Role::User, Role::Assistant]),
                 last_modified: None,

@@ -100,7 +100,7 @@ mod tests {
 
     use super::*;
 
-    use rmcp::ErrorData;
+    
 
     #[test]
     fn test_cargo_info_schema() {

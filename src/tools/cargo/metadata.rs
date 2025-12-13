@@ -144,7 +144,7 @@ mod tests {
     use super::*;
     use serde_json::json;
 
-    use rmcp::ErrorData;
+    
 
     #[test]
     fn test_deserialize_with_features_array() {

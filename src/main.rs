@@ -1,5 +1,3 @@
-#![allow(unused, dead_code)] // FIXME: Remove this when the codebase is more complete.
-
 mod rmcp_server;
 pub(crate) mod serde_utils;
 mod tool;
