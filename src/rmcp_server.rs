@@ -151,6 +151,7 @@ impl Server {
             output.push('\n');
         }
 
+        output.pop();
         output
     }
 
