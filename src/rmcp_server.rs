@@ -48,4 +48,16 @@ impl rmcp::ServerHandler for Server {
             tools,
         })
     }
+
+    async fn call_tool(
+        &self,
+        request: rmcp::model::CallToolRequestParam,
+        _context: RequestContext<rmcp::RoleServer>,
+    ) -> Result<rmcp::model::CallToolResult, ErrorData> {
+        let tool = self.tools.get(request.name.as_ref()).ok_or_else(|| {
+            ErrorData::invalid_request(format!("Tool '{}' not found", request.name), None)
+        })?;
+
+        tool.call_rmcp_tool(request)
+    }
 }
