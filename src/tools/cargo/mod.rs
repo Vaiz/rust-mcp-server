@@ -9,6 +9,7 @@ mod package;
 mod search;
 mod test;
 mod update;
+mod workspace_info;
 
 pub use add_remove::{CargoAddRmcpTool, CargoRemoveRmcpTool};
 pub use build::CargoBuildRmcpTool;
@@ -21,6 +22,7 @@ pub use package::CargoPackageRmcpTool;
 pub use search::CargoSearchRmcpTool;
 pub use test::CargoTestRmcpTool;
 pub use update::CargoUpdateRmcpTool;
+pub use workspace_info::CargoWorkspaceInfoRmcpTool;
 
 use std::process::Command;
 
