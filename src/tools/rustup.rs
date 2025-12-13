@@ -41,7 +41,6 @@ impl ToolImpl for RustupShowRmcpTool {
 
 #[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
 pub struct RustupToolchainAddRequest {
-
     /// Toolchain name, such as 'stable', 'nightly', or '1.8.0'
     pub toolchain: String,
 
@@ -130,7 +129,6 @@ impl ToolImpl for RustupToolchainAddRmcpTool {
 
 #[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
 pub struct RustupUpdateRequest {
-
     /// Toolchain name to update, such as 'stable', 'nightly', or '1.8.0'. If not specified, updates all installed toolchains
     #[serde(default, deserialize_with = "deserialize_string")]
     pub toolchain: Option<String>,

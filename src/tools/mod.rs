@@ -6,13 +6,15 @@ pub mod rustc;
 pub mod rustup;
 
 use cargo::{
-    CargoAddRmcpTool, CargoBuildRmcpTool, CargoCheckRmcpTool, CargoCleanRmcpTool, 
+    CargoAddRmcpTool, CargoBuildRmcpTool, CargoCheckRmcpTool, CargoCleanRmcpTool,
     CargoClippyRmcpTool, CargoDocRmcpTool, CargoFmtRmcpTool, CargoGenerateLockfileRmcpTool,
-    CargoInfoRmcpTool, CargoListRmcpTool, CargoMetadataRmcpTool, CargoNewRmcpTool, 
+    CargoInfoRmcpTool, CargoListRmcpTool, CargoMetadataRmcpTool, CargoNewRmcpTool,
     CargoPackageRmcpTool, CargoRemoveRmcpTool, CargoSearchRmcpTool, CargoTestRmcpTool,
     CargoUpdateRmcpTool,
 };
-use cargo_deny::{CargoDenyCheckRmcpTool, CargoDenyInitRmcpTool, CargoDenyInstallRmcpTool, CargoDenyListRmcpTool};
+use cargo_deny::{
+    CargoDenyCheckRmcpTool, CargoDenyInitRmcpTool, CargoDenyInstallRmcpTool, CargoDenyListRmcpTool,
+};
 use cargo_hack::{CargoHackInstallRmcpTool, CargoHackRmcpTool};
 use cargo_machete::{CargoMacheteInstallRmcpTool, CargoMacheteRmcpTool};
 use rustc::RustcExplainRmcpTool;

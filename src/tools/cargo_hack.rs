@@ -2,9 +2,7 @@ use std::process::Command;
 
 use crate::{
     ToolImpl, execute_rmcp_command,
-    serde_utils::{
-        deserialize_string, deserialize_string_vec, output_verbosity_to_cli_flags,
-    },
+    serde_utils::{deserialize_string, deserialize_string_vec, output_verbosity_to_cli_flags},
 };
 use rmcp::{ErrorData, model::CallToolResult};
 
@@ -361,7 +359,8 @@ pub struct CargoHackInstallRmcpTool;
 impl ToolImpl for CargoHackInstallRmcpTool {
     const NAME: &'static str = "cargo-hack-install";
     const TITLE: &'static str = "Install cargo-hack";
-    const DESCRIPTION: &'static str = "Installs cargo-hack tool for feature testing and continuous integration";
+    const DESCRIPTION: &'static str =
+        "Installs cargo-hack tool for feature testing and continuous integration";
     type RequestArgs = CargoHackInstallRequest;
 
     fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {

@@ -61,25 +61,25 @@ async fn main() -> anyhow::Result<()> {
             .with_ansi(false)
             .init();
     }
-    tracing::info!(?args, "Starting Rust MCP Server");
+    tracing::info!("Starting Rust MCP Server: {:?}", args);
 
     // Warn about long-running requests
     if args.timeout < 60 {
         tracing::warn!(
-            timeout = args.timeout,
-            "Short timeout may interrupt long-running requests like cargo-build"
+            "Short timeout ({}) may interrupt long-running requests like cargo-build",
+            args.timeout
         );
     } else if args.timeout >= 600 {
         tracing::info!(
-            timeout = args.timeout,
-            "Long timeout set; some requests (e.g., cargo-build) may take a while"
+            "Long timeout ({}) set; some requests (e.g., cargo-build) may take a while",
+            args.timeout
         );
     }
 
-    tracing::info!(version = AppVersion::version(), "Server version");
+    tracing::info!("Server version: {}", AppVersion::version());
 
     if let Some(workspace) = args.workspace {
-        tracing::info!(workspace = %workspace, "Workspace root has been overridden");
+        tracing::info!("Workspace root has been overridden: {}", workspace);
         tools::set_workspace_root(workspace);
     } else {
         tracing::info!("No workspace root specified, using current directory");

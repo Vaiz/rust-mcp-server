@@ -1,9 +1,6 @@
 use std::process::Command;
 
-use crate::{
-    ToolImpl, execute_rmcp_command,
-    serde_utils::deserialize_string_vec,
-};
+use crate::{ToolImpl, execute_rmcp_command, serde_utils::deserialize_string_vec};
 use rmcp::{ErrorData, model::CallToolResult};
 
 #[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]

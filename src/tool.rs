@@ -90,11 +90,7 @@ pub(crate) fn execute_rmcp_command(
     tool_name: &str,
 ) -> Result<CallToolResult, ErrorData> {
     apply_workspace_root(&mut cmd);
-    tracing::info!(
-        command = ?cmd,
-        tool_name = tool_name,
-        "Executing command"
-    );
+    tracing::info!("Executing command for {}: {:?}", tool_name, cmd);
     let output = cmd.output();
 
     match output {
@@ -104,7 +100,9 @@ pub(crate) fn execute_rmcp_command(
 
             let mut content: Vec<Annotated<RawContent>> = Vec::new();
             if output.status.success() {
-                tracing::info!(%stdout, %stderr, %tool_name, "Command executed successfully");
+                tracing::info!(
+                    "Command executed successfully for {tool_name}\nstdout=\n{stdout}\n\nstderr=\n{stderr}",
+                );
                 content.push(
                     RawContent::text(format!("✅ {tool_name}: Success")).annotate(Annotations {
                         audience: Some(vec![Role::User, Role::Assistant]),
@@ -114,11 +112,8 @@ pub(crate) fn execute_rmcp_command(
                 );
             } else {
                 tracing::warn!(
-                    %stdout,
-                    %stderr,
-                    status = output.status.code(),
-                    %tool_name,
-                    "Command execution failed",
+                    "Command execution failed for {tool_name} (status: {:?}): stdout='\n{stdout}\n', stderr='\n{stderr}\n'",
+                    output.status.code(),
                 );
                 content.push(
                     RawContent::text(format!("❌ {tool_name}: Failure")).annotate(Annotations {
@@ -151,7 +146,7 @@ pub(crate) fn execute_rmcp_command(
             })
         }
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-            tracing::error!(error = %e, "Command not found");
+            tracing::error!("Command not found: {e}");
             let program = cmd.get_program().to_string_lossy();
             let args = cmd
                 .get_args()
@@ -176,7 +171,7 @@ pub(crate) fn execute_rmcp_command(
             })
         }
         Err(e) => {
-            tracing::error!(error = %e, "Failed to execute command");
+            tracing::error!("Failed to execute command: {}", e);
             Err(ErrorData::internal_error(e.to_string(), None))
         }
     }

@@ -99,8 +99,8 @@ impl Server {
         if !disabled_tools.is_empty() {
             tracing::info!("Disabled tools: {}", disabled_tools.join(", "));
             for tool_name in disabled_tools {
-                if !tools.remove(tool_name.as_str()).is_some() {
-                    tracing::warn!("Tool not found: {tool_name}");
+                if tools.remove(tool_name.as_str()).is_none() {
+                    tracing::warn!("Tool not found: {}", tool_name);
                 }
             }
         }
