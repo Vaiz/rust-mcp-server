@@ -28,9 +28,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-cargo-
 
-      - name: Install mcp-discovery
-        run: cargo install mcp-discovery
-
       - name: Build project
         run: cargo build --release
 

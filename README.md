@@ -71,9 +71,6 @@ rust-mcp-server exposes a comprehensive set of Rust development tools to the LLM
 *   **`rustup-toolchain-add`**: Install or update toolchains
 *   **`rustup-update`**: Update Rust toolchains and rustup
 
-### Experimental Features
-The server provides **experimental** access to the official [Cargo Book](https://doc.rust-lang.org/cargo/) documentation through MCP resources. This feature allows LLMs to fetch and reference about 95 pages of Cargo documentation directly from the official repository, including command references, guides, and technical specifications. Resources are accessible using the `cargo-book://` URI scheme and require network connectivity.
-
 For a complete list with detailed descriptions and parameters, see [tools.md](tools.md).
 
 ## Command Line Arguments
