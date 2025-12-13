@@ -18,10 +18,6 @@ use version::AppVersion;
 #[derive(Parser, Debug)]
 #[command(author, version = AppVersion, about = "Rust MCP Server", long_about = None)]
 struct Args {
-    /// Timeout for processing a request (seconds)
-    #[arg(long, default_value_t = 600)]
-    timeout: u64,
-
     /// Log level (error, warn, info, debug, trace)
     #[arg(long, default_value = "info")]
     log_level: String,
@@ -45,7 +41,6 @@ struct Args {
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    // Parse command line arguments
     let args = Args::parse();
 
     // Set up logging
@@ -66,20 +61,6 @@ async fn main() -> anyhow::Result<()> {
             .init();
     }
     tracing::info!("Starting Rust MCP Server: {:?}", args);
-
-    // Warn about long-running requests
-    if args.timeout < 60 {
-        tracing::warn!(
-            "Short timeout ({}) may interrupt long-running requests like cargo-build",
-            args.timeout
-        );
-    } else if args.timeout >= 600 {
-        tracing::info!(
-            "Long timeout ({}) set; some requests (e.g., cargo-build) may take a while",
-            args.timeout
-        );
-    }
-
     tracing::info!("Server version: {}", AppVersion::version());
 
     if let Some(workspace) = args.workspace {
@@ -100,7 +81,6 @@ async fn main() -> anyhow::Result<()> {
         return Ok(());
     }
 
-    /// FIXME: How to pass timeout to StdioTransport?
     let service = server
         .serve(rmcp::transport::stdio())
         .await
@@ -108,7 +88,6 @@ async fn main() -> anyhow::Result<()> {
 
     eprintln!("Precisely File Editor MCP Server started on stdio");
 
-    // Keep the service running until cancelled
     let result = service.waiting().await;
 
     match result {
