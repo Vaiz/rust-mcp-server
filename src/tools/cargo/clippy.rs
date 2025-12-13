@@ -288,7 +288,7 @@ impl ToolImpl for CargoClippyRmcpTool {
         request: Self::RequestArgs,
     ) -> Result<rmcp::model::CallToolResult, ErrorData> {
         let cmd = request.build_cmd()?;
-        execute_rmcp_command(cmd, &Self::NAME)
+        execute_rmcp_command(cmd, Self::NAME)
     }
 }
 #[cfg(test)]

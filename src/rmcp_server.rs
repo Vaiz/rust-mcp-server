@@ -113,7 +113,7 @@ impl Server {
         let mut output = String::new();
 
         // Header
-        output.push_str(&format!("## Rust MCP Server\n"));
+        output.push_str("## Rust MCP Server\n");
         output.push_str(&format!("| 🟢 Tools ({}) | 🟢 Prompts (0) | 🟢 Resources (0) | <span style=\"opacity:0.6\">🔴 Logging</span> | <span style=\"opacity:0.6\">🔴 Completions</span> | <span style=\"opacity:0.6\">🔴 Experimental</span> |\n", self.tools.len()));
         output.push_str("| --- | --- | --- | --- | --- | --- |\n\n");
 
@@ -130,25 +130,25 @@ impl Server {
             output.push_str(&format!("  - {}\n", tool.description()));
 
             let schema = tool.json_schema();
-            if let Some(serde_json::Value::Object(properties)) = schema.get("properties") {
-                if !properties.is_empty() {
-                    output.push_str("  - **Inputs:**\n");
+            if let Some(serde_json::Value::Object(properties)) = schema.get("properties")
+                && !properties.is_empty()
+            {
+                output.push_str("  - **Inputs:**\n");
 
-                    // Sort properties for consistent output
-                    let mut prop_names: Vec<&String> = properties.keys().collect();
-                    prop_names.sort();
+                // Sort properties for consistent output
+                let mut prop_names: Vec<&String> = properties.keys().collect();
+                prop_names.sort();
 
-                    for prop_name in prop_names {
-                        let prop = &properties[prop_name];
-                        let type_str = self.format_property_type(prop);
-                        output.push_str(&format!(
-                            "      - <code>{}</code> : {}<br />\n",
-                            prop_name, type_str
-                        ));
-                    }
+                for prop_name in prop_names {
+                    let prop = &properties[prop_name];
+                    let type_str = self.format_property_type(prop);
+                    output.push_str(&format!(
+                        "      - <code>{}</code> : {}<br />\n",
+                        prop_name, type_str
+                    ));
                 }
             }
-            output.push_str("\n");
+            output.push('\n');
         }
 
         output
@@ -158,10 +158,10 @@ impl Server {
         if let Some(type_val) = prop.get("type") {
             match type_val.as_str() {
                 Some("array") => {
-                    if let Some(items) = prop.get("items") {
-                        if let Some(item_type) = items.get("type") {
-                            return format!("{} [ ]", item_type.as_str().unwrap_or("unknown"));
-                        }
+                    if let Some(items) = prop.get("items")
+                        && let Some(item_type) = items.get("type")
+                    {
+                        return format!("{} [ ]", item_type.as_str().unwrap_or("unknown"));
                     }
                     "array".to_string()
                 }
