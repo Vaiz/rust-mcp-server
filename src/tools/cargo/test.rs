@@ -1,24 +1,16 @@
 use std::process::Command;
 
 use crate::{
+    Tool, execute_rmcp_command,
     serde_utils::{
         deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
     },
-    tools::execute_command,
 };
-use rust_mcp_sdk::{
-    macros::{JsonSchema, mcp_tool},
-    schema::{CallToolResult, schema_utils::CallToolError},
-};
+use rmcp::ErrorData;
 
-#[mcp_tool(
-    name = "cargo-test",
-    description = "Run `cargo test` to execute Rust tests in the current project.",
-    openWorldHint = false
-)]
-#[derive(Debug, ::serde::Deserialize, JsonSchema)]
-pub struct CargoTestTool {
+#[derive(Debug, ::serde::Deserialize, ::schemars::JsonSchema)]
+pub struct CargoTestRequest {
     /// The toolchain to use, e.g., "stable" or "nightly".
     #[serde(default, deserialize_with = "deserialize_string")]
     toolchain: Option<String>,
@@ -158,9 +150,8 @@ pub struct CargoTestTool {
     #[serde(default, deserialize_with = "deserialize_string")]
     output_verbosity: Option<String>,
 }
-
-impl CargoTestTool {
-    pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
+impl CargoTestRequest {
+    pub fn build_cmd(&self) -> Result<Command, ErrorData> {
         let mut cmd = Command::new("cargo");
         if let Some(toolchain) = &self.toolchain {
             cmd.arg(format!("+{toolchain}"));
@@ -310,10 +301,27 @@ impl CargoTestTool {
             }
         }
 
-        execute_command(cmd, &Self::tool_name())
+        Ok(cmd)
     }
 }
 
+pub struct CargoTestRmcpTool;
+
+impl Tool for CargoTestRmcpTool {
+    const NAME: &'static str = "cargo-test";
+    const TITLE: &'static str = "cargo test";
+    const DESCRIPTION: &'static str =
+        "Run `cargo test` to execute Rust tests in the current project.";
+    type RequestArgs = CargoTestRequest;
+
+    fn call_rmcp_tool(
+        &self,
+        request: Self::RequestArgs,
+    ) -> Result<rmcp::model::CallToolResult, ErrorData> {
+        let cmd = request.build_cmd()?;
+        execute_rmcp_command(cmd, Self::NAME)
+    }
+}
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -330,7 +338,7 @@ mod tests {
             "all_targets": true
         });
 
-        let tool: Result<CargoTestTool, _> = serde_json::from_value(input);
+        let tool: Result<CargoTestRequest, _> = serde_json::from_value(input);
         let tool = tool
             .expect("Deserialization should succeed even if `package` is missing (it's Option)");
 
@@ -346,7 +354,7 @@ mod tests {
             "package": ["my_package", "another_package"],
         });
 
-        let tool: Result<CargoTestTool, _> = serde_json::from_value(input);
+        let tool: Result<CargoTestRequest, _> = serde_json::from_value(input);
         let tool = tool.expect("Deserialization should succeed with package array");
 
         assert_eq!(
@@ -363,7 +371,7 @@ mod tests {
             "package": ["single_package"],
         });
 
-        let tool: Result<CargoTestTool, _> = serde_json::from_value(input);
+        let tool: Result<CargoTestRequest, _> = serde_json::from_value(input);
         let tool = tool.expect("Deserialization should succeed with single-item package array");
 
         assert_eq!(tool.package.unwrap(), ["single_package".to_owned()]);
@@ -375,7 +383,7 @@ mod tests {
             "package": "single_package",
         });
 
-        let tool: Result<CargoTestTool, _> = serde_json::from_value(input);
+        let tool: Result<CargoTestRequest, _> = serde_json::from_value(input);
         let tool = tool.expect("Deserialization should succeed with single-item package array");
 
         assert_eq!(tool.package.unwrap(), ["single_package".to_owned()]);
@@ -387,7 +395,7 @@ mod tests {
             "features": ["serde", "tokio"],
         });
 
-        let tool: Result<CargoTestTool, _> = serde_json::from_value(input);
+        let tool: Result<CargoTestRequest, _> = serde_json::from_value(input);
         let tool = tool.expect("Deserialization should succeed with features array");
 
         assert_eq!(
@@ -402,7 +410,7 @@ mod tests {
             "features": "serde",
         });
 
-        let tool: Result<CargoTestTool, _> = serde_json::from_value(input);
+        let tool: Result<CargoTestRequest, _> = serde_json::from_value(input);
         let tool = tool.expect("Deserialization should succeed with single feature string");
 
         assert_eq!(tool.features.unwrap(), ["serde".to_owned()]);
@@ -414,7 +422,7 @@ mod tests {
             "features": "[\"serde\",\"tokio\"]",
         });
 
-        let tool: Result<CargoTestTool, _> = serde_json::from_value(input);
+        let tool: Result<CargoTestRequest, _> = serde_json::from_value(input);
         let tool = tool
             .expect("Deserialization should succeed with features string that looks like array");
 

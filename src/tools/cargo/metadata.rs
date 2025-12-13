@@ -1,22 +1,15 @@
 use std::process::Command;
 
-use crate::serde_utils::{
-    deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
-    output_verbosity_to_cli_flags,
+use crate::{
+    Tool, execute_rmcp_command,
+    serde_utils::{
+        deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
+        output_verbosity_to_cli_flags,
+    },
 };
-use crate::tools::execute_command;
-use rust_mcp_sdk::{
-    macros::{JsonSchema, mcp_tool},
-    schema::{CallToolResult, schema_utils::CallToolError},
-};
-
-#[mcp_tool(
-    name = "cargo-metadata",
-    description = "Outputs a listing of a project's resolved dependencies and metadata in machine-readable format (JSON).",
-    openWorldHint = false
-)]
-#[derive(Debug, ::serde::Deserialize, JsonSchema)]
-pub struct CargoMetadataTool {
+use rmcp::ErrorData;
+#[derive(Debug, ::serde::Deserialize, ::schemars::JsonSchema)]
+pub struct CargoMetadataRequest {
     /// The toolchain to use, e.g., "stable" or "nightly".
     #[serde(default, deserialize_with = "deserialize_string")]
     toolchain: Option<String>,
@@ -73,9 +66,8 @@ pub struct CargoMetadataTool {
     #[serde(default, deserialize_with = "deserialize_string")]
     locking_mode: Option<String>,
 }
-
-impl CargoMetadataTool {
-    pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
+impl CargoMetadataRequest {
+    pub fn build_cmd(&self) -> Result<Command, ErrorData> {
         let mut cmd = Command::new("cargo");
         if let Some(toolchain) = &self.toolchain {
             cmd.arg(format!("+{toolchain}"));
@@ -127,10 +119,26 @@ impl CargoMetadataTool {
         let locking_flags = locking_mode_to_cli_flags(self.locking_mode.as_deref(), "locked")?;
         cmd.args(locking_flags);
 
-        execute_command(cmd, &Self::tool_name())
+        Ok(cmd)
     }
 }
 
+pub struct CargoMetadataRmcpTool;
+
+impl Tool for CargoMetadataRmcpTool {
+    const NAME: &'static str = "cargo-metadata";
+    const TITLE: &'static str = "cargo metadata";
+    const DESCRIPTION: &'static str = "Outputs a listing of a project's resolved dependencies and metadata in machine-readable format (JSON).";
+    type RequestArgs = CargoMetadataRequest;
+
+    fn call_rmcp_tool(
+        &self,
+        request: Self::RequestArgs,
+    ) -> Result<rmcp::model::CallToolResult, ErrorData> {
+        let cmd = request.build_cmd()?;
+        execute_rmcp_command(cmd, Self::NAME)
+    }
+}
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -142,7 +150,7 @@ mod tests {
             "features": ["serde", "tokio"],
         });
 
-        let tool: Result<CargoMetadataTool, _> = serde_json::from_value(input);
+        let tool: Result<CargoMetadataRequest, _> = serde_json::from_value(input);
         let tool = tool.expect("Deserialization should succeed with features array");
 
         assert_eq!(
@@ -157,7 +165,7 @@ mod tests {
             "features": "serde",
         });
 
-        let tool: Result<CargoMetadataTool, _> = serde_json::from_value(input);
+        let tool: Result<CargoMetadataRequest, _> = serde_json::from_value(input);
         let tool = tool.expect("Deserialization should succeed with single feature string");
 
         assert_eq!(tool.features.unwrap(), ["serde".to_owned()]);
@@ -169,7 +177,7 @@ mod tests {
             "features": "[\"serde\",\"tokio\"]",
         });
 
-        let tool: Result<CargoMetadataTool, _> = serde_json::from_value(input);
+        let tool: Result<CargoMetadataRequest, _> = serde_json::from_value(input);
         let tool = tool
             .expect("Deserialization should succeed with features string that looks like array");
 

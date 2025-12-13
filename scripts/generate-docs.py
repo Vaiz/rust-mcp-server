@@ -10,7 +10,7 @@ from pathlib import Path
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Generate documentation using mcp-discovery")
+    parser = argparse.ArgumentParser(description="Generate documentation for MCP server")
     parser.add_argument("filename", nargs="?", default="tools.md", 
                        help="Output filename (default: tools.md)")
     args = parser.parse_args()
@@ -27,14 +27,12 @@ def main():
     os.chdir(project_root)
     subprocess.run(["cargo", "build", "--release"], check=True)
 
-    print("📝 Generating documentation using mcp-discovery...")
+    print("📝 Generating documentation...")
     print(f"   - Creating {args.filename} documentation...")
     
     subprocess.run([
-        "mcp-discovery", "create", 
-        "--template", "md-plain", 
-        "--filename", str(output_file),
-        "--", str(server_binary)
+        str(server_binary),
+        "--generate-docs", str(output_file)
     ], check=True)
 
     print("   - Removing git hash from version string for CI stability...")

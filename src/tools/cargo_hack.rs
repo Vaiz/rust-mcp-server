@@ -1,28 +1,17 @@
 use std::process::Command;
 
-use rust_mcp_sdk::{
-    macros::mcp_tool,
-    schema::{CallToolResult, schema_utils::CallToolError},
+use crate::{
+    Tool, execute_rmcp_command,
+    serde_utils::{deserialize_string, deserialize_string_vec, output_verbosity_to_cli_flags},
 };
-
-use crate::serde_utils::{
-    deserialize_string, deserialize_string_vec, output_verbosity_to_cli_flags,
-};
-use crate::tools::execute_command;
+use rmcp::{ErrorData, model::CallToolResult};
 
 fn default_check() -> String {
     "check".to_string()
 }
 
-use crate::serde_utils::Tool;
-
-#[mcp_tool(
-    name = "cargo-hack",
-    description = "Cargo subcommand to provide various options useful for testing and continuous integration, including feature testing and multi-version compatibility. Available commands: check, test, build, clippy. Recommend using 'check' for fast validation. Example: cargo-hack with \"feature_powerset\": true, \"depth\": 3, \"keep_going\": true",
-    openWorldHint = false
-)]
 #[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
-pub struct CargoHackTool {
+pub struct CargoHackRequest {
     /// The cargo command to run (check, test, build, clippy)
     #[serde(default = "default_check")]
     command: String,
@@ -163,8 +152,8 @@ pub struct CargoHackTool {
     output_verbosity: Option<String>,
 }
 
-impl CargoHackTool {
-    pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
+impl CargoHackRequest {
+    pub fn build_cmd(&self) -> Result<Command, ErrorData> {
         // Validate command
         let allowed_commands = ["check", "test", "build", "clippy"];
         if !allowed_commands.contains(&self.command.as_str()) {
@@ -173,10 +162,7 @@ impl CargoHackTool {
                 self.command,
                 allowed_commands.join(", ")
             );
-            return Err(CallToolError::new(Box::new(std::io::Error::new(
-                std::io::ErrorKind::InvalidInput,
-                error_msg,
-            ))));
+            return Err(ErrorData::invalid_params(error_msg, None));
         }
 
         let mut cmd = Command::new("cargo");
@@ -339,23 +325,45 @@ impl CargoHackTool {
         // Add the cargo command to run (e.g., check, test, build)
         cmd.arg(&self.command);
 
-        execute_command(cmd, &Self::tool_name())
+        Ok(cmd)
     }
 }
 
-#[mcp_tool(
-    name = "cargo-hack-install",
-    description = "Installs cargo-hack tool for feature testing and continuous integration",
-    openWorldHint = false
-)]
-#[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
-pub struct CargoHackInstallTool {}
+pub struct CargoHackRmcpTool;
 
-impl CargoHackInstallTool {
-    pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
+impl Tool for CargoHackRmcpTool {
+    const NAME: &'static str = "cargo-hack";
+    const TITLE: &'static str = "Run cargo-hack";
+    const DESCRIPTION: &'static str = "Cargo subcommand to provide various options useful for testing and continuous integration, including feature testing and multi-version compatibility. Available commands: check, test, build, clippy. Recommend using 'check' for fast validation. Example: cargo-hack with \"feature_powerset\": true, \"depth\": 3, \"keep_going\": true";
+    type RequestArgs = CargoHackRequest;
+
+    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
+        execute_rmcp_command(request.build_cmd()?, Self::NAME)
+    }
+}
+
+#[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
+pub struct CargoHackInstallRequest {}
+
+impl CargoHackInstallRequest {
+    pub fn build_cmd(&self) -> Result<Command, ErrorData> {
         let mut cmd = Command::new("cargo");
         cmd.arg("install").arg("cargo-hack");
 
-        execute_command(cmd, &Self::tool_name())
+        Ok(cmd)
+    }
+}
+
+pub struct CargoHackInstallRmcpTool;
+
+impl Tool for CargoHackInstallRmcpTool {
+    const NAME: &'static str = "cargo-hack-install";
+    const TITLE: &'static str = "Install cargo-hack";
+    const DESCRIPTION: &'static str =
+        "Installs cargo-hack tool for feature testing and continuous integration";
+    type RequestArgs = CargoHackInstallRequest;
+
+    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
+        execute_rmcp_command(request.build_cmd()?, Self::NAME)
     }
 }

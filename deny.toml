@@ -91,11 +91,6 @@ ignore = [
 allow = [
     "MIT",
     "Apache-2.0",
-    "Apache-2.0 WITH LLVM-exception",
-    "BSD-2-Clause",
-    "BSD-3-Clause",
-    "ISC",
-    "Unicode-DFS-2016",
     "Unicode-3.0",
     "Unlicense",
 ]
@@ -204,16 +199,7 @@ deny = [
 
 # Certain crates/versions that will be skipped when doing duplicate detection.
 skip = [
-    # thiserror v1.0.69 is required by tracing-appender, while v2.0.17 is used by rust-mcp-sdk
-    { crate = "thiserror@1.0.69", reason = "tracing-appender requires older version for compatibility" },
-    { crate = "thiserror-impl@1.0.69", reason = "thiserror v1.0.69 dependency" },
-    # wasi duplicates for different snapshot versions
-    { crate = "wasi@0.11.1+wasi-snapshot-preview1", reason = "mio requires older WASI version for compatibility" },
-    # Windows crates have multiple versions for different dependencies
-    { crate = "windows-link@0.1.3", reason = "windows-registry compatibility requirement" },
-    { crate = "windows-link@0.2.1", reason = "backtrace and parking_lot_core compatibility requirement" },
-    { crate = "windows-sys@0.59.0", reason = "mio, socket2, and tokio compatibility requirement" },
-    { crate = "windows-sys@0.61.2", reason = "errno, nu-ansi-term, rustix, schannel, and tempfile compatibility requirement" },
+
 ]
 # Similarly to `skip` allows you to skip certain crates during duplicate
 # detection. Unlike skip, it also includes the entire tree of transitive

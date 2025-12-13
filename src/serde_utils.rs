@@ -1,4 +1,4 @@
-use rust_mcp_sdk::schema::schema_utils::CallToolError;
+use rmcp::ErrorData;
 
 /// Utility function for parsing Option<String> fields in serde,
 /// returning None if the string is "null" (case-insensitive) or empty.
@@ -54,17 +54,18 @@ where
 pub fn locking_mode_to_cli_flags(
     mode: Option<&str>,
     preferred: &str,
-) -> Result<Vec<&'static str>, CallToolError> {
+) -> Result<Vec<&'static str>, ErrorData> {
     Ok(match mode.unwrap_or(preferred) {
         "locked" => vec!["--locked"],
         "unlocked" => vec![], // No flags needed
         "offline" => vec!["--offline"],
         "frozen" => vec!["--frozen"],
         unknown => {
-            return Err(CallToolError(
-                anyhow::anyhow!(
-                    "Unknown locking mode: {unknown}. Valid options are: locked, unlocked, offline, frozen"                    
-                ).into()
+            return Err(ErrorData::invalid_params(
+                format!(
+                    "Unknown locking mode: {unknown}. Valid options are: locked, unlocked, offline, frozen"
+                ),
+                None,
             ));
         }
     })
@@ -77,19 +78,17 @@ pub fn locking_mode_to_cli_flags(
 /// - "quiet" (default): Show only the essential command output
 /// - "normal": Show standard output (no additional flags)
 /// - "verbose": Show detailed output including build information
-pub fn output_verbosity_to_cli_flags(
-    mode: Option<&str>,
-) -> Result<Vec<&'static str>, CallToolError> {
+pub fn output_verbosity_to_cli_flags(mode: Option<&str>) -> Result<Vec<&'static str>, ErrorData> {
     Ok(match mode.unwrap_or("quiet") {
         "quiet" => vec!["--quiet"],
         "normal" => vec![], // No flags needed
         "verbose" => vec!["--verbose"],
         unknown => {
-            return Err(CallToolError(
-                anyhow::anyhow!(
+            return Err(ErrorData::invalid_params(
+                format!(
                     "Unknown output verbosity: {unknown}. Valid options are: quiet, normal, verbose"
-                )
-                .into(),
+                ),
+                None,
             ));
         }
     })
@@ -133,43 +132,6 @@ impl PackageWithVersion {
         }
     }
 }
-
-pub trait Tool: schemars::JsonSchema {
-    /// Returns the JSON schema for this type.
-    fn json_schema() -> serde_json::Map<String, serde_json::Value> {
-        use schemars::schema_for;
-        use serde_json::Value;
-
-        let schema = schema_for!(Self).to_value();
-        if let serde_json::Value::Object(mut map) = schema {
-            map.remove("$schema");
-
-            // Gemini doesn't like "type": ["string", "null"]
-            let null_string = Value::String("null".to_string());
-            if let Some(Value::Object(props_map)) = map.get_mut("properties") {
-                for value in props_map.values_mut() {
-                    if let Value::Object(prop_obj) = value
-                        && let Some(Value::Array(ty)) = prop_obj.get("type")
-                        && ty.len() == 2
-                        && ty.contains(&null_string)
-                    {
-                        let new_ty = ty.iter().find(|v| v != &&null_string).cloned();
-
-                        if let Some(new_ty) = new_ty {
-                            prop_obj.insert("type".to_string(), new_ty);
-                        }
-                    }
-                }
-            }
-
-            map
-        } else {
-            panic!("Expected schema to be an object, got: {schema:?}");
-        }
-    }
-}
-
-impl<T: schemars::JsonSchema> Tool for T {}
 
 #[cfg(test)]
 mod tests {
@@ -320,111 +282,6 @@ mod tests {
 
         let pkg3 = PackageWithVersion::with_version("clap".to_string(), "4.0.0-beta.1".to_string());
         assert_eq!(pkg3.to_spec(), "clap@4.0.0-beta.1");
-    }
-
-    #[test]
-    fn test_tool_json_schema_removes_null_type_first() {
-        #[derive(serde::Serialize, serde::Deserialize, schemars::JsonSchema)]
-        struct Example {
-            #[serde(default)]
-            value: Option<String>,
-        }
-
-        let schema = Example::json_schema();
-        let props = schema.get("properties").unwrap();
-        let value_schema = props.get("value").unwrap();
-        if let serde_json::Value::Object(obj) = value_schema {
-            // Should not be an array of types, just "string"
-            let ty = obj.get("type").unwrap();
-            assert_eq!(ty, "string");
-        } else {
-            panic!("Expected value property to be an object");
-        }
-    }
-
-    #[test]
-    fn test_tool_json_schema_removes_null_type_second() {
-        #[derive(serde::Serialize, serde::Deserialize, schemars::JsonSchema)]
-        struct Example {
-            #[serde(default)]
-            value: Option<i32>,
-        }
-
-        let schema = Example::json_schema();
-        let props = schema.get("properties").unwrap();
-        let value_schema = props.get("value").unwrap();
-        if let serde_json::Value::Object(obj) = value_schema {
-            // Should not be an array of types, just "integer"
-            let ty = obj.get("type").unwrap();
-            assert_eq!(ty, "integer");
-        } else {
-            panic!("Expected value property to be an object");
-        }
-    }
-
-    #[test]
-    fn test_tool_json_schema_leaves_non_null_type_untouched() {
-        #[derive(serde::Serialize, serde::Deserialize, schemars::JsonSchema)]
-        struct Example {
-            value: String,
-        }
-
-        let schema = Example::json_schema();
-        let props = schema.get("properties").unwrap();
-        let value_schema = props.get("value").unwrap();
-        if let serde_json::Value::Object(obj) = value_schema {
-            let ty = obj.get("type").unwrap();
-            assert_eq!(ty, "string");
-        } else {
-            panic!("Expected value property to be an object");
-        }
-    }
-
-    #[test]
-    fn test_tool_json_schema_handles_multiple_properties() {
-        #[derive(serde::Serialize, serde::Deserialize, schemars::JsonSchema)]
-        struct Example {
-            #[serde(default)]
-            opt: Option<String>,
-            num: i32,
-        }
-
-        let schema = Example::json_schema();
-        let props = schema.get("properties").unwrap();
-        let opt_schema = props.get("opt").unwrap();
-        let num_schema = props.get("num").unwrap();
-
-        if let serde_json::Value::Object(obj) = opt_schema {
-            let ty = obj.get("type").unwrap();
-            assert_eq!(ty, "string");
-        } else {
-            panic!("Expected opt property to be an object");
-        }
-
-        if let serde_json::Value::Object(obj) = num_schema {
-            let ty = obj.get("type").unwrap();
-            assert_eq!(ty, "integer");
-        } else {
-            panic!("Expected num property to be an object");
-        }
-    }
-
-    #[test]
-    fn test_tool_json_schema_ignores_non_array_type() {
-        #[derive(serde::Serialize, serde::Deserialize, schemars::JsonSchema)]
-        struct Example {
-            value: bool,
-        }
-
-        let schema = Example::json_schema();
-        let props = schema.get("properties").unwrap();
-        let value_schema = props.get("value").unwrap();
-        if let serde_json::Value::Object(obj) = value_schema {
-            let ty = obj.get("type").unwrap();
-            assert_eq!(ty, "boolean");
-        } else {
-            panic!("Expected value property to be an object");
-        }
     }
 
     #[test]

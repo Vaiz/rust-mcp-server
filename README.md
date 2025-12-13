@@ -13,7 +13,6 @@ By exposing local tools and project context to the LLM, rust-mcp-server allows t
   - [Dependency Management](#dependency-management)
   - [Code Quality & Security](#code-quality--security)
   - [Rust Toolchain Management](#rust-toolchain-management)
-  - [Experimental Features](#experimental-features)
 - [Command Line Arguments](#command-line-arguments)
 - [Configuring with VS Code](#configuring-with-vs-code)
 - [GitHub Copilot Coding Agent Integration](#github-copilot-coding-agent-integration)
@@ -71,20 +70,11 @@ rust-mcp-server exposes a comprehensive set of Rust development tools to the LLM
 *   **`rustup-toolchain-add`**: Install or update toolchains
 *   **`rustup-update`**: Update Rust toolchains and rustup
 
-### Experimental Features
-The server provides **experimental** access to the official [Cargo Book](https://doc.rust-lang.org/cargo/) documentation through MCP resources. This feature allows LLMs to fetch and reference about 95 pages of Cargo documentation directly from the official repository, including command references, guides, and technical specifications. Resources are accessible using the `cargo-book://` URI scheme and require network connectivity.
-
 For a complete list with detailed descriptions and parameters, see [tools.md](tools.md).
 
 ## Command Line Arguments
 
 The rust-mcp-server supports several command line arguments to customize its behavior:
-
-### `--timeout <TIMEOUT>`
-- **Description**: Sets the timeout for processing a request in seconds. It might be useful to change this option depending on
-  the size of your project.
-- **Default**: 600 (10 minutes)
-- **Example**: `--timeout 300` (5 minutes)
 
 ### `--log-level <LOG_LEVEL>`
 - **Description**: Sets the logging level for the server
@@ -106,6 +96,11 @@ The rust-mcp-server supports several command line arguments to customize its beh
 - **Description**: Specifies the Rust project workspace path for the server to operate in
 - **Default**: Current directory
 - **Example**: `--workspace /path/to/rust/project`
+
+### `--generate-docs <OUTPUT_FILE>`
+- **Description**: Generates markdown documentation file and exits without starting the server
+- **Default**: None
+- **Example**: `--generate-docs tools.md`
 
 ### `-h, --help`
 - **Description**: Displays help information about available command line arguments

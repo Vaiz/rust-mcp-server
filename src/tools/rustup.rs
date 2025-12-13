@@ -1,29 +1,20 @@
 use std::process::Command;
 
-use rust_mcp_sdk::{
-    macros::mcp_tool,
-    schema::{CallToolResult, schema_utils::CallToolError},
+use crate::{
+    Tool, execute_rmcp_command,
+    serde_utils::{deserialize_string, deserialize_string_vec},
 };
+use rmcp::{ErrorData, model::CallToolResult};
 
-use crate::serde_utils::{deserialize_string, deserialize_string_vec};
-use crate::tools::execute_command;
-
-use crate::serde_utils::Tool;
-
-#[mcp_tool(
-    name = "rustup-show",
-    description = "Show the active and installed toolchains or profiles. Shows the name of the active toolchain and the version of rustc. If the active toolchain has installed support for additional compilation targets, then they are listed as well.",
-    openWorldHint = false
-)]
 #[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
-pub struct RustupShowTool {
+pub struct RustupShowRequest {
     /// Enable verbose output with rustc information for all installed toolchains
     #[serde(default)]
     verbose: bool,
 }
 
-impl RustupShowTool {
-    pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
+impl RustupShowRequest {
+    pub fn build_cmd(&self) -> Result<Command, ErrorData> {
         let mut cmd = Command::new("rustup");
         cmd.arg("show");
 
@@ -31,17 +22,25 @@ impl RustupShowTool {
             cmd.arg("--verbose");
         }
 
-        execute_command(cmd, &Self::tool_name())
+        Ok(cmd)
     }
 }
 
-#[mcp_tool(
-    name = "rustup-toolchain-add",
-    description = "Install or update the given toolchains, or by default the active toolchain. Toolchain name can be 'stable', 'nightly', or a specific version like '1.8.0'.",
-    openWorldHint = false
-)]
+pub struct RustupShowRmcpTool;
+
+impl Tool for RustupShowRmcpTool {
+    const NAME: &'static str = "rustup-show";
+    const TITLE: &'static str = "Show Rust toolchains";
+    const DESCRIPTION: &'static str = "Show the active and installed toolchains or profiles. Shows the name of the active toolchain and the version of rustc. If the active toolchain has installed support for additional compilation targets, then they are listed as well.";
+    type RequestArgs = RustupShowRequest;
+
+    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
+        execute_rmcp_command(request.build_cmd()?, Self::NAME)
+    }
+}
+
 #[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
-pub struct RustupToolchainAddTool {
+pub struct RustupToolchainAddRequest {
     /// Toolchain name, such as 'stable', 'nightly', or '1.8.0'
     pub toolchain: String,
 
@@ -74,8 +73,8 @@ pub struct RustupToolchainAddTool {
     pub force_non_host: bool,
 }
 
-impl RustupToolchainAddTool {
-    pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
+impl RustupToolchainAddRequest {
+    pub fn build_cmd(&self) -> Result<Command, ErrorData> {
         let mut cmd = Command::new("rustup");
         cmd.arg("toolchain").arg("install").arg(&self.toolchain);
 
@@ -111,17 +110,25 @@ impl RustupToolchainAddTool {
             cmd.arg("--force-non-host");
         }
 
-        execute_command(cmd, &Self::tool_name())
+        Ok(cmd)
     }
 }
 
-#[mcp_tool(
-    name = "rustup-update",
-    description = "Update Rust toolchains and rustup. With no toolchain specified, updates each of the installed toolchains from the official release channels, then updates rustup itself. If given a toolchain argument then updates that toolchain.",
-    openWorldHint = false
-)]
+pub struct RustupToolchainAddRmcpTool;
+
+impl Tool for RustupToolchainAddRmcpTool {
+    const NAME: &'static str = "rustup-toolchain-add";
+    const TITLE: &'static str = "Install Rust toolchain";
+    const DESCRIPTION: &'static str = "Install or update the given toolchains, or by default the active toolchain. Toolchain name can be 'stable', 'nightly', or a specific version like '1.8.0'.";
+    type RequestArgs = RustupToolchainAddRequest;
+
+    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
+        execute_rmcp_command(request.build_cmd()?, Self::NAME)
+    }
+}
+
 #[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
-pub struct RustupUpdateTool {
+pub struct RustupUpdateRequest {
     /// Toolchain name to update, such as 'stable', 'nightly', or '1.8.0'. If not specified, updates all installed toolchains
     #[serde(default, deserialize_with = "deserialize_string")]
     pub toolchain: Option<String>,
@@ -139,8 +146,8 @@ pub struct RustupUpdateTool {
     pub force_non_host: bool,
 }
 
-impl RustupUpdateTool {
-    pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
+impl RustupUpdateRequest {
+    pub fn build_cmd(&self) -> Result<Command, ErrorData> {
         let mut cmd = Command::new("rustup");
         cmd.arg("update");
 
@@ -160,6 +167,19 @@ impl RustupUpdateTool {
             cmd.arg("--force-non-host");
         }
 
-        execute_command(cmd, &Self::tool_name())
+        Ok(cmd)
+    }
+}
+
+pub struct RustupUpdateRmcpTool;
+
+impl Tool for RustupUpdateRmcpTool {
+    const NAME: &'static str = "rustup-update";
+    const TITLE: &'static str = "Update Rust toolchains";
+    const DESCRIPTION: &'static str = "Update Rust toolchains and rustup. With no toolchain specified, updates each of the installed toolchains from the official release channels, then updates rustup itself. If given a toolchain argument then updates that toolchain.";
+    type RequestArgs = RustupUpdateRequest;
+
+    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
+        execute_rmcp_command(request.build_cmd()?, Self::NAME)
     }
 }

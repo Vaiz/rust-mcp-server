@@ -50,7 +50,7 @@ use crate::{
     description = "Clear, concise description",
     openWorldHint = false
 )]
-#[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
+#[derive(Debug, ::serde::Deserialize, ::serde::Serialize, ::schemars::JsonSchema)]
 pub struct YourToolName {
     /// The toolchain to use (for Rust tools)
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -202,7 +202,7 @@ pub locked: bool,
 **Simple installation tool**:
 ```rust
 #[mcp_tool(name = "tool-install", description = "Installs the tool")]
-#[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
+#[derive(Debug, ::serde::Deserialize, ::serde::Serialize, ::schemars::JsonSchema)]
 pub struct ToolInstallTool {}
 
 impl ToolInstallTool {

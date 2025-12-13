@@ -1,51 +1,21 @@
-mod handler;
-mod prompts;
-mod resources;
+mod rmcp_server;
 pub(crate) mod serde_utils;
+mod tool;
 mod tools;
+mod version;
 
+use anyhow::Context;
 use clap::Parser;
-use rust_mcp_sdk::McpServer;
-use rust_mcp_sdk::schema::ServerCapabilitiesPrompts;
-use rust_mcp_sdk::{
-    StdioTransport, TransportOptions,
-    error::SdkResult,
-    mcp_server::server_runtime,
-    schema::{
-        Implementation, InitializeResult, LATEST_PROTOCOL_VERSION, ServerCapabilities,
-        ServerCapabilitiesResources, ServerCapabilitiesTools,
-    },
-};
+use rmcp::ServiceExt;
+use rmcp::service::QuitReason;
+pub(crate) use tool::{Tool, execute_rmcp_command};
 use tracing_appender::rolling;
 use tracing_subscriber::{EnvFilter, fmt};
-
-const VERSION: &str = env!("CARGO_PKG_VERSION");
-const GIT_HASH: Option<&str> = option_env!("GIT_HASH");
-
-struct AppVersion;
-
-impl AppVersion {
-    fn version() -> String {
-        match GIT_HASH {
-            Some(hash) => format!("{VERSION}.{hash}"),
-            None => VERSION.into(),
-        }
-    }
-}
-
-impl From<AppVersion> for clap::builder::Str {
-    fn from(_: AppVersion) -> Self {
-        AppVersion::version().into()
-    }
-}
+use version::AppVersion;
 
 #[derive(Parser, Debug)]
 #[command(author, version = AppVersion, about = "Rust MCP Server", long_about = None)]
 struct Args {
-    /// Timeout for processing a request (seconds)
-    #[arg(long, default_value_t = 600)]
-    timeout: u64,
-
     /// Log level (error, warn, info, debug, trace)
     #[arg(long, default_value = "info")]
     log_level: String,
@@ -61,11 +31,14 @@ struct Args {
     /// Rust project workspace path. By default, uses the current directory.
     #[arg(long)]
     workspace: Option<String>,
+
+    /// Generate tools.md documentation file and exit
+    #[arg(long)]
+    generate_docs: Option<String>,
 }
 
 #[tokio::main]
-async fn main() -> SdkResult<()> {
-    // Parse command line arguments
+async fn main() -> anyhow::Result<()> {
     let args = Args::parse();
 
     // Set up logging
@@ -85,58 +58,48 @@ async fn main() -> SdkResult<()> {
             .with_ansi(false)
             .init();
     }
-    tracing::info!(?args, "Starting Rust MCP Server");
-
-    // Warn about long-running requests
-    if args.timeout < 60 {
-        tracing::warn!(
-            timeout = args.timeout,
-            "Short timeout may interrupt long-running requests like cargo-build"
-        );
-    } else if args.timeout >= 600 {
-        tracing::info!(
-            timeout = args.timeout,
-            "Long timeout set; some requests (e.g., cargo-build) may take a while"
-        );
-    }
-
-    tracing::info!(version = AppVersion::version(), "Server version");
+    tracing::info!("Starting Rust MCP Server: {:?}", args);
+    tracing::info!("Server version: {}", AppVersion::version());
 
     if let Some(workspace) = args.workspace {
-        tracing::info!(workspace = %workspace, "Workspace root has been overridden");
+        tracing::info!("Workspace root has been overridden: {}", workspace);
         tools::set_workspace_root(workspace);
     } else {
         tracing::info!("No workspace root specified, using current directory");
     }
 
-    let server_details = InitializeResult {
-        server_info: Implementation {
-            name: "Rust MCP Server".into(),
-            title: Some("Rust MCP Server".into()),
-            version: AppVersion::version(),
-        },
-        capabilities: ServerCapabilities {
-            tools: Some(ServerCapabilitiesTools { list_changed: None }),
-            prompts: Some(ServerCapabilitiesPrompts { list_changed: None }),
-            resources: Some(ServerCapabilitiesResources {
-                list_changed: None,
-                subscribe: None,
-            }),
-            ..Default::default()
-        },
-        meta: None,
-        instructions: Some(include_str!("../docs/instructions.md").into()),
-        protocol_version: LATEST_PROTOCOL_VERSION.into(),
-    };
+    let server = rmcp_server::Server::new(&args.disabled_tools);
 
-    let transport = StdioTransport::new(TransportOptions {
-        timeout: std::time::Duration::from_secs(args.timeout),
-    })?;
+    // Handle documentation generation mode
+    if let Some(output_file) = args.generate_docs {
+        tracing::info!("Generating documentation to: {}", output_file);
+        let docs = server.generate_markdown_docs();
+        std::fs::write(&output_file, docs).context("Failed to write documentation file")?;
+        println!("Documentation generated successfully: {}", output_file);
+        return Ok(());
+    }
 
-    let server = server_runtime::create_server(
-        server_details,
-        transport,
-        handler::McpServerHandler::new(args.disabled_tools),
-    );
-    server.start().await
+    let service = server
+        .serve(rmcp::transport::stdio())
+        .await
+        .context("Failed to start server")?;
+
+    eprintln!("Rust MCP Server started on stdio");
+
+    let result = service.waiting().await;
+
+    match result {
+        Ok(QuitReason::Closed) => tracing::info!("Server closed normally"),
+        Ok(QuitReason::Cancelled) => tracing::info!("Server was cancelled"),
+        Ok(QuitReason::JoinError(error)) => {
+            tracing::error!("Server join error: {error}");
+            return Err(error.into());
+        }
+        Err(error) => {
+            tracing::error!("Server encountered an error: {error}");
+            return Err(error.into());
+        }
+    }
+
+    Ok(())
 }

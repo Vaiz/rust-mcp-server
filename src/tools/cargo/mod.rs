@@ -10,40 +10,31 @@ mod search;
 mod test;
 mod update;
 
-pub use add_remove::{CargoAddTool, CargoRemoveTool};
-pub use build::CargoBuildTool;
-pub use check::CargoCheckTool;
-pub use clippy::CargoClippyTool;
-pub use doc::CargoDocTool;
-pub use info::CargoInfoTool;
-pub use metadata::CargoMetadataTool;
-pub use package::CargoPackageTool;
-pub use search::CargoSearchTool;
-pub use test::CargoTestTool;
-pub use update::CargoUpdateTool;
+pub use add_remove::{CargoAddRmcpTool, CargoRemoveRmcpTool};
+pub use build::CargoBuildRmcpTool;
+pub use check::CargoCheckRmcpTool;
+pub use clippy::CargoClippyRmcpTool;
+pub use doc::CargoDocRmcpTool;
+pub use info::CargoInfoRmcpTool;
+pub use metadata::CargoMetadataRmcpTool;
+pub use package::CargoPackageRmcpTool;
+pub use search::CargoSearchRmcpTool;
+pub use test::CargoTestRmcpTool;
+pub use update::CargoUpdateRmcpTool;
 
 use std::process::Command;
 
-use rust_mcp_sdk::{
-    macros::mcp_tool,
-    schema::{CallToolResult, schema_utils::CallToolError},
+use crate::{
+    Tool, execute_rmcp_command,
+    serde_utils::{
+        deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
+        output_verbosity_to_cli_flags,
+    },
 };
+use rmcp::{ErrorData, model::CallToolResult};
 
-use crate::serde_utils::{
-    deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
-    output_verbosity_to_cli_flags,
-};
-use crate::tools::execute_command;
-
-use crate::serde_utils::Tool;
-
-#[mcp_tool(
-    name = "cargo-generate_lockfile",
-    description = "Generates or updates the Cargo.lock file for a Rust project. Usually, run without any additional arguments.",
-    openWorldHint = false
-)]
 #[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
-pub struct CargoGenerateLockfileTool {
+pub struct CargoGenerateLockfileRequest {
     /// Path to Cargo.toml
     #[serde(default, deserialize_with = "deserialize_string")]
     manifest_path: Option<String>,
@@ -76,8 +67,8 @@ pub struct CargoGenerateLockfileTool {
     output_verbosity: Option<String>,
 }
 
-impl CargoGenerateLockfileTool {
-    pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
+impl CargoGenerateLockfileRequest {
+    pub fn build_cmd(&self) -> Result<Command, ErrorData> {
         let mut cmd = Command::new("cargo");
         cmd.arg("generate-lockfile");
 
@@ -101,17 +92,25 @@ impl CargoGenerateLockfileTool {
         let output_flags = output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
         cmd.args(output_flags);
 
-        execute_command(cmd, &Self::tool_name())
+        Ok(cmd)
     }
 }
 
-#[mcp_tool(
-    name = "cargo-clean",
-    description = "Cleans the target directory for a Rust project using Cargo. By default, it cleans the entire workspace.",
-    openWorldHint = false
-)]
+pub struct CargoGenerateLockfileRmcpTool;
+
+impl Tool for CargoGenerateLockfileRmcpTool {
+    const NAME: &'static str = "cargo-generate_lockfile";
+    const TITLE: &'static str = "Generate Cargo.lock";
+    const DESCRIPTION: &'static str = "Generates or updates the Cargo.lock file for a Rust project. Usually, run without any additional arguments.";
+    type RequestArgs = CargoGenerateLockfileRequest;
+
+    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
+        execute_rmcp_command(request.build_cmd()?, Self::NAME)
+    }
+}
+
 #[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
-pub struct CargoCleanTool {
+pub struct CargoCleanRequest {
     /// The toolchain to use, e.g., "stable" or "nightly".
     #[serde(default, deserialize_with = "deserialize_string")]
     toolchain: Option<String>,
@@ -175,8 +174,8 @@ pub struct CargoCleanTool {
     output_verbosity: Option<String>,
 }
 
-impl CargoCleanTool {
-    pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
+impl CargoCleanRequest {
+    pub fn build_cmd(&self) -> Result<Command, ErrorData> {
         let mut cmd = Command::new("cargo");
         if let Some(toolchain) = &self.toolchain {
             cmd.arg(format!("+{toolchain}"));
@@ -231,17 +230,25 @@ impl CargoCleanTool {
         let output_flags = output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
         cmd.args(output_flags);
 
-        execute_command(cmd, &Self::tool_name())
+        Ok(cmd)
     }
 }
 
-#[mcp_tool(
-    name = "cargo-fmt",
-    description = "Formats Rust code using rustfmt. Usually, run without any additional arguments.",
-    openWorldHint = false
-)]
+pub struct CargoCleanRmcpTool;
+
+impl Tool for CargoCleanRmcpTool {
+    const NAME: &'static str = "cargo-clean";
+    const TITLE: &'static str = "Clean Cargo artifacts";
+    const DESCRIPTION: &'static str = "Cleans the target directory for a Rust project using Cargo. By default, it cleans the entire workspace.";
+    type RequestArgs = CargoCleanRequest;
+
+    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
+        execute_rmcp_command(request.build_cmd()?, Self::NAME)
+    }
+}
+
 #[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
-pub struct CargoFmtTool {
+pub struct CargoFmtRequest {
     /// The toolchain to use, e.g., "stable" or "nightly".
     #[serde(default, deserialize_with = "deserialize_string")]
     toolchain: Option<String>,
@@ -276,8 +283,8 @@ pub struct CargoFmtTool {
     output_verbosity: Option<String>,
 }
 
-impl CargoFmtTool {
-    pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
+impl CargoFmtRequest {
+    pub fn build_cmd(&self) -> Result<Command, ErrorData> {
         let mut cmd = Command::new("cargo");
         if let Some(toolchain) = &self.toolchain {
             cmd.arg(format!("+{toolchain}"));
@@ -313,17 +320,26 @@ impl CargoFmtTool {
         let output_flags = output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
         cmd.args(output_flags);
 
-        execute_command(cmd, &Self::tool_name())
+        Ok(cmd)
     }
 }
 
-#[mcp_tool(
-    name = "cargo-new",
-    description = "Create a new cargo package at <path>. Creates a new Rust project with the specified name and template.",
-    openWorldHint = false
-)]
+pub struct CargoFmtRmcpTool;
+
+impl Tool for CargoFmtRmcpTool {
+    const NAME: &'static str = "cargo-fmt";
+    const TITLE: &'static str = "Format Rust code";
+    const DESCRIPTION: &'static str =
+        "Formats Rust code using rustfmt. Usually, run without any additional arguments.";
+    type RequestArgs = CargoFmtRequest;
+
+    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
+        execute_rmcp_command(request.build_cmd()?, Self::NAME)
+    }
+}
+
 #[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
-pub struct CargoNewTool {
+pub struct CargoNewRequest {
     /// The toolchain to use, e.g., "stable" or "nightly".
     #[serde(default, deserialize_with = "deserialize_string")]
     toolchain: Option<String>,
@@ -377,8 +393,8 @@ pub struct CargoNewTool {
     pub output_verbosity: Option<String>,
 }
 
-impl CargoNewTool {
-    pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
+impl CargoNewRequest {
+    pub fn build_cmd(&self) -> Result<Command, ErrorData> {
         let mut cmd = Command::new("cargo");
         if let Some(toolchain) = &self.toolchain {
             cmd.arg(format!("+{toolchain}"));
@@ -420,22 +436,43 @@ impl CargoNewTool {
         let output_flags = output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
         cmd.args(output_flags);
 
-        execute_command(cmd, &Self::tool_name())
+        Ok(cmd)
     }
 }
 
-#[mcp_tool(
-    name = "cargo-list",
-    description = "Lists installed cargo commands using 'cargo --list'.",
-    openWorldHint = false
-)]
-#[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
-pub struct CargoListTool {}
+pub struct CargoNewRmcpTool;
 
-impl CargoListTool {
-    pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
+impl Tool for CargoNewRmcpTool {
+    const NAME: &'static str = "cargo-new";
+    const TITLE: &'static str = "Create new Rust project";
+    const DESCRIPTION: &'static str = "Create a new cargo package at <path>. Creates a new Rust project with the specified name and template.";
+    type RequestArgs = CargoNewRequest;
+
+    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
+        execute_rmcp_command(request.build_cmd()?, Self::NAME)
+    }
+}
+
+#[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
+pub struct CargoListRequest {}
+
+impl CargoListRequest {
+    pub fn build_cmd(&self) -> Result<Command, ErrorData> {
         let mut cmd = Command::new("cargo");
         cmd.arg("--list");
-        execute_command(cmd, &Self::tool_name())
+        Ok(cmd)
+    }
+}
+
+pub struct CargoListRmcpTool;
+
+impl Tool for CargoListRmcpTool {
+    const NAME: &'static str = "cargo-list";
+    const TITLE: &'static str = "List cargo commands";
+    const DESCRIPTION: &'static str = "Lists installed cargo commands using 'cargo --list'.";
+    type RequestArgs = CargoListRequest;
+
+    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
+        execute_rmcp_command(request.build_cmd()?, Self::NAME)
     }
 }

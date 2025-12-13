@@ -1,26 +1,16 @@
 use std::process::Command;
 
 use crate::{
+    Tool, execute_rmcp_command,
     serde_utils::{
         deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
     },
-    tools::execute_command,
 };
-use rust_mcp_sdk::{
-    macros::mcp_tool,
-    schema::{CallToolResult, schema_utils::CallToolError},
-};
+use rmcp::ErrorData;
 
-use crate::serde_utils::Tool;
-
-#[mcp_tool(
-    name = "cargo-clippy",
-    description = "Checks a Rust package to catch common mistakes and improve code quality using Clippy",
-    openWorldHint = false
-)]
 #[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
-pub struct CargoClippyTool {
+pub struct CargoClippyRequest {
     /// The toolchain to use, e.g., "stable" or "nightly".
     #[serde(default, deserialize_with = "deserialize_string")]
     toolchain: Option<String>,
@@ -148,9 +138,8 @@ pub struct CargoClippyTool {
     #[serde(default)]
     warnings_as_errors: Option<bool>,
 }
-
-impl CargoClippyTool {
-    pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
+impl CargoClippyRequest {
+    pub fn build_cmd(&self) -> Result<Command, ErrorData> {
         let mut cmd = Command::new("cargo");
         if let Some(toolchain) = &self.toolchain {
             cmd.arg(format!("+{toolchain}"));
@@ -281,10 +270,27 @@ impl CargoClippyTool {
             cmd.env("RUSTFLAGS", "-D warnings");
         }
 
-        execute_command(cmd, &Self::tool_name())
+        Ok(cmd)
     }
 }
 
+pub struct CargoClippyRmcpTool;
+
+impl Tool for CargoClippyRmcpTool {
+    const NAME: &'static str = "cargo-clippy";
+    const TITLE: &'static str = "cargo clippy";
+    const DESCRIPTION: &'static str =
+        "Checks a Rust package to catch common mistakes and improve code quality using Clippy";
+    type RequestArgs = CargoClippyRequest;
+
+    fn call_rmcp_tool(
+        &self,
+        request: Self::RequestArgs,
+    ) -> Result<rmcp::model::CallToolResult, ErrorData> {
+        let cmd = request.build_cmd()?;
+        execute_rmcp_command(cmd, Self::NAME)
+    }
+}
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -314,7 +320,7 @@ mod tests {
             "warnings_as_errors": false
         });
 
-        let tool: Result<CargoClippyTool, _> = serde_json::from_value(input);
+        let tool: Result<CargoClippyRequest, _> = serde_json::from_value(input);
         let tool = tool
             .expect("Deserialization should succeed even if `package` is missing (it's Option)");
 
@@ -331,7 +337,7 @@ mod tests {
             "package": ["my_package"],
         });
 
-        let tool: Result<CargoClippyTool, _> = serde_json::from_value(input);
+        let tool: Result<CargoClippyRequest, _> = serde_json::from_value(input);
         let tool = tool.expect("Deserialization should succeed");
 
         assert_eq!(tool.package.unwrap(), ["my_package".to_owned()]);

@@ -1,20 +1,10 @@
 use std::process::Command;
 
-use rust_mcp_sdk::{
-    macros::{JsonSchema, mcp_tool},
-    schema::{CallToolResult, schema_utils::CallToolError},
-};
+use crate::{Tool, execute_rmcp_command, serde_utils::deserialize_string};
+use rmcp::{ErrorData, model::CallToolResult};
 
-use crate::serde_utils::deserialize_string;
-use crate::tools::execute_command;
-
-#[mcp_tool(
-    name = "rustc-explain",
-    description = "Provide a detailed explanation of a Rust compiler error code. This tool allows AI agents to request more information about compilation errors by providing the error code (e.g., E0001, E0308, etc.). Very useful for understanding and resolving Rust compilation errors.",
-    openWorldHint = false
-)]
-#[derive(Debug, ::serde::Deserialize, JsonSchema)]
-pub struct RustcExplainTool {
+#[derive(Debug, ::serde::Deserialize, ::schemars::JsonSchema)]
+pub struct RustcExplainRequest {
     /// The Rust compiler error code to explain (e.g., "E0001", "E0308", "E0432")
     pub error_code: String,
 
@@ -23,8 +13,8 @@ pub struct RustcExplainTool {
     pub toolchain: Option<String>,
 }
 
-impl RustcExplainTool {
-    pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
+impl RustcExplainRequest {
+    pub fn build_cmd(&self) -> Result<Command, ErrorData> {
         let mut cmd = Command::new("rustc");
 
         if let Some(toolchain) = &self.toolchain {
@@ -34,6 +24,19 @@ impl RustcExplainTool {
 
         cmd.arg("--explain").arg(&self.error_code);
 
-        execute_command(cmd, &Self::tool_name())
+        Ok(cmd)
+    }
+}
+
+pub struct RustcExplainRmcpTool;
+
+impl Tool for RustcExplainRmcpTool {
+    const NAME: &'static str = "rustc-explain";
+    const TITLE: &'static str = "Explain Rust error";
+    const DESCRIPTION: &'static str = "Provide a detailed explanation of a Rust compiler error code. This tool allows AI agents to request more information about compilation errors by providing the error code (e.g., E0001, E0308, etc.). Very useful for understanding and resolving Rust compilation errors.";
+    type RequestArgs = RustcExplainRequest;
+
+    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
+        execute_rmcp_command(request.build_cmd()?, Self::NAME)
     }
 }

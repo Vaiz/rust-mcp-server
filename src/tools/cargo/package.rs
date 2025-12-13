@@ -1,37 +1,16 @@
 use std::process::Command;
 
-use rust_mcp_sdk::{
-    macros::mcp_tool,
-    schema::{CallToolResult, schema_utils::CallToolError},
+use crate::{
+    Tool, execute_rmcp_command,
+    serde_utils::{
+        deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
+        output_verbosity_to_cli_flags,
+    },
 };
+use rmcp::ErrorData;
 
-use crate::serde_utils::{
-    deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
-    output_verbosity_to_cli_flags,
-};
-use crate::tools::execute_command;
-
-use crate::serde_utils::Tool;
-
-#[mcp_tool(
-    name = "cargo-package",
-    description = "Assemble the local package into a distributable tarball for publishing or distribution. 
-    
-    Common use cases:
-    - Create a .crate file for publishing to crates.io or a private registry
-    - Generate distribution packages for deployment or sharing
-    - Validate package contents before publishing (using --list)
-    - Test packaging process without verification (using --no-verify)
-    - Package workspace members selectively or all at once
-    
-    The generated tarball contains all files needed to build the package, excluding files listed in .gitignore or .cargo_vcs_info.json. 
-    By default, the package is also built to verify it can be compiled successfully.
-    
-    Usually run without any additional arguments for single-package projects.",
-    openWorldHint = false
-)]
 #[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
-pub struct CargoPackageTool {
+pub struct CargoPackageRequest {
     /// [Optional] The toolchain to use for packaging, e.g., "stable", "nightly", or "1.70.0".
     /// When specified, cargo will use this specific Rust toolchain version.
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -158,9 +137,8 @@ pub struct CargoPackageTool {
     #[serde(default, deserialize_with = "deserialize_string")]
     output_verbosity: Option<String>,
 }
-
-impl CargoPackageTool {
-    pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
+impl CargoPackageRequest {
+    pub fn build_cmd(&self) -> Result<Command, ErrorData> {
         let mut cmd = Command::new("cargo");
 
         // Add toolchain if specified
@@ -272,6 +250,23 @@ impl CargoPackageTool {
         let output_flags = output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
         cmd.args(output_flags);
 
-        execute_command(cmd, &Self::tool_name())
+        Ok(cmd)
+    }
+}
+
+pub struct CargoPackageRmcpTool;
+
+impl Tool for CargoPackageRmcpTool {
+    const NAME: &'static str = "cargo-package";
+    const TITLE: &'static str = "cargo package";
+    const DESCRIPTION: &'static str = "Assemble the local package into a distributable tarball for publishing or distribution. <br/>    <br/>    Common use cases:<br/>    - Create a .crate file for publishing to crates.io or a private registry<br/>    - Generate distribution packages for deployment or sharing<br/>    - Validate package contents before publishing (using --list)<br/>    - Test packaging process without verification (using --no-verify)<br/>    - Package workspace members selectively or all at once<br/>    <br/>    The generated tarball contains all files needed to build the package, excluding files listed in .gitignore or .cargo_vcs_info.json. <br/>    By default, the package is also built to verify it can be compiled successfully.<br/>    <br/>    Usually run without any additional arguments for single-package projects.";
+    type RequestArgs = CargoPackageRequest;
+
+    fn call_rmcp_tool(
+        &self,
+        request: Self::RequestArgs,
+    ) -> Result<rmcp::model::CallToolResult, ErrorData> {
+        let cmd = request.build_cmd()?;
+        execute_rmcp_command(cmd, Self::NAME)
     }
 }

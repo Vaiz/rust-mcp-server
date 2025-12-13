@@ -1,21 +1,13 @@
-use crate::serde_utils::Tool;
 use std::process::Command;
 
-use rust_mcp_sdk::{
-    macros::mcp_tool,
-    schema::{CallToolResult, schema_utils::CallToolError},
+use crate::{
+    Tool, execute_rmcp_command,
+    serde_utils::{deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags},
 };
+use rmcp::{ErrorData, model::CallToolResult};
 
-use crate::serde_utils::{deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags};
-use crate::tools::execute_command;
-
-#[mcp_tool(
-    name = "cargo-deny-check",
-    description = "Checks a project's crate graph for security advisories, license compliance, banned crates.",
-    openWorldHint = false
-)]
 #[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
-pub struct CargoDenyCheckTool {
+pub struct CargoDenyCheckRequest {
     /// The check(s) to perform. Options: advisories, ban, bans, license, licenses, sources, all
     #[serde(default, deserialize_with = "deserialize_string_vec")]
     which: Option<Vec<String>>,
@@ -118,8 +110,8 @@ pub struct CargoDenyCheckTool {
     exclude_unpublished: Option<bool>,
 }
 
-impl CargoDenyCheckTool {
-    pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
+impl CargoDenyCheckRequest {
+    pub fn build_cmd(&self) -> Result<Command, ErrorData> {
         let mut cmd = Command::new("cargo");
         cmd.arg("deny");
 
@@ -236,24 +228,32 @@ impl CargoDenyCheckTool {
             }
         }
 
-        execute_command(cmd, &Self::tool_name())
+        Ok(cmd)
     }
 }
 
-#[mcp_tool(
-    name = "cargo-deny-init",
-    description = "Creates a cargo-deny config from a template",
-    openWorldHint = false
-)]
+pub struct CargoDenyCheckRmcpTool;
+
+impl Tool for CargoDenyCheckRmcpTool {
+    const NAME: &'static str = "cargo-deny-check";
+    const TITLE: &'static str = "Check dependencies";
+    const DESCRIPTION: &'static str = "Checks a project's crate graph for security advisories, license compliance, banned crates.";
+    type RequestArgs = CargoDenyCheckRequest;
+
+    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
+        execute_rmcp_command(request.build_cmd()?, Self::NAME)
+    }
+}
+
 #[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
-pub struct CargoDenyInitTool {
+pub struct CargoDenyInitRequest {
     /// The path to create. Defaults to <cwd>/deny.toml
     #[serde(default, deserialize_with = "deserialize_string")]
     config: Option<String>,
 }
 
-impl CargoDenyInitTool {
-    pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
+impl CargoDenyInitRequest {
+    pub fn build_cmd(&self) -> Result<Command, ErrorData> {
         let mut cmd = Command::new("cargo");
         cmd.arg("deny").arg("init");
 
@@ -261,17 +261,25 @@ impl CargoDenyInitTool {
             cmd.arg(config);
         }
 
-        execute_command(cmd, &Self::tool_name())
+        Ok(cmd)
     }
 }
 
-#[mcp_tool(
-    name = "cargo-deny-list",
-    description = "Outputs a listing of all licenses and the crates that use them",
-    openWorldHint = false
-)]
+pub struct CargoDenyInitRmcpTool;
+
+impl Tool for CargoDenyInitRmcpTool {
+    const NAME: &'static str = "cargo-deny-init";
+    const TITLE: &'static str = "Initialize cargo-deny config";
+    const DESCRIPTION: &'static str = "Creates a cargo-deny config from a template";
+    type RequestArgs = CargoDenyInitRequest;
+
+    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
+        execute_rmcp_command(request.build_cmd()?, Self::NAME)
+    }
+}
+
 #[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
-pub struct CargoDenyListTool {
+pub struct CargoDenyListRequest {
     /// Path to the config to use. Defaults to a deny.toml in the same folder as the manifest path
     #[serde(default, deserialize_with = "deserialize_string")]
     config: Option<String>,
@@ -288,8 +296,8 @@ pub struct CargoDenyListTool {
     layout: Option<String>,
 }
 
-impl CargoDenyListTool {
-    pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
+impl CargoDenyListRequest {
+    pub fn build_cmd(&self) -> Result<Command, ErrorData> {
         let mut cmd = Command::new("cargo");
         cmd.arg("deny").arg("list");
 
@@ -309,23 +317,46 @@ impl CargoDenyListTool {
             cmd.arg("--layout").arg(layout);
         }
 
-        execute_command(cmd, &Self::tool_name())
+        Ok(cmd)
     }
 }
 
-#[mcp_tool(
-    name = "cargo-deny-install",
-    description = "Installs cargo-deny tool for dependency graph analysis and security checks",
-    openWorldHint = false
-)]
-#[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
-pub struct CargoDenyInstallTool {}
+pub struct CargoDenyListRmcpTool;
 
-impl CargoDenyInstallTool {
-    pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
+impl Tool for CargoDenyListRmcpTool {
+    const NAME: &'static str = "cargo-deny-list";
+    const TITLE: &'static str = "List licenses";
+    const DESCRIPTION: &'static str =
+        "Outputs a listing of all licenses and the crates that use them";
+    type RequestArgs = CargoDenyListRequest;
+
+    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
+        execute_rmcp_command(request.build_cmd()?, Self::NAME)
+    }
+}
+
+#[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
+pub struct CargoDenyInstallRequest {}
+
+impl CargoDenyInstallRequest {
+    pub fn build_cmd(&self) -> Result<Command, ErrorData> {
         let mut cmd = Command::new("cargo");
         cmd.arg("install").arg("cargo-deny");
 
-        execute_command(cmd, &Self::tool_name())
+        Ok(cmd)
+    }
+}
+
+pub struct CargoDenyInstallRmcpTool;
+
+impl Tool for CargoDenyInstallRmcpTool {
+    const NAME: &'static str = "cargo-deny-install";
+    const TITLE: &'static str = "Install cargo-deny";
+    const DESCRIPTION: &'static str =
+        "Installs cargo-deny tool for dependency graph analysis and security checks";
+    type RequestArgs = CargoDenyInstallRequest;
+
+    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
+        execute_rmcp_command(request.build_cmd()?, Self::NAME)
     }
 }

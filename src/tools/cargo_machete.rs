@@ -1,22 +1,10 @@
 use std::process::Command;
 
-use rust_mcp_sdk::{
-    macros::mcp_tool,
-    schema::{CallToolResult, schema_utils::CallToolError},
-};
+use crate::{Tool, execute_rmcp_command, serde_utils::deserialize_string_vec};
+use rmcp::{ErrorData, model::CallToolResult};
 
-use crate::serde_utils::deserialize_string_vec;
-use crate::tools::execute_command;
-
-use crate::serde_utils::Tool;
-
-#[mcp_tool(
-    name = "cargo-machete",
-    description = "Finds unused dependencies in a fast yet imprecise way. Helps identify dependencies that are declared in Cargo.toml but not actually used in the code.",
-    openWorldHint = false
-)]
 #[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
-pub struct CargoMacheteTool {
+pub struct CargoMacheteRequest {
     /// Uses cargo-metadata to figure out the dependencies' names. May be useful if some dependencies are renamed.
     #[serde(default)]
     with_metadata: Option<bool>,
@@ -39,8 +27,8 @@ pub struct CargoMacheteTool {
     paths: Option<Vec<String>>,
 }
 
-impl CargoMacheteTool {
-    pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
+impl CargoMacheteRequest {
+    pub fn build_cmd(&self) -> Result<Command, ErrorData> {
         let mut cmd = Command::new("cargo");
         cmd.arg("machete");
 
@@ -66,23 +54,44 @@ impl CargoMacheteTool {
             }
         }
 
-        execute_command(cmd, &Self::tool_name())
+        Ok(cmd)
     }
 }
 
-#[mcp_tool(
-    name = "cargo-machete-install",
-    description = "Installs cargo-machete tool for finding unused dependencies",
-    openWorldHint = false
-)]
-#[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
-pub struct CargoMacheteInstallTool {}
+pub struct CargoMacheteRmcpTool;
 
-impl CargoMacheteInstallTool {
-    pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
+impl Tool for CargoMacheteRmcpTool {
+    const NAME: &'static str = "cargo-machete";
+    const TITLE: &'static str = "Find unused dependencies";
+    const DESCRIPTION: &'static str = "Finds unused dependencies in a fast yet imprecise way. Helps identify dependencies that are declared in Cargo.toml but not actually used in the code.";
+    type RequestArgs = CargoMacheteRequest;
+
+    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
+        execute_rmcp_command(request.build_cmd()?, Self::NAME)
+    }
+}
+
+#[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
+pub struct CargoMacheteInstallRequest {}
+
+impl CargoMacheteInstallRequest {
+    pub fn build_cmd(&self) -> Result<Command, ErrorData> {
         let mut cmd = Command::new("cargo");
         cmd.arg("install").arg("cargo-machete");
 
-        execute_command(cmd, &Self::tool_name())
+        Ok(cmd)
+    }
+}
+
+pub struct CargoMacheteInstallRmcpTool;
+
+impl Tool for CargoMacheteInstallRmcpTool {
+    const NAME: &'static str = "cargo-machete-install";
+    const TITLE: &'static str = "Install cargo-machete";
+    const DESCRIPTION: &'static str = "Installs cargo-machete tool for finding unused dependencies";
+    type RequestArgs = CargoMacheteInstallRequest;
+
+    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
+        execute_rmcp_command(request.build_cmd()?, Self::NAME)
     }
 }
