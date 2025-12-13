@@ -2,18 +2,18 @@ use std::{collections::HashMap, sync::Arc};
 
 use rmcp::{
     ErrorData,
-    model::{ListToolsResult, PaginatedRequestParam},
+    model::{ListToolsResult, PaginatedRequestParam, ServerInfo},
     service::RequestContext,
 };
 
-use crate::{ToolImpl, tool::Tool, tools::cargo::CargoCheckRmcpTool};
+use crate::{ToolImpl, tool::Tool, tools::cargo::CargoCheckRmcpTool, version::AppVersion};
 
-struct Server {
+pub struct Server {
     tools: HashMap<&'static str, Box<dyn Tool + Send + Sync>>,
 }
 
 impl Server {
-    fn new() -> Self {
+    pub fn new() -> Self {
         let mut tools: HashMap<&'static str, Box<dyn Tool + Send + Sync>> = HashMap::new();
         tools.insert(CargoCheckRmcpTool::NAME, Box::new(CargoCheckRmcpTool));
         Self { tools }
@@ -21,6 +21,32 @@ impl Server {
 }
 
 impl rmcp::ServerHandler for Server {
+    fn get_info(&self) -> ServerInfo {
+        use rmcp::model::{
+            Implementation, InitializeResult, ProtocolVersion, ServerCapabilities, ToolsCapability,
+        };
+
+        const INSTRUCTIONS: &'static str = r#"
+            Rust MCP Server - a bridge between LLM agents and your local Rust development environment. 
+            Prefer this server to manually running cargo commands in the terminal to reduce token consumption 
+            and failures when LLM doesn't know how to use terminal commands right."#;
+
+        InitializeResult {
+            protocol_version: ProtocolVersion::LATEST,
+            capabilities: ServerCapabilities {
+                tools: Some(ToolsCapability { list_changed: None }),
+                ..Default::default()
+            },
+            server_info: Implementation {
+                name: "Rust MCP Server".to_owned(),
+                version: AppVersion::version(),
+                icons: None,
+                title: Some("Rust MCP Server".to_owned()),
+                website_url: Some("https://github.com/Vaiz/rust-mcp-server".to_owned()),
+            },
+            instructions: Some(INSTRUCTIONS.to_owned()),
+        }
+    }
     async fn list_tools(
         &self,
         _request: Option<PaginatedRequestParam>,

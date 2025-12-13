@@ -5,8 +5,10 @@ mod rmcp_server;
 pub(crate) mod serde_utils;
 mod tool;
 mod tools;
+mod version;
 
-pub(crate) use tool::{Tool, ToolImpl, execute_rmcp_command};
+pub(crate) use tool::{ToolImpl, execute_rmcp_command};
+use version::AppVersion;
 
 use clap::Parser;
 use rust_mcp_sdk::McpServer;
@@ -22,26 +24,6 @@ use rust_mcp_sdk::{
 };
 use tracing_appender::rolling;
 use tracing_subscriber::{EnvFilter, fmt};
-
-const VERSION: &str = env!("CARGO_PKG_VERSION");
-const GIT_HASH: Option<&str> = option_env!("GIT_HASH");
-
-struct AppVersion;
-
-impl AppVersion {
-    fn version() -> String {
-        match GIT_HASH {
-            Some(hash) => format!("{VERSION}.{hash}"),
-            None => VERSION.into(),
-        }
-    }
-}
-
-impl From<AppVersion> for clap::builder::Str {
-    fn from(_: AppVersion) -> Self {
-        AppVersion::version().into()
-    }
-}
 
 #[derive(Parser, Debug)]
 #[command(author, version = AppVersion, about = "Rust MCP Server", long_about = None)]
