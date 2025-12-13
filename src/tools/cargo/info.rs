@@ -100,8 +100,6 @@ mod tests {
 
     use super::*;
 
-    
-
     #[test]
     fn test_cargo_info_schema() {
         const EXPECTED_SCHEMA: &str = r##"{
@@ -145,7 +143,7 @@ mod tests {
   "required": [
     "package"
   ],
-  "title": "CargoInfoTool",
+  "title": "CargoInfoRequest",
   "type": "object"
 }"##;
         let schema = serde_json::Value::from(CargoInfoRmcpTool {}.json_schema());
