@@ -1,7 +1,7 @@
 use std::process::Command;
 
 use crate::{
-    ToolImpl, execute_rmcp_command,
+    Tool, execute_rmcp_command,
     serde_utils::{deserialize_string, output_verbosity_to_cli_flags},
 };
 use rmcp::ErrorData;
@@ -43,7 +43,7 @@ impl CargoSearchRequest {
 
 pub struct CargoSearchRmcpTool;
 
-impl ToolImpl for CargoSearchRmcpTool {
+impl Tool for CargoSearchRmcpTool {
     const NAME: &'static str = "cargo-search";
     const TITLE: &'static str = "cargo search";
     const DESCRIPTION: &'static str = "Search packages in the registry. Default registry is crates.io. Equivalent to 'cargo search <code>QUERY</code>'.";

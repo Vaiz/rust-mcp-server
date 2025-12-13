@@ -1,7 +1,7 @@
 use std::process::Command;
 
 use crate::{
-    ToolImpl, execute_rmcp_command,
+    Tool, execute_rmcp_command,
     serde_utils::{
         PackageWithVersion, deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
@@ -225,7 +225,7 @@ impl CargoAddRequest {
 
 pub struct CargoAddRmcpTool;
 
-impl ToolImpl for CargoAddRmcpTool {
+impl Tool for CargoAddRmcpTool {
     const NAME: &'static str = "cargo-add";
     const TITLE: &'static str = "Add Rust dependency";
     const DESCRIPTION: &'static str = "Adds a dependency to a Rust project using cargo add.";
@@ -348,7 +348,7 @@ impl CargoRemoveRequest {
 
 pub struct CargoRemoveRmcpTool;
 
-impl ToolImpl for CargoRemoveRmcpTool {
+impl Tool for CargoRemoveRmcpTool {
     const NAME: &'static str = "cargo-remove";
     const TITLE: &'static str = "Remove Rust dependency";
     const DESCRIPTION: &'static str = "Remove dependencies from a Cargo.toml manifest file.";

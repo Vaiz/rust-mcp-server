@@ -1,6 +1,6 @@
 use std::process::Command;
 
-use crate::{ToolImpl, execute_rmcp_command, serde_utils::deserialize_string_vec};
+use crate::{Tool, execute_rmcp_command, serde_utils::deserialize_string_vec};
 use rmcp::{ErrorData, model::CallToolResult};
 
 #[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
@@ -60,7 +60,7 @@ impl CargoMacheteRequest {
 
 pub struct CargoMacheteRmcpTool;
 
-impl ToolImpl for CargoMacheteRmcpTool {
+impl Tool for CargoMacheteRmcpTool {
     const NAME: &'static str = "cargo-machete";
     const TITLE: &'static str = "Find unused dependencies";
     const DESCRIPTION: &'static str = "Finds unused dependencies in a fast yet imprecise way. Helps identify dependencies that are declared in Cargo.toml but not actually used in the code.";
@@ -85,7 +85,7 @@ impl CargoMacheteInstallRequest {
 
 pub struct CargoMacheteInstallRmcpTool;
 
-impl ToolImpl for CargoMacheteInstallRmcpTool {
+impl Tool for CargoMacheteInstallRmcpTool {
     const NAME: &'static str = "cargo-machete-install";
     const TITLE: &'static str = "Install cargo-machete";
     const DESCRIPTION: &'static str = "Installs cargo-machete tool for finding unused dependencies";

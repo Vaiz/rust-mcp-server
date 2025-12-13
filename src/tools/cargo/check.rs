@@ -1,7 +1,7 @@
 use std::process::Command;
 
 use crate::{
-    ToolImpl, execute_rmcp_command,
+    Tool, execute_rmcp_command,
     serde_utils::{
         deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
@@ -275,7 +275,7 @@ impl CargoCheckRequest {
 
 pub struct CargoCheckRmcpTool;
 
-impl ToolImpl for CargoCheckRmcpTool {
+impl Tool for CargoCheckRmcpTool {
     const NAME: &'static str = "cargo-check";
     const TITLE: &'static str = "cargo check";
     const DESCRIPTION: &'static str = "Checks a Rust package and all of its dependencies for errors. Usually, run without any additional arguments.";

@@ -6,7 +6,7 @@ use rmcp::model::{
 use crate::tools::apply_workspace_root;
 
 /// Dyn compatible Tool trait
-pub(crate) trait Tool {
+pub(crate) trait DynTool {
     fn name(&self) -> &'static str;
     fn title(&self) -> &'static str;
     fn description(&self) -> &'static str;
@@ -15,7 +15,7 @@ pub(crate) trait Tool {
 }
 
 /// Actual trait that all tools must implement
-pub(crate) trait ToolImpl {
+pub(crate) trait Tool {
     const NAME: &'static str;
     const TITLE: &'static str;
     const DESCRIPTION: &'static str;
@@ -24,9 +24,9 @@ pub(crate) trait ToolImpl {
     fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData>;
 }
 
-impl<T> Tool for T
+impl<T> DynTool for T
 where
-    T: ToolImpl,
+    T: Tool,
 {
     fn name(&self) -> &'static str {
         T::NAME

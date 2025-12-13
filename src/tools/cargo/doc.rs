@@ -7,7 +7,7 @@ use rmcp::{
 };
 
 use crate::{
-    ToolImpl, execute_rmcp_command,
+    Tool, execute_rmcp_command,
     serde_utils::{
         deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
@@ -330,7 +330,7 @@ impl CargoDocRequest {
 
 pub struct CargoDocRmcpTool;
 
-impl ToolImpl for CargoDocRmcpTool {
+impl Tool for CargoDocRmcpTool {
     const NAME: &'static str = "cargo-doc";
     const TITLE: &'static str = "Build Rust documentation";
     const DESCRIPTION: &'static str = "Build documentation for a Rust package using Cargo. Recommended to use with no_deps and specific package for faster builds. Returns path to generated documentation index.";

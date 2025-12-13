@@ -1,6 +1,6 @@
 use std::process::Command;
 
-use crate::{ToolImpl, execute_rmcp_command, serde_utils::deserialize_string};
+use crate::{Tool, execute_rmcp_command, serde_utils::deserialize_string};
 use rmcp::{ErrorData, model::CallToolResult};
 
 #[derive(Debug, ::serde::Deserialize, ::schemars::JsonSchema)]
@@ -30,7 +30,7 @@ impl RustcExplainRequest {
 
 pub struct RustcExplainRmcpTool;
 
-impl ToolImpl for RustcExplainRmcpTool {
+impl Tool for RustcExplainRmcpTool {
     const NAME: &'static str = "rustc-explain";
     const TITLE: &'static str = "Explain Rust error";
     const DESCRIPTION: &'static str = "Provide a detailed explanation of a Rust compiler error code. This tool allows AI agents to request more information about compilation errors by providing the error code (e.g., E0001, E0308, etc.). Very useful for understanding and resolving Rust compilation errors.";

@@ -1,7 +1,7 @@
 use std::process::Command;
 
 use crate::{
-    ToolImpl, execute_rmcp_command,
+    Tool, execute_rmcp_command,
     serde_utils::{deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags},
 };
 use rmcp::{ErrorData, model::CallToolResult};
@@ -234,7 +234,7 @@ impl CargoDenyCheckRequest {
 
 pub struct CargoDenyCheckRmcpTool;
 
-impl ToolImpl for CargoDenyCheckRmcpTool {
+impl Tool for CargoDenyCheckRmcpTool {
     const NAME: &'static str = "cargo-deny-check";
     const TITLE: &'static str = "Check dependencies";
     const DESCRIPTION: &'static str = "Checks a project's crate graph for security advisories, license compliance, banned crates.";
@@ -267,7 +267,7 @@ impl CargoDenyInitRequest {
 
 pub struct CargoDenyInitRmcpTool;
 
-impl ToolImpl for CargoDenyInitRmcpTool {
+impl Tool for CargoDenyInitRmcpTool {
     const NAME: &'static str = "cargo-deny-init";
     const TITLE: &'static str = "Initialize cargo-deny config";
     const DESCRIPTION: &'static str = "Creates a cargo-deny config from a template";
@@ -323,7 +323,7 @@ impl CargoDenyListRequest {
 
 pub struct CargoDenyListRmcpTool;
 
-impl ToolImpl for CargoDenyListRmcpTool {
+impl Tool for CargoDenyListRmcpTool {
     const NAME: &'static str = "cargo-deny-list";
     const TITLE: &'static str = "List licenses";
     const DESCRIPTION: &'static str =
@@ -349,7 +349,7 @@ impl CargoDenyInstallRequest {
 
 pub struct CargoDenyInstallRmcpTool;
 
-impl ToolImpl for CargoDenyInstallRmcpTool {
+impl Tool for CargoDenyInstallRmcpTool {
     const NAME: &'static str = "cargo-deny-install";
     const TITLE: &'static str = "Install cargo-deny";
     const DESCRIPTION: &'static str =

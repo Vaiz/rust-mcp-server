@@ -7,8 +7,8 @@ use rmcp::{
 };
 
 use crate::{
-    ToolImpl,
-    tool::Tool,
+    Tool,
+    tool::DynTool,
     tools::{
         cargo::{
             CargoAddRmcpTool, CargoBuildRmcpTool, CargoCheckRmcpTool, CargoCleanRmcpTool,
@@ -30,12 +30,12 @@ use crate::{
 };
 
 pub struct Server {
-    tools: HashMap<&'static str, Box<dyn Tool + Send + Sync>>,
+    tools: HashMap<&'static str, Box<dyn DynTool + Send + Sync>>,
 }
 
 impl Server {
     pub fn new(disabled_tools: &[String]) -> Self {
-        let mut tools: HashMap<&'static str, Box<dyn Tool + Send + Sync>> = HashMap::new();
+        let mut tools: HashMap<&'static str, Box<dyn DynTool + Send + Sync>> = HashMap::new();
 
         // Cargo tools
         tools.insert(CargoAddRmcpTool::NAME, Box::new(CargoAddRmcpTool));

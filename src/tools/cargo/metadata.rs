@@ -1,7 +1,7 @@
 use std::process::Command;
 
 use crate::{
-    ToolImpl, execute_rmcp_command,
+    Tool, execute_rmcp_command,
     serde_utils::{
         deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
@@ -125,7 +125,7 @@ impl CargoMetadataRequest {
 
 pub struct CargoMetadataRmcpTool;
 
-impl ToolImpl for CargoMetadataRmcpTool {
+impl Tool for CargoMetadataRmcpTool {
     const NAME: &'static str = "cargo-metadata";
     const TITLE: &'static str = "cargo metadata";
     const DESCRIPTION: &'static str = "Outputs a listing of a project's resolved dependencies and metadata in machine-readable format (JSON).";

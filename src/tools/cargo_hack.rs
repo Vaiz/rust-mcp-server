@@ -1,7 +1,7 @@
 use std::process::Command;
 
 use crate::{
-    ToolImpl, execute_rmcp_command,
+    Tool, execute_rmcp_command,
     serde_utils::{deserialize_string, deserialize_string_vec, output_verbosity_to_cli_flags},
 };
 use rmcp::{ErrorData, model::CallToolResult};
@@ -331,7 +331,7 @@ impl CargoHackRequest {
 
 pub struct CargoHackRmcpTool;
 
-impl ToolImpl for CargoHackRmcpTool {
+impl Tool for CargoHackRmcpTool {
     const NAME: &'static str = "cargo-hack";
     const TITLE: &'static str = "Run cargo-hack";
     const DESCRIPTION: &'static str = "Cargo subcommand to provide various options useful for testing and continuous integration, including feature testing and multi-version compatibility. Available commands: check, test, build, clippy. Recommend using 'check' for fast validation. Example: cargo-hack with \"feature_powerset\": true, \"depth\": 3, \"keep_going\": true";
@@ -356,7 +356,7 @@ impl CargoHackInstallRequest {
 
 pub struct CargoHackInstallRmcpTool;
 
-impl ToolImpl for CargoHackInstallRmcpTool {
+impl Tool for CargoHackInstallRmcpTool {
     const NAME: &'static str = "cargo-hack-install";
     const TITLE: &'static str = "Install cargo-hack";
     const DESCRIPTION: &'static str =

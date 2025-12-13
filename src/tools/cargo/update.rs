@@ -1,7 +1,7 @@
 use std::process::Command;
 
 use crate::{
-    ToolImpl, execute_rmcp_command,
+    Tool, execute_rmcp_command,
     serde_utils::{
         deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
@@ -154,7 +154,7 @@ impl CargoUpdateRequest {
 
 pub struct CargoUpdateRmcpTool;
 
-impl ToolImpl for CargoUpdateRmcpTool {
+impl Tool for CargoUpdateRmcpTool {
     const NAME: &'static str = "cargo-update";
     const TITLE: &'static str = "cargo update";
     const DESCRIPTION: &'static str = "Update dependencies as recorded in the local lock file. Updates the dependencies in Cargo.lock to their latest compatible versions.";

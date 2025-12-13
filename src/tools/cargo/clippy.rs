@@ -1,7 +1,7 @@
 use std::process::Command;
 
 use crate::{
-    ToolImpl, execute_rmcp_command,
+    Tool, execute_rmcp_command,
     serde_utils::{
         deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
@@ -276,7 +276,7 @@ impl CargoClippyRequest {
 
 pub struct CargoClippyRmcpTool;
 
-impl ToolImpl for CargoClippyRmcpTool {
+impl Tool for CargoClippyRmcpTool {
     const NAME: &'static str = "cargo-clippy";
     const TITLE: &'static str = "cargo clippy";
     const DESCRIPTION: &'static str =

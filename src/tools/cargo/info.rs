@@ -1,7 +1,7 @@
 use std::process::Command;
 
 use crate::{
-    ToolImpl, execute_rmcp_command,
+    Tool, execute_rmcp_command,
     serde_utils::{
         PackageWithVersion, deserialize_string, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
@@ -80,7 +80,7 @@ impl CargoInfoRequest {
 
 pub struct CargoInfoRmcpTool;
 
-impl ToolImpl for CargoInfoRmcpTool {
+impl Tool for CargoInfoRmcpTool {
     const NAME: &'static str = "cargo-info";
     const TITLE: &'static str = "cargo info";
     const DESCRIPTION: &'static str = "Display information about a package. Information includes package description, list of available features, etc. Equivalent to 'cargo info <SPEC>'.";
@@ -96,7 +96,7 @@ impl ToolImpl for CargoInfoRmcpTool {
 }
 #[cfg(test)]
 mod tests {
-    use crate::tool::Tool;
+    use crate::tool::DynTool;
 
     use super::*;
 

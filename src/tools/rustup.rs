@@ -1,7 +1,7 @@
 use std::process::Command;
 
 use crate::{
-    ToolImpl, execute_rmcp_command,
+    Tool, execute_rmcp_command,
     serde_utils::{deserialize_string, deserialize_string_vec},
 };
 use rmcp::{ErrorData, model::CallToolResult};
@@ -28,7 +28,7 @@ impl RustupShowRequest {
 
 pub struct RustupShowRmcpTool;
 
-impl ToolImpl for RustupShowRmcpTool {
+impl Tool for RustupShowRmcpTool {
     const NAME: &'static str = "rustup-show";
     const TITLE: &'static str = "Show Rust toolchains";
     const DESCRIPTION: &'static str = "Show the active and installed toolchains or profiles. Shows the name of the active toolchain and the version of rustc. If the active toolchain has installed support for additional compilation targets, then they are listed as well.";
@@ -116,7 +116,7 @@ impl RustupToolchainAddRequest {
 
 pub struct RustupToolchainAddRmcpTool;
 
-impl ToolImpl for RustupToolchainAddRmcpTool {
+impl Tool for RustupToolchainAddRmcpTool {
     const NAME: &'static str = "rustup-toolchain-add";
     const TITLE: &'static str = "Install Rust toolchain";
     const DESCRIPTION: &'static str = "Install or update the given toolchains, or by default the active toolchain. Toolchain name can be 'stable', 'nightly', or a specific version like '1.8.0'.";
@@ -173,7 +173,7 @@ impl RustupUpdateRequest {
 
 pub struct RustupUpdateRmcpTool;
 
-impl ToolImpl for RustupUpdateRmcpTool {
+impl Tool for RustupUpdateRmcpTool {
     const NAME: &'static str = "rustup-update";
     const TITLE: &'static str = "Update Rust toolchains";
     const DESCRIPTION: &'static str = "Update Rust toolchains and rustup. With no toolchain specified, updates each of the installed toolchains from the official release channels, then updates rustup itself. If given a toolchain argument then updates that toolchain.";

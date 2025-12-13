@@ -25,7 +25,7 @@ pub use update::CargoUpdateRmcpTool;
 use std::process::Command;
 
 use crate::{
-    ToolImpl, execute_rmcp_command,
+    Tool, execute_rmcp_command,
     serde_utils::{
         deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
@@ -98,7 +98,7 @@ impl CargoGenerateLockfileRequest {
 
 pub struct CargoGenerateLockfileRmcpTool;
 
-impl ToolImpl for CargoGenerateLockfileRmcpTool {
+impl Tool for CargoGenerateLockfileRmcpTool {
     const NAME: &'static str = "cargo-generate_lockfile";
     const TITLE: &'static str = "Generate Cargo.lock";
     const DESCRIPTION: &'static str = "Generates or updates the Cargo.lock file for a Rust project. Usually, run without any additional arguments.";
@@ -236,7 +236,7 @@ impl CargoCleanRequest {
 
 pub struct CargoCleanRmcpTool;
 
-impl ToolImpl for CargoCleanRmcpTool {
+impl Tool for CargoCleanRmcpTool {
     const NAME: &'static str = "cargo-clean";
     const TITLE: &'static str = "Clean Cargo artifacts";
     const DESCRIPTION: &'static str = "Cleans the target directory for a Rust project using Cargo. By default, it cleans the entire workspace.";
@@ -326,7 +326,7 @@ impl CargoFmtRequest {
 
 pub struct CargoFmtRmcpTool;
 
-impl ToolImpl for CargoFmtRmcpTool {
+impl Tool for CargoFmtRmcpTool {
     const NAME: &'static str = "cargo-fmt";
     const TITLE: &'static str = "Format Rust code";
     const DESCRIPTION: &'static str =
@@ -442,7 +442,7 @@ impl CargoNewRequest {
 
 pub struct CargoNewRmcpTool;
 
-impl ToolImpl for CargoNewRmcpTool {
+impl Tool for CargoNewRmcpTool {
     const NAME: &'static str = "cargo-new";
     const TITLE: &'static str = "Create new Rust project";
     const DESCRIPTION: &'static str = "Create a new cargo package at <path>. Creates a new Rust project with the specified name and template.";
@@ -466,7 +466,7 @@ impl CargoListRequest {
 
 pub struct CargoListRmcpTool;
 
-impl ToolImpl for CargoListRmcpTool {
+impl Tool for CargoListRmcpTool {
     const NAME: &'static str = "cargo-list";
     const TITLE: &'static str = "List cargo commands";
     const DESCRIPTION: &'static str = "Lists installed cargo commands using 'cargo --list'.";
