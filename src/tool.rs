@@ -3,6 +3,8 @@ use rmcp::model::{
     AnnotateAble, Annotated, Annotations, CallToolRequestParam, CallToolResult, RawContent, Role,
 };
 
+use crate::tools::apply_workspace_root;
+
 /// Dyn compatible Tool trait
 pub(crate) trait Tool {
     fn name(&self) -> &'static str;
@@ -87,7 +89,7 @@ pub(crate) fn execute_rmcp_command(
     mut cmd: std::process::Command,
     tool_name: &str,
 ) -> Result<CallToolResult, ErrorData> {
-    // apply_workspace_root(&mut cmd); // FIXME
+    apply_workspace_root(&mut cmd);
     tracing::info!(
         command = ?cmd,
         tool_name = tool_name,

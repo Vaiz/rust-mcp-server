@@ -1,24 +1,12 @@
 use std::process::Command;
 
-use crate::{
-    serde_utils::{
-        deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
-        output_verbosity_to_cli_flags,
-    },
-    tools::execute_command,
-};
-use rust_mcp_sdk::{
-    macros::mcp_tool,
-    schema::{CallToolResult, schema_utils::CallToolError},
+use crate::serde_utils::{
+    deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
+    output_verbosity_to_cli_flags,
 };
 
 use crate::serde_utils::Tool;
 
-#[mcp_tool(
-    name = "cargo-clippy",
-    description = "Checks a Rust package to catch common mistakes and improve code quality using Clippy",
-    openWorldHint = false
-)]
 #[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
 pub struct CargoClippyTool {
     /// The toolchain to use, e.g., "stable" or "nightly".

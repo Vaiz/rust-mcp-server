@@ -17,7 +17,7 @@ use rust_mcp_sdk::{
     description = "Update dependencies as recorded in the local lock file. Updates the dependencies in Cargo.lock to their latest compatible versions.",
     openWorldHint = false
 )]
-#[derive(Debug, ::serde::Deserialize, JsonSchema)]
+#[derive(Debug, ::serde::Deserialize, ::schemars::JsonSchema)]
 pub struct CargoUpdateTool {
     /// The toolchain to use, e.g., "stable" or "nightly".
     #[serde(default, deserialize_with = "deserialize_string")]

@@ -1,4 +1,4 @@
-use rust_mcp_sdk::schema::schema_utils::CallToolError;
+use rmcp::ErrorData;
 
 /// Utility function for parsing Option<String> fields in serde,
 /// returning None if the string is "null" (case-insensitive) or empty.
@@ -54,17 +54,18 @@ where
 pub fn locking_mode_to_cli_flags(
     mode: Option<&str>,
     preferred: &str,
-) -> Result<Vec<&'static str>, CallToolError> {
+) -> Result<Vec<&'static str>, ErrorData> {
     Ok(match mode.unwrap_or(preferred) {
         "locked" => vec!["--locked"],
         "unlocked" => vec![], // No flags needed
         "offline" => vec!["--offline"],
         "frozen" => vec!["--frozen"],
         unknown => {
-            return Err(CallToolError(
-                anyhow::anyhow!(
-                    "Unknown locking mode: {unknown}. Valid options are: locked, unlocked, offline, frozen"                    
-                ).into()
+            return Err(ErrorData::invalid_params(
+                format!(
+                    "Unknown locking mode: {unknown}. Valid options are: locked, unlocked, offline, frozen"
+                ),
+                None,
             ));
         }
     })
@@ -77,19 +78,17 @@ pub fn locking_mode_to_cli_flags(
 /// - "quiet" (default): Show only the essential command output
 /// - "normal": Show standard output (no additional flags)
 /// - "verbose": Show detailed output including build information
-pub fn output_verbosity_to_cli_flags(
-    mode: Option<&str>,
-) -> Result<Vec<&'static str>, CallToolError> {
+pub fn output_verbosity_to_cli_flags(mode: Option<&str>) -> Result<Vec<&'static str>, ErrorData> {
     Ok(match mode.unwrap_or("quiet") {
         "quiet" => vec!["--quiet"],
         "normal" => vec![], // No flags needed
         "verbose" => vec!["--verbose"],
         unknown => {
-            return Err(CallToolError(
-                anyhow::anyhow!(
+            return Err(ErrorData::invalid_params(
+                format!(
                     "Unknown output verbosity: {unknown}. Valid options are: quiet, normal, verbose"
-                )
-                .into(),
+                ),
+                None,
             ));
         }
     })

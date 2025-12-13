@@ -15,7 +15,7 @@ use rust_mcp_sdk::{
     description = "Outputs a listing of a project's resolved dependencies and metadata in machine-readable format (JSON).",
     openWorldHint = false
 )]
-#[derive(Debug, ::serde::Deserialize, JsonSchema)]
+#[derive(Debug, ::serde::Deserialize, ::schemars::JsonSchema)]
 pub struct CargoMetadataTool {
     /// The toolchain to use, e.g., "stable" or "nightly".
     #[serde(default, deserialize_with = "deserialize_string")]

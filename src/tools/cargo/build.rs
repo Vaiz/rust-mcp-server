@@ -1,23 +1,11 @@
 use std::process::Command;
 
-use crate::{
-    serde_utils::{
-        deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
-        output_verbosity_to_cli_flags,
-    },
-    tools::execute_command,
-};
-use rust_mcp_sdk::{
-    macros::{JsonSchema, mcp_tool},
-    schema::{CallToolResult, schema_utils::CallToolError},
+use crate::serde_utils::{
+    deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
+    output_verbosity_to_cli_flags,
 };
 
-#[mcp_tool(
-    name = "cargo-build",
-    description = "Builds a Rust project using Cargo. Usually, run without any additional arguments.",
-    openWorldHint = false
-)]
-#[derive(Debug, ::serde::Deserialize, JsonSchema)]
+#[derive(Debug, ::serde::Deserialize, ::schemars::JsonSchema)]
 pub struct CargoBuildTool {
     /// The toolchain to use, e.g., "stable" or "nightly".
     #[serde(default, deserialize_with = "deserialize_string")]

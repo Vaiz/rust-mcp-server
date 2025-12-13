@@ -1,6 +1,7 @@
 use std::path::Path;
 use std::process::Command;
 
+use crate::tools::{CallToolError, CallToolResult};
 use crate::{
     serde_utils::{
         deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
@@ -8,17 +9,9 @@ use crate::{
     },
     tools::{WORKSPACE_ROOT, execute_command},
 };
-use rust_mcp_sdk::{
-    macros::{JsonSchema, mcp_tool},
-    schema::{Annotations, CallToolResult, Role, TextContent, schema_utils::CallToolError},
-};
+use schemars::JsonSchema;
 
-#[mcp_tool(
-    name = "cargo-doc",
-    description = "Build documentation for a Rust package using Cargo. Recommended to use with no_deps and specific package for faster builds. Returns path to generated documentation index.",
-    openWorldHint = false
-)]
-#[derive(Debug, ::serde::Deserialize, JsonSchema)]
+#[derive(Debug, ::serde::Deserialize, ::schemars::JsonSchema)]
 pub struct CargoDocTool {
     /// The toolchain to use, e.g., "stable" or "nightly".
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -267,7 +260,7 @@ impl CargoDocTool {
         }
 
         // Execute the command and get the result
-        let mut result = execute_command(cmd, &Self::tool_name())?;
+        let mut result = execute_command(cmd, "cargo-doc")?;
 
         // Add documentation path information only if the command was successful
         if result.is_error != Some(true) {

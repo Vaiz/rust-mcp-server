@@ -1,40 +1,32 @@
 use std::process::Command;
 
 use crate::serde_utils::Tool;
-use crate::{
-    serde_utils::{
-        PackageWithVersion, deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
-        output_verbosity_to_cli_flags,
-    },
-    tools::execute_command,
+use crate::serde_utils::{
+    PackageWithVersion, deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
+    output_verbosity_to_cli_flags,
 };
-use rust_mcp_sdk::{
-    macros::mcp_tool,
-    schema::{CallToolResult, schema_utils::CallToolError},
-};
+use anyhow::Error;
+use rmcp::ErrorData;
+use schemars::JsonSchema;
 
 fn dependency_type_to_cli_flag(
     dependency_type: Option<&str>,
-) -> Result<Option<&'static str>, CallToolError> {
+) -> Result<Option<&'static str>, ErrorData> {
     Ok(match dependency_type {
         None => None,
         Some("regular") => None,
         Some("dev") => Some("--dev"),
         Some("build") => Some("--build"),
         Some(dep) => {
-            return Err(CallToolError(
-                anyhow::anyhow!("Unknown dependency type: {dep}").into(),
+            return Err(ErrorData::invalid_params(
+                format!("Unknown dependency type: {dep}"),
+                None,
             ));
         }
     })
 }
 
 /// Adds a dependency to a Rust project using cargo add.
-#[mcp_tool(
-    name = "cargo-add",
-    description = "Adds a dependency to a Rust project using cargo add.",
-    openWorldHint = false
-)]
 #[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
 pub struct CargoAddTool {
     /// The toolchain to use, e.g., "stable" or "nightly".
@@ -227,16 +219,11 @@ impl CargoAddTool {
         let output_flags = output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
         cmd.args(output_flags);
 
-        execute_command(cmd, &Self::tool_name())
+        execute_command(cmd, "cargo-add")
     }
 }
 
 /// Remove dependencies from a Cargo.toml manifest file.
-#[mcp_tool(
-    name = "cargo-remove",
-    description = "Remove dependencies from a Cargo.toml manifest file.",
-    openWorldHint = false
-)]
 #[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
 pub struct CargoRemoveTool {
     /// The toolchain to use, e.g., "stable" or "nightly".
@@ -342,7 +329,7 @@ impl CargoRemoveTool {
         let output_flags = output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
         cmd.args(output_flags);
 
-        execute_command(cmd, &Self::tool_name())
+        execute_command(cmd, "cargo-add")
     }
 }
 

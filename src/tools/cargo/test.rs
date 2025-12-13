@@ -17,7 +17,7 @@ use rust_mcp_sdk::{
     description = "Run `cargo test` to execute Rust tests in the current project.",
     openWorldHint = false
 )]
-#[derive(Debug, ::serde::Deserialize, JsonSchema)]
+#[derive(Debug, ::serde::Deserialize, ::schemars::JsonSchema)]
 pub struct CargoTestTool {
     /// The toolchain to use, e.g., "stable" or "nightly".
     #[serde(default, deserialize_with = "deserialize_string")]

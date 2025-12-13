@@ -1,7 +1,5 @@
 #![allow(unused, dead_code)] // FIXME: Remove this when the codebase is more complete.
 
-mod prompts;
-mod resources;
 mod rmcp_server;
 pub(crate) mod serde_utils;
 mod tool;
@@ -12,17 +10,6 @@ use anyhow::Context;
 use clap::Parser;
 use rmcp::ServiceExt;
 use rmcp::service::QuitReason;
-use rust_mcp_sdk::McpServer;
-use rust_mcp_sdk::schema::ServerCapabilitiesPrompts;
-use rust_mcp_sdk::{
-    StdioTransport, TransportOptions,
-    error::SdkResult,
-    mcp_server::server_runtime,
-    schema::{
-        Implementation, InitializeResult, LATEST_PROTOCOL_VERSION, ServerCapabilities,
-        ServerCapabilitiesResources, ServerCapabilitiesTools,
-    },
-};
 pub(crate) use tool::{ToolImpl, execute_rmcp_command};
 use tracing_appender::rolling;
 use tracing_subscriber::{EnvFilter, fmt};
