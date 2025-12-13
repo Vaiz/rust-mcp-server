@@ -22,10 +22,7 @@ include = [
 
 [dependencies]
 anyhow = "1.0.98"
-async-trait = "0.1.88"
 clap = { version = "4.5.40", default-features = false, features = ["std", "help", "error-context", "usage", "suggestions", "derive", "string"] }
-phf = { version = "0.13.1", features = ["macros"] }
-reqwest = { version = "0.12.21" }
 rmcp = { version = "0.11.0", default-features = false, features = ["base64", "server", "macros", "transport-io"] }
 schemars = "1.1.0"
 serde = { version ="1.0.219", features = ["derive"] }
@@ -34,6 +31,3 @@ tokio = { version = "1.45.1", default-features = false, features = ["rt-multi-th
 tracing = "0.1.41"
 tracing-appender = "0.2.3"
 tracing-subscriber = { version = "0.3.20", features = ["env-filter"] }
-
-[package.metadata.cargo-machete]
-ignored = ["serde_json"]
