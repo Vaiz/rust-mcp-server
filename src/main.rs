@@ -1,3 +1,5 @@
+#![allow(unused, dead_code)] // FIXME: Remove this when the codebase is more complete.
+
 mod handler;
 mod prompts;
 mod resources;
@@ -7,10 +9,10 @@ mod tool;
 mod tools;
 mod version;
 
-pub(crate) use tool::{ToolImpl, execute_rmcp_command};
-use version::AppVersion;
-
+use anyhow::Context;
 use clap::Parser;
+use rmcp::ServiceExt;
+use rmcp::service::QuitReason;
 use rust_mcp_sdk::McpServer;
 use rust_mcp_sdk::schema::ServerCapabilitiesPrompts;
 use rust_mcp_sdk::{
@@ -22,8 +24,10 @@ use rust_mcp_sdk::{
         ServerCapabilitiesResources, ServerCapabilitiesTools,
     },
 };
+pub(crate) use tool::{ToolImpl, execute_rmcp_command};
 use tracing_appender::rolling;
 use tracing_subscriber::{EnvFilter, fmt};
+use version::AppVersion;
 
 #[derive(Parser, Debug)]
 #[command(author, version = AppVersion, about = "Rust MCP Server", long_about = None)]
@@ -50,7 +54,7 @@ struct Args {
 }
 
 #[tokio::main]
-async fn main() -> SdkResult<()> {
+async fn main() -> anyhow::Result<()> {
     // Parse command line arguments
     let args = Args::parse();
 
@@ -95,34 +99,32 @@ async fn main() -> SdkResult<()> {
         tracing::info!("No workspace root specified, using current directory");
     }
 
-    let server_details = InitializeResult {
-        server_info: Implementation {
-            name: "Rust MCP Server".into(),
-            title: Some("Rust MCP Server".into()),
-            version: AppVersion::version(),
-        },
-        capabilities: ServerCapabilities {
-            tools: Some(ServerCapabilitiesTools { list_changed: None }),
-            prompts: Some(ServerCapabilitiesPrompts { list_changed: None }),
-            resources: Some(ServerCapabilitiesResources {
-                list_changed: None,
-                subscribe: None,
-            }),
-            ..Default::default()
-        },
-        meta: None,
-        instructions: Some(include_str!("../docs/instructions.md").into()),
-        protocol_version: LATEST_PROTOCOL_VERSION.into(),
-    };
+    /// FIXME: Pass configuration to Server
+    let server = rmcp_server::Server::new();
 
-    let transport = StdioTransport::new(TransportOptions {
-        timeout: std::time::Duration::from_secs(args.timeout),
-    })?;
+    /// FIXME: How to pass timeout to StdioTransport?
+    let service = server
+        .serve(rmcp::transport::stdio())
+        .await
+        .context("Failed to start server")?;
 
-    let server = server_runtime::create_server(
-        server_details,
-        transport,
-        handler::McpServerHandler::new(args.disabled_tools),
-    );
-    server.start().await
+    eprintln!("Precisely File Editor MCP Server started on stdio");
+
+    // Keep the service running until cancelled
+    let result = service.waiting().await;
+
+    match result {
+        Ok(QuitReason::Closed) => tracing::info!("Server closed normally"),
+        Ok(QuitReason::Cancelled) => tracing::info!("Server was cancelled"),
+        Ok(QuitReason::JoinError(error)) => {
+            tracing::error!("Server join error: {error}");
+            return Err(error.into());
+        }
+        Err(error) => {
+            tracing::error!("Server encountered an error: {error}");
+            return Err(error.into());
+        }
+    }
+
+    Ok(())
 }

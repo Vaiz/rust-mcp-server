@@ -26,7 +26,7 @@ async-trait = "0.1.88"
 clap = { version = "4.5.40", default-features = false, features = ["std", "help", "error-context", "usage", "suggestions", "derive", "string"] }
 phf = { version = "0.13.1", features = ["macros"] }
 reqwest = { version = "0.12.21" }
-rmcp = "0.11.0"
+rmcp = { version = "0.11.0", default-features = false, features = ["base64", "server", "macros", "transport-io"] }
 rust-mcp-sdk = { version = "0.7.0", default-features = false, features = ["server", "2025_06_18", "macros", "stdio"] }
 schemars = "1.1.0"
 serde = { version ="1.0.219", features = ["derive"] }

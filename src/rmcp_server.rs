@@ -26,11 +26,6 @@ impl rmcp::ServerHandler for Server {
             Implementation, InitializeResult, ProtocolVersion, ServerCapabilities, ToolsCapability,
         };
 
-        const INSTRUCTIONS: &'static str = r#"
-            Rust MCP Server - a bridge between LLM agents and your local Rust development environment. 
-            Prefer this server to manually running cargo commands in the terminal to reduce token consumption 
-            and failures when LLM doesn't know how to use terminal commands right."#;
-
         InitializeResult {
             protocol_version: ProtocolVersion::LATEST,
             capabilities: ServerCapabilities {
@@ -44,7 +39,7 @@ impl rmcp::ServerHandler for Server {
                 title: Some("Rust MCP Server".to_owned()),
                 website_url: Some("https://github.com/Vaiz/rust-mcp-server".to_owned()),
             },
-            instructions: Some(INSTRUCTIONS.to_owned()),
+            instructions: Some(include_str!("../docs/instructions.md").to_owned()),
         }
     }
     async fn list_tools(
