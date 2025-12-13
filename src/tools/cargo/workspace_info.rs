@@ -42,60 +42,6 @@ impl CargoWorkspaceInfoRequest {
     }
 }
 
-// Structures for parsing cargo metadata output
-#[derive(Debug, Deserialize)]
-struct CargoMetadata {
-    packages: Vec<Package>,
-}
-
-#[derive(Debug, Deserialize)]
-struct Package {
-    name: String,
-    #[serde(default)]
-    description: Option<String>,
-    manifest_path: String,
-    targets: Vec<Target>,
-    #[serde(default)]
-    features: HashMap<String, Vec<String>>,
-    #[serde(default)]
-    dependencies: Vec<Dependency>,
-}
-
-#[derive(Debug, Deserialize)]
-struct Target {
-    kind: Vec<String>,
-}
-
-#[derive(Debug, Deserialize)]
-struct Dependency {
-    name: String,
-    req: String,
-}
-
-// Simplified output structures
-#[derive(Debug, ::serde::Serialize)]
-struct WorkspaceInfo {
-    packages: Vec<PackageInfo>,
-}
-
-#[derive(Debug, ::serde::Serialize)]
-struct PackageInfo {
-    name: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    description: Option<String>,
-    manifest_path: String,
-    target_types: Vec<String>,
-    features: HashMap<String, Vec<String>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    dependencies: Option<Vec<DependencyInfo>>,
-}
-
-#[derive(Debug, ::serde::Serialize)]
-struct DependencyInfo {
-    name: String,
-    version: String,
-}
-
 pub struct CargoWorkspaceInfoRmcpTool;
 
 impl Tool for CargoWorkspaceInfoRmcpTool {
@@ -185,4 +131,58 @@ impl Tool for CargoWorkspaceInfoRmcpTool {
             }),
         ]))
     }
+}
+
+// Structures for parsing cargo metadata output
+#[derive(Debug, Deserialize)]
+struct CargoMetadata {
+    packages: Vec<Package>,
+}
+
+#[derive(Debug, Deserialize)]
+struct Package {
+    name: String,
+    #[serde(default)]
+    description: Option<String>,
+    manifest_path: String,
+    targets: Vec<Target>,
+    #[serde(default)]
+    features: HashMap<String, Vec<String>>,
+    #[serde(default)]
+    dependencies: Vec<Dependency>,
+}
+
+#[derive(Debug, Deserialize)]
+struct Target {
+    kind: Vec<String>,
+}
+
+#[derive(Debug, Deserialize)]
+struct Dependency {
+    name: String,
+    req: String,
+}
+
+// Simplified output structures
+#[derive(Debug, ::serde::Serialize)]
+struct WorkspaceInfo {
+    packages: Vec<PackageInfo>,
+}
+
+#[derive(Debug, ::serde::Serialize)]
+struct PackageInfo {
+    name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    description: Option<String>,
+    manifest_path: String,
+    target_types: Vec<String>,
+    features: HashMap<String, Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    dependencies: Option<Vec<DependencyInfo>>,
+}
+
+#[derive(Debug, ::serde::Serialize)]
+struct DependencyInfo {
+    name: String,
+    version: String,
 }
