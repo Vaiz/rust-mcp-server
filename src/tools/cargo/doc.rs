@@ -1,10 +1,7 @@
 use std::path::Path;
 use std::process::Command;
 
-use rmcp::{
-    ErrorData,
-    model::RawContent,
-};
+use rmcp::{ErrorData, model::RawContent};
 
 use crate::{
     Tool, execute_rmcp_command,

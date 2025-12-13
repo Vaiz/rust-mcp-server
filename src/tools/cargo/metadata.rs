@@ -144,8 +144,6 @@ mod tests {
     use super::*;
     use serde_json::json;
 
-    
-
     #[test]
     fn test_deserialize_with_features_array() {
         let input = json!({
