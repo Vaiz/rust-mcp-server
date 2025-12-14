@@ -77,25 +77,17 @@ impl Tool for CargoWorkspaceInfoRmcpTool {
         let mut packages: Vec<PackageInfo> = vec![];
 
         for package in metadata.packages {
-            let mut target_types = Vec::new();
-            let mut seen = std::collections::HashSet::new();
-            for target in &package.targets {
-                for kind in &target.kind {
-                    if !seen.contains(kind) {
-                        target_types.push(kind.clone());
-                        seen.insert(kind);
-                    }
-                }
-            }
+            let mut target_types = package
+                .targets
+                .iter()
+                .flat_map(|t| &t.kind)
+                .collect::<std::collections::HashSet<_>>()
+                .into_iter()
+                .map(String::from)
+                .collect::<Vec<_>>();
             target_types.sort();
 
-            let dependencies = include_deps.then(|| {
-                package
-                    .dependencies
-                    .into_iter()
-                    .map(DependencyInfo::from)
-                    .collect()
-            });
+            let dependencies = include_deps.then(|| package.dependencies);
 
             packages.push(PackageInfo {
                 name: package.name,
@@ -144,7 +136,7 @@ struct Target {
     kind: Vec<String>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, ::serde::Serialize)]
 struct Dependency {
     name: String,
     req: String,
@@ -166,20 +158,5 @@ struct PackageInfo {
     #[serde(skip_serializing_if = "HashMap::is_empty")]
     features: HashMap<String, Vec<String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    dependencies: Option<Vec<DependencyInfo>>,
-}
-
-#[derive(Debug, ::serde::Serialize)]
-struct DependencyInfo {
-    name: String,
-    version: String,
-}
-
-impl From<Dependency> for DependencyInfo {
-    fn from(dep: Dependency) -> Self {
-        DependencyInfo {
-            name: dep.name,
-            version: dep.req,
-        }
-    }
+    dependencies: Option<Vec<Dependency>>,
 }
