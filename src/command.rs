@@ -63,6 +63,18 @@ impl ExitStatus {
     }
 }
 
+pub(crate) struct Recommendation(pub String);
+
+impl Into<Annotated<RawContent>> for Recommendation {
+    fn into(self) -> Annotated<RawContent> {
+        RawContent::text(self.0).annotate(Annotations {
+            audience: Some(vec![Role::User, Role::Assistant]),
+            last_modified: None,
+            priority: Some(0.7),
+        })
+    }
+}
+
 pub(crate) struct Output {
     pub(crate) tool_name: String,
     pub(crate) cmd_line: CommandLine,
