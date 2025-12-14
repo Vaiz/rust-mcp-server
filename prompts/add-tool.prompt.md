@@ -12,7 +12,7 @@ Research CLI tool: run `--help`, understand arguments/flags. Tools in `src/tools
 ### 1. Create Request Struct
 
 ```rust
-use crate::{Tool, execute_rmcp_command, serde_utils::*};
+use crate::{Tool, execute_command, serde_utils::*};
 use std::process::Command;
 
 #[derive(Debug, ::serde::Deserialize, ::schemars::JsonSchema)]
@@ -84,7 +84,7 @@ impl Tool for YourToolRmcpTool {
     type RequestArgs = YourToolRequest;
 
     fn call_rmcp_tool(&self, req: Self::RequestArgs) -> Result<rmcp::model::CallToolResult, rmcp::ErrorData> {
-        execute_rmcp_command(req.build_cmd()?, Self::NAME)
+        execute_command(req.build_cmd()?, Self::NAME).map(Into::into)
     }
 }
 ```
