@@ -63,14 +63,14 @@ impl ExitStatus {
     }
 }
 
-pub(crate) struct Recommendation(pub String);
+pub(crate) struct AgentRecommendation(pub String);
 
-impl From<Recommendation> for Annotated<RawContent> {
-    fn from(val: Recommendation) -> Self {
+impl From<AgentRecommendation> for Annotated<RawContent> {
+    fn from(val: AgentRecommendation) -> Self {
         RawContent::text(val.0).annotate(Annotations {
-            audience: Some(vec![Role::User, Role::Assistant]),
+            audience: Some(vec![Role::Assistant]),
             last_modified: None,
-            priority: Some(0.7),
+            priority: Some(1.),
         })
     }
 }
