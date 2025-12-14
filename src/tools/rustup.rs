@@ -1,7 +1,7 @@
 use std::process::Command;
 
 use crate::{
-    Tool, execute_rmcp_command,
+    Tool, execute_command,
     serde_utils::{deserialize_string, deserialize_string_vec},
 };
 use rmcp::{ErrorData, model::CallToolResult};
@@ -35,7 +35,7 @@ impl Tool for RustupShowRmcpTool {
     type RequestArgs = RustupShowRequest;
 
     fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
-        execute_rmcp_command(request.build_cmd()?, Self::NAME)
+        execute_command(request.build_cmd()?, Self::NAME).map(Into::into)
     }
 }
 
@@ -123,7 +123,7 @@ impl Tool for RustupToolchainAddRmcpTool {
     type RequestArgs = RustupToolchainAddRequest;
 
     fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
-        execute_rmcp_command(request.build_cmd()?, Self::NAME)
+        execute_command(request.build_cmd()?, Self::NAME).map(Into::into)
     }
 }
 
@@ -180,6 +180,6 @@ impl Tool for RustupUpdateRmcpTool {
     type RequestArgs = RustupUpdateRequest;
 
     fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
-        execute_rmcp_command(request.build_cmd()?, Self::NAME)
+        execute_command(request.build_cmd()?, Self::NAME).map(Into::into)
     }
 }

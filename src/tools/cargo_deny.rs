@@ -1,7 +1,7 @@
 use std::process::Command;
 
 use crate::{
-    Tool, execute_rmcp_command,
+    Tool, execute_command,
     serde_utils::{deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags},
 };
 use rmcp::{ErrorData, model::CallToolResult};
@@ -241,7 +241,7 @@ impl Tool for CargoDenyCheckRmcpTool {
     type RequestArgs = CargoDenyCheckRequest;
 
     fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
-        execute_rmcp_command(request.build_cmd()?, Self::NAME)
+        execute_command(request.build_cmd()?, Self::NAME).map(Into::into)
     }
 }
 
@@ -274,7 +274,7 @@ impl Tool for CargoDenyInitRmcpTool {
     type RequestArgs = CargoDenyInitRequest;
 
     fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
-        execute_rmcp_command(request.build_cmd()?, Self::NAME)
+        execute_command(request.build_cmd()?, Self::NAME).map(Into::into)
     }
 }
 
@@ -331,7 +331,7 @@ impl Tool for CargoDenyListRmcpTool {
     type RequestArgs = CargoDenyListRequest;
 
     fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
-        execute_rmcp_command(request.build_cmd()?, Self::NAME)
+        execute_command(request.build_cmd()?, Self::NAME).map(Into::into)
     }
 }
 
@@ -357,6 +357,6 @@ impl Tool for CargoDenyInstallRmcpTool {
     type RequestArgs = CargoDenyInstallRequest;
 
     fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
-        execute_rmcp_command(request.build_cmd()?, Self::NAME)
+        execute_command(request.build_cmd()?, Self::NAME).map(Into::into)
     }
 }

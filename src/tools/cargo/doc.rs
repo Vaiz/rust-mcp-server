@@ -4,7 +4,7 @@ use std::process::Command;
 use rmcp::{ErrorData, model::RawContent};
 
 use crate::{
-    Tool, execute_rmcp_command,
+    Tool, execute_command,
     serde_utils::{
         deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
@@ -338,7 +338,7 @@ impl Tool for CargoDocRmcpTool {
         request: Self::RequestArgs,
     ) -> Result<rmcp::model::CallToolResult, ErrorData> {
         let cmd = request.build_cmd()?;
-        let mut result = execute_rmcp_command(cmd, Self::NAME)?;
+        let mut result: rmcp::model::CallToolResult = execute_command(cmd, Self::NAME)?.into();
 
         // Add documentation path information only if the command was successful
         if result.is_error != Some(true) {

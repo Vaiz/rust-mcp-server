@@ -10,7 +10,7 @@ use clap::Parser;
 use command::execute_command;
 use rmcp::ServiceExt;
 use rmcp::service::QuitReason;
-pub(crate) use tool::{Tool, execute_rmcp_command};
+pub(crate) use tool::Tool;
 use tracing_appender::rolling;
 use tracing_subscriber::{EnvFilter, fmt};
 use version::AppVersion;

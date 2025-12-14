@@ -54,13 +54,6 @@ where
     }
 }
 
-pub(crate) fn execute_rmcp_command(
-    cmd: std::process::Command,
-    tool_name: &str,
-) -> Result<CallToolResult, ErrorData> {
-    crate::execute_command(cmd, tool_name).map(Into::into)
-}
-
 fn json_schema_impl<T: JsonSchema>() -> serde_json::Map<String, serde_json::Value> {
     use schemars::schema_for;
     use serde_json::Value;
