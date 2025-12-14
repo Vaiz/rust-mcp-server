@@ -67,7 +67,7 @@ pub(crate) struct AgentRecommendation(pub String);
 
 impl From<AgentRecommendation> for Annotated<RawContent> {
     fn from(val: AgentRecommendation) -> Self {
-        RawContent::text(val.0).annotate(Annotations {
+        RawContent::text(format!("RECOMMENDATION: {}", val.0)).annotate(Annotations {
             audience: Some(vec![Role::Assistant]),
             last_modified: None,
             priority: Some(1.),
