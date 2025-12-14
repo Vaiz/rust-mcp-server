@@ -87,7 +87,7 @@ impl Tool for CargoWorkspaceInfoRmcpTool {
                 .collect::<Vec<_>>();
             target_types.sort();
 
-            let dependencies = include_deps.then(|| package.dependencies);
+            let dependencies = include_deps.then_some(package.dependencies);
 
             packages.push(PackageInfo {
                 name: package.name,
