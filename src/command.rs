@@ -8,9 +8,9 @@ use crate::tools::apply_workspace_root;
 #[derive(Debug, Clone)]
 pub(crate) struct CommandLine(pub String);
 
-impl Into<Annotated<RawContent>> for CommandLine {
-    fn into(self) -> Annotated<RawContent> {
-        RawContent::text(format!("Executed command: `{}`", self.0)).annotate(Annotations {
+impl From<CommandLine> for Annotated<RawContent> {
+    fn from(val: CommandLine) -> Self {
+        RawContent::text(format!("Executed command: `{}`", val.0)).annotate(Annotations {
             audience: Some(vec![Role::User, Role::Assistant]),
             last_modified: None,
             priority: Some(0.5),
@@ -21,9 +21,9 @@ impl Into<Annotated<RawContent>> for CommandLine {
 #[derive(Debug, Clone)]
 pub(crate) struct Stdout(pub String);
 
-impl Into<Annotated<RawContent>> for Stdout {
-    fn into(self) -> Annotated<RawContent> {
-        RawContent::text(self.0).annotate(Annotations {
+impl From<Stdout> for Annotated<RawContent> {
+    fn from(val: Stdout) -> Self {
+        RawContent::text(val.0).annotate(Annotations {
             audience: Some(vec![Role::User, Role::Assistant]),
             last_modified: None,
             priority: Some(0.2),
@@ -34,9 +34,9 @@ impl Into<Annotated<RawContent>> for Stdout {
 #[derive(Debug, Clone)]
 pub(crate) struct Stderr(pub String);
 
-impl Into<Annotated<RawContent>> for Stderr {
-    fn into(self) -> Annotated<RawContent> {
-        RawContent::text(self.0).annotate(Annotations {
+impl From<Stderr> for Annotated<RawContent> {
+    fn from(val: Stderr) -> Self {
+        RawContent::text(val.0).annotate(Annotations {
             audience: Some(vec![Role::User, Role::Assistant]),
             last_modified: None,
             priority: Some(1.),
@@ -65,9 +65,9 @@ impl ExitStatus {
 
 pub(crate) struct Recommendation(pub String);
 
-impl Into<Annotated<RawContent>> for Recommendation {
-    fn into(self) -> Annotated<RawContent> {
-        RawContent::text(self.0).annotate(Annotations {
+impl From<Recommendation> for Annotated<RawContent> {
+    fn from(val: Recommendation) -> Self {
+        RawContent::text(val.0).annotate(Annotations {
             audience: Some(vec![Role::User, Role::Assistant]),
             last_modified: None,
             priority: Some(0.7),
@@ -119,24 +119,24 @@ impl Output {
     }
 }
 
-impl Into<CallToolResult> for Output {
-    fn into(self) -> CallToolResult {
+impl From<Output> for CallToolResult {
+    fn from(val: Output) -> Self {
         let mut content: Vec<Annotated<RawContent>> = Vec::new();
 
-        content.push(self.cmd_line.into());
+        content.push(val.cmd_line.into());
 
-        if let Some(stdout) = self.stdout {
+        if let Some(stdout) = val.stdout {
             content.push(stdout.into());
         }
-        if let Some(stderr) = self.stderr {
+        if let Some(stderr) = val.stderr {
             content.push(stderr.into());
         }
 
-        content.push(self.exit_status.as_content(&self.tool_name));
+        content.push(val.exit_status.as_content(&val.tool_name));
 
         CallToolResult {
             content,
-            is_error: Some(!self.exit_status.0.success()),
+            is_error: Some(!val.exit_status.0.success()),
             meta: None,
             structured_content: None,
         }
