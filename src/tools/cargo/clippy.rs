@@ -1,7 +1,8 @@
 use std::process::Command;
 
 use crate::{
-    Tool, execute_rmcp_command,
+    Tool,
+    command::{AgentRecommendation, execute_command},
     serde_utils::{
         deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
@@ -288,9 +289,29 @@ impl Tool for CargoClippyRmcpTool {
         request: Self::RequestArgs,
     ) -> Result<rmcp::model::CallToolResult, ErrorData> {
         let cmd = request.build_cmd()?;
-        execute_rmcp_command(cmd, Self::NAME)
+        let output = execute_command(cmd, Self::NAME)?;
+
+        let add_fix_recommendation = !request.fix.unwrap_or(false) && output.stderr.is_some();
+        let add_fmt_recommendation = request.fix.unwrap_or(false);
+        let mut call_tool_result: rmcp::model::CallToolResult = output.into();
+
+        if add_fix_recommendation {
+            let recommendation = AgentRecommendation(
+                "Run #cargo-clippy with the `fix` and `allow_dirty` options to automatically fix the issues".into(),
+            );
+            call_tool_result.content.push(recommendation.into());
+        }
+
+        if add_fmt_recommendation {
+            let recommendation =
+                AgentRecommendation("Run #cargo-fmt to format code after applying fixes".into());
+            call_tool_result.content.push(recommendation.into());
+        }
+
+        Ok(call_tool_result)
     }
 }
+
 #[cfg(test)]
 mod tests {
     use super::*;

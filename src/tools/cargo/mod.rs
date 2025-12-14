@@ -9,6 +9,7 @@ mod package;
 mod search;
 mod test;
 mod update;
+mod workspace_info;
 
 pub use add_remove::{CargoAddRmcpTool, CargoRemoveRmcpTool};
 pub use build::CargoBuildRmcpTool;
@@ -21,11 +22,12 @@ pub use package::CargoPackageRmcpTool;
 pub use search::CargoSearchRmcpTool;
 pub use test::CargoTestRmcpTool;
 pub use update::CargoUpdateRmcpTool;
+pub use workspace_info::CargoWorkspaceInfoRmcpTool;
 
 use std::process::Command;
 
 use crate::{
-    Tool, execute_rmcp_command,
+    Tool, execute_command,
     serde_utils::{
         deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
@@ -105,7 +107,7 @@ impl Tool for CargoGenerateLockfileRmcpTool {
     type RequestArgs = CargoGenerateLockfileRequest;
 
     fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
-        execute_rmcp_command(request.build_cmd()?, Self::NAME)
+        execute_command(request.build_cmd()?, Self::NAME).map(Into::into)
     }
 }
 
@@ -243,7 +245,7 @@ impl Tool for CargoCleanRmcpTool {
     type RequestArgs = CargoCleanRequest;
 
     fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
-        execute_rmcp_command(request.build_cmd()?, Self::NAME)
+        execute_command(request.build_cmd()?, Self::NAME).map(Into::into)
     }
 }
 
@@ -334,7 +336,7 @@ impl Tool for CargoFmtRmcpTool {
     type RequestArgs = CargoFmtRequest;
 
     fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
-        execute_rmcp_command(request.build_cmd()?, Self::NAME)
+        execute_command(request.build_cmd()?, Self::NAME).map(Into::into)
     }
 }
 
@@ -449,7 +451,7 @@ impl Tool for CargoNewRmcpTool {
     type RequestArgs = CargoNewRequest;
 
     fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
-        execute_rmcp_command(request.build_cmd()?, Self::NAME)
+        execute_command(request.build_cmd()?, Self::NAME).map(Into::into)
     }
 }
 
@@ -473,6 +475,6 @@ impl Tool for CargoListRmcpTool {
     type RequestArgs = CargoListRequest;
 
     fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
-        execute_rmcp_command(request.build_cmd()?, Self::NAME)
+        execute_command(request.build_cmd()?, Self::NAME).map(Into::into)
     }
 }

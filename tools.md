@@ -1,8 +1,8 @@
 ## Rust MCP Server
-| 🟢 Tools (29) | 🟢 Prompts (0) | 🟢 Resources (0) | <span style="opacity:0.6">🔴 Logging</span> | <span style="opacity:0.6">🔴 Completions</span> | <span style="opacity:0.6">🔴 Experimental</span> |
+| 🟢 Tools (30) | 🟢 Prompts (0) | 🟢 Resources (0) | <span style="opacity:0.6">🔴 Logging</span> | <span style="opacity:0.6">🔴 Completions</span> | <span style="opacity:0.6">🔴 Experimental</span> |
 | --- | --- | --- | --- | --- | --- |
 
-## 🛠️ Tools (29)
+## 🛠️ Tools (30)
 
 
 - **cargo-add**
@@ -470,4 +470,11 @@
       - <code>force</code> : boolean<br />
       - <code>force_non_host</code> : boolean<br />
       - <code>no_self_update</code> : boolean<br />
+      - <code>toolchain</code> : string<br />
+
+- **workspace-info**
+  - Get information about crates in the current workspace, including package names, target types, manifest paths, descriptions, features, and optionally dependencies. This is a cut down version of cargo metadata with the goal of saving tokens.
+  - **Inputs:**
+      - <code>include_dependencies</code> : boolean<br />
+      - <code>manifest_path</code> : string<br />
       - <code>toolchain</code> : string<br />

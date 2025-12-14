@@ -1,7 +1,7 @@
 use std::process::Command;
 
 use crate::{
-    Tool, execute_rmcp_command,
+    Tool, execute_command,
     serde_utils::{
         PackageWithVersion, deserialize_string, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
@@ -91,7 +91,7 @@ impl Tool for CargoInfoRmcpTool {
         request: Self::RequestArgs,
     ) -> Result<rmcp::model::CallToolResult, ErrorData> {
         let cmd = request.build_cmd()?;
-        execute_rmcp_command(cmd, Self::NAME)
+        execute_command(cmd, Self::NAME).map(Into::into)
     }
 }
 #[cfg(test)]
