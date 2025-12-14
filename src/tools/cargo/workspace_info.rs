@@ -163,6 +163,7 @@ struct PackageInfo {
     description: Option<String>,
     manifest_path: String,
     target_types: Vec<String>,
+    #[serde(skip_serializing_if = "HashMap::is_empty")]
     features: HashMap<String, Vec<String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     dependencies: Option<Vec<DependencyInfo>>,
