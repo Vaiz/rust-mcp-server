@@ -1,10 +1,6 @@
 use rmcp::ErrorData;
-use rmcp::model::{
-    AnnotateAble, Annotated, Annotations, CallToolRequestParam, CallToolResult, RawContent, Role,
-};
+use rmcp::model::{CallToolRequestParam, CallToolResult};
 use schemars::JsonSchema;
-
-use crate::tools::apply_workspace_root;
 
 /// Dyn compatible Tool trait
 pub(crate) trait DynTool {
@@ -59,95 +55,10 @@ where
 }
 
 pub(crate) fn execute_rmcp_command(
-    mut cmd: std::process::Command,
+    cmd: std::process::Command,
     tool_name: &str,
 ) -> Result<CallToolResult, ErrorData> {
-    apply_workspace_root(&mut cmd);
-    tracing::info!("Executing command for {}: {:?}", tool_name, cmd);
-    let output = cmd.output();
-
-    match output {
-        Ok(output) => {
-            let stdout = String::from_utf8_lossy(output.stdout.trim_ascii());
-            let stderr = String::from_utf8_lossy(output.stderr.trim_ascii());
-
-            let mut content: Vec<Annotated<RawContent>> = Vec::new();
-            if output.status.success() {
-                tracing::info!(
-                    "Command executed successfully for {tool_name}\nstdout=\n{stdout}\n\nstderr=\n{stderr}",
-                );
-                content.push(
-                    RawContent::text(format!("✅ {tool_name}: Success")).annotate(Annotations {
-                        audience: Some(vec![Role::User, Role::Assistant]),
-                        last_modified: None,
-                        priority: Some(0.3),
-                    }),
-                );
-            } else {
-                tracing::warn!(
-                    "Command execution failed for {tool_name} (status: {:?}): stdout='\n{stdout}\n', stderr='\n{stderr}\n'",
-                    output.status.code(),
-                );
-                content.push(
-                    RawContent::text(format!("❌ {tool_name}: Failure")).annotate(Annotations {
-                        audience: Some(vec![Role::User, Role::Assistant]),
-                        last_modified: None,
-                        priority: Some(0.3),
-                    }),
-                );
-            }
-
-            if !stdout.is_empty() {
-                content.push(RawContent::text(stdout).annotate(Annotations {
-                    audience: Some(vec![Role::User, Role::Assistant]),
-                    last_modified: None,
-                    priority: Some(0.2),
-                }));
-            }
-            if !stderr.is_empty() {
-                content.push(RawContent::text(stderr).annotate(Annotations {
-                    audience: Some(vec![Role::User, Role::Assistant]),
-                    last_modified: None,
-                    priority: Some(1.),
-                }));
-            }
-            Ok(CallToolResult {
-                content,
-                is_error: Some(!output.status.success()),
-                meta: None,
-                structured_content: None,
-            })
-        }
-        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-            tracing::error!("Command not found: {e}");
-            let program = cmd.get_program().to_string_lossy();
-            let args = cmd
-                .get_args()
-                .map(|arg| arg.to_string_lossy())
-                .collect::<Vec<_>>()
-                .join(" ");
-            let item = RawContent::text(
-                format!(
-                    "The command `{program}` was not found, please ensure it is installed and accessible. You can try running the following command yourself to verify: `{program} {args}`",
-                )).annotate(
-                Annotations {
-                    audience: Some(vec![Role::User, Role::Assistant]),
-                    last_modified: None,
-                    priority: Some(1.),
-                });
-
-            Ok(CallToolResult {
-                content: vec![item],
-                is_error: Some(true),
-                meta: None,
-                structured_content: None,
-            })
-        }
-        Err(e) => {
-            tracing::error!("Failed to execute command: {}", e);
-            Err(ErrorData::internal_error(e.to_string(), None))
-        }
-    }
+    crate::execute_command(cmd, tool_name).map(Into::into)
 }
 
 fn json_schema_impl<T: JsonSchema>() -> serde_json::Map<String, serde_json::Value> {
