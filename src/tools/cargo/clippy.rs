@@ -303,13 +303,15 @@ impl Tool for CargoClippyRmcpTool {
         }
 
         if add_fmt_recommendation {
-            let recommendation = AgentRecommendation("Run #cargo-fmt to format your code".into());
+            let recommendation =
+                AgentRecommendation("Run #cargo-fmt to format code after applying fixes".into());
             call_tool_result.content.push(recommendation.into());
         }
 
         Ok(call_tool_result)
     }
 }
+
 #[cfg(test)]
 mod tests {
     use super::*;
