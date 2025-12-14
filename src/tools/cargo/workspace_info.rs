@@ -1,10 +1,10 @@
 use std::collections::HashMap;
 use std::process::Command;
 
-use crate::{Tool, serde_utils::deserialize_string};
+use crate::{Tool, command::execute_command, serde_utils::deserialize_string};
 use rmcp::{
     ErrorData,
-    model::{AnnotateAble, Annotations, RawContent, Role},
+    model::{AnnotateAble, Annotations, CallToolResult, RawContent, Role},
 };
 use serde::Deserialize;
 
@@ -55,81 +55,68 @@ impl Tool for CargoWorkspaceInfoRmcpTool {
         &self,
         request: Self::RequestArgs,
     ) -> Result<rmcp::model::CallToolResult, ErrorData> {
-        let mut cmd = request.build_cmd()?;
+        let cmd = request.build_cmd()?;
+        let mut output = execute_command(cmd, Self::NAME)?;
 
-        // Execute command and get output
-        let output = cmd.output().map_err(|e| {
-            ErrorData::internal_error(format!("Failed to execute cargo metadata: {}", e), None)
-        })?;
-
-        if !output.status.success() {
-            let stderr = String::from_utf8_lossy(&output.stderr);
-            return Err(ErrorData::internal_error(
-                format!("cargo metadata failed: {}", stderr),
-                None,
-            ));
+        if !output.success() {
+            return Ok(output.into());
         }
 
-        let stdout = String::from_utf8_lossy(&output.stdout);
+        let Some(stdout) = output.stdout.take() else {
+            return Err(ErrorData::internal_error(
+                "cargo metadata command produced no output".to_owned(),
+                None,
+            ));
+        };
 
-        let metadata: CargoMetadata = serde_json::from_str(&stdout).map_err(|e| {
-            ErrorData::internal_error(format!("Failed to parse cargo metadata JSON: {}", e), None)
+        let metadata: CargoMetadata = serde_json::from_str(&stdout.0).map_err(|e| {
+            ErrorData::internal_error(format!("failed to parse cargo metadata JSON: {e}"), None)
         })?;
 
         let include_deps = request.include_dependencies.unwrap_or(false);
+        let mut packages: Vec<PackageInfo> = vec![];
 
-        let packages: Vec<PackageInfo> = metadata
-            .packages
-            .into_iter()
-            .map(|pkg| {
-                // Extract unique target types (lib, bin, etc.)
-                let mut target_types = Vec::new();
-                let mut seen = std::collections::HashSet::new();
-
-                for target in &pkg.targets {
-                    for kind in &target.kind {
-                        // Only include lib and bin, skip custom-build
-                        if (kind == "lib" || kind == "bin") && !seen.contains(kind) {
-                            target_types.push(kind.clone());
-                            seen.insert(kind.clone());
-                        }
+        for package in metadata.packages {
+            let mut target_types = Vec::new();
+            let mut seen = std::collections::HashSet::new();
+            for target in &package.targets {
+                for kind in &target.kind {
+                    if !seen.contains(kind) {
+                        target_types.push(kind.clone());
+                        seen.insert(kind);
                     }
                 }
-                target_types.sort();
+            }
+            target_types.sort();
 
-                let dependencies = if include_deps {
-                    Some(
-                        pkg.dependencies
-                            .into_iter()
-                            .map(|dep| DependencyInfo {
-                                name: dep.name,
-                                version: dep.req,
-                            })
-                            .collect(),
-                    )
-                } else {
-                    None
-                };
+            let dependencies = include_deps.then(|| {
+                package
+                    .dependencies
+                    .into_iter()
+                    .map(DependencyInfo::from)
+                    .collect()
+            });
 
-                PackageInfo {
-                    name: pkg.name,
-                    description: pkg.description,
-                    manifest_path: pkg.manifest_path,
-                    target_types,
-                    features: pkg.features,
-                    dependencies,
-                }
-            })
-            .collect();
+            packages.push(PackageInfo {
+                name: package.name,
+                description: package.description,
+                manifest_path: package.manifest_path,
+                target_types,
+                features: package.features,
+                dependencies,
+            });
+        }
 
+        let mut call_tool_result: CallToolResult = output.into();
         let workspace_info = WorkspaceInfo { packages };
-        Ok(rmcp::model::CallToolResult::success(vec![
-            RawContent::json(workspace_info)?.annotate(Annotations {
-                audience: Some(vec![Role::User, Role::Assistant]),
-                last_modified: None,
-                priority: Some(1.),
-            }),
-        ]))
+        let workspace_info = RawContent::json(workspace_info)?.annotate(Annotations {
+            audience: Some(vec![Role::User, Role::Assistant]),
+            last_modified: None,
+            priority: Some(1.),
+        });
+
+        call_tool_result.content.push(workspace_info);
+        Ok(call_tool_result)
     }
 }
 
@@ -185,4 +172,13 @@ struct PackageInfo {
 struct DependencyInfo {
     name: String,
     version: String,
+}
+
+impl From<Dependency> for DependencyInfo {
+    fn from(dep: Dependency) -> Self {
+        DependencyInfo {
+            name: dep.name,
+            version: dep.req,
+        }
+    }
 }
