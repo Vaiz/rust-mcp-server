@@ -1,4 +1,5 @@
 mod command;
+mod meta;
 mod rmcp_server;
 pub(crate) mod serde_utils;
 mod tool;
