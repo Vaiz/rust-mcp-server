@@ -27,7 +27,7 @@ pub use workspace_info::CargoWorkspaceInfoRmcpTool;
 use std::process::Command;
 
 use crate::{
-    Tool, execute_command,
+    ResultExt, Tool, execute_command,
     serde_utils::{
         deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
@@ -336,7 +336,18 @@ impl Tool for CargoFmtRmcpTool {
     type RequestArgs = CargoFmtRequest;
 
     fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
-        execute_command(request.build_cmd()?, Self::NAME).map(Into::into)
+        let output = execute_command(request.build_cmd()?, Self::NAME)?;
+        let failed = !output.success();
+        let mut call_tool_result: CallToolResult = output.into();
+
+        if failed && request.check {
+            call_tool_result.add_recommendation(format!(
+                "Run #{} without `check: true` to automatically format the code",
+                Self::NAME
+            ));
+        }
+
+        Ok(call_tool_result)
     }
 }
 
