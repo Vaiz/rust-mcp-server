@@ -4,7 +4,7 @@ use crate::{
     Tool, execute_command,
     serde_utils::{deserialize_string, deserialize_string_vec, output_verbosity_to_cli_flags},
 };
-use rmcp::{ErrorData, model::CallToolResult};
+use rmcp::ErrorData;
 
 fn default_check() -> String {
     "check".to_string()

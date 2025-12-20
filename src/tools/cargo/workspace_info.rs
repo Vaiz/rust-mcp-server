@@ -4,7 +4,7 @@ use std::process::Command;
 use crate::{Tool, command::execute_command, serde_utils::deserialize_string};
 use rmcp::{
     ErrorData,
-    model::{AnnotateAble, Annotations, CallToolResult, RawContent, Role},
+    model::{AnnotateAble, Annotations, RawContent, Role},
 };
 use serde::Deserialize;
 

@@ -1,7 +1,7 @@
 use std::process::Command;
 
 use crate::{Tool, execute_command, serde_utils::deserialize_string};
-use rmcp::{ErrorData, model::CallToolResult};
+use rmcp::ErrorData;
 
 #[derive(Debug, ::serde::Deserialize, ::schemars::JsonSchema)]
 pub struct RustcExplainRequest {

@@ -4,7 +4,7 @@ use std::process::Command;
 use rmcp::{ErrorData, model::RawContent};
 
 use crate::{
-    Tool, execute_command, response,
+    Tool, execute_command,
     serde_utils::{
         deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,

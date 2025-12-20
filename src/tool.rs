@@ -1,5 +1,5 @@
 use rmcp::ErrorData;
-use rmcp::model::{CallToolRequestParam, CallToolResult};
+use rmcp::model::CallToolRequestParam;
 use schemars::JsonSchema;
 
 use crate::response::Response;

@@ -33,10 +33,10 @@ impl Response {
     }
 }
 
-impl Into<Response> for Output {
-    fn into(self) -> Response {
+impl From<Output> for Response {
+    fn from(val: Output) -> Self {
         Response {
-            output: self,
+            output: val,
             additional_content: Vec::new(),
             recommendations: Vec::new(),
         }
