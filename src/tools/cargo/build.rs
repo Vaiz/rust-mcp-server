@@ -296,11 +296,8 @@ impl Tool for CargoBuildRmcpTool {
         let mut call_tool_result: rmcp::model::CallToolResult = output.into();
         if duration.as_secs() >= 60 {
             call_tool_result.content.push(
-                AgentRecommendation(
-                    "Consider using #cargo-check tool for faster feedback during development cycles"
-                        .into(),
-                )
-                .into(),
+                AgentRecommendation("Consider using #cargo-check tool for faster feedback".into())
+                    .into(),
             );
         }
         Ok(call_tool_result)
