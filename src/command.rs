@@ -13,13 +13,15 @@ pub(crate) struct CommandLine(pub String);
 
 impl From<CommandLine> for Annotated<RawContent> {
     fn from(val: CommandLine) -> Self {
-        text_with_description(format!("Executed command: `{}`", val.0), "command line").annotate(
-            Annotations {
-                audience: Some(vec![Role::User, Role::Assistant]),
-                last_modified: None,
-                priority: Some(0.5),
-            },
+        text_with_description(
+            format!("Executed command: `{}`", val.0),
+            "command line executed by MCP server",
         )
+        .annotate(Annotations {
+            audience: Some(vec![Role::User]),
+            last_modified: None,
+            priority: Some(0.5),
+        })
     }
 }
 
@@ -56,6 +58,8 @@ impl ExitStatus {
     fn as_content(&self, tool_name: &str) -> Annotated<RawContent> {
         let status_str = if self.0.success() {
             format!("✅ {tool_name}: Success")
+        } else if let Some(code) = self.0.code() {
+            format!("❌ {tool_name}: Failure, exit code: {code}")
         } else {
             format!("❌ {tool_name}: Failure")
         };
