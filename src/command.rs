@@ -1,8 +1,11 @@
 use rmcp::{
     ErrorData,
-    model::{AnnotateAble, Annotated, Annotations, CallToolResult, RawContent, Role},
+    model::{
+        AnnotateAble, Annotated, Annotations, CallToolResult, RawContent, RawTextContent, Role,
+    },
 };
 
+use crate::meta::Meta;
 use crate::tools::apply_workspace_root;
 
 #[derive(Debug, Clone)]
@@ -10,8 +13,12 @@ pub(crate) struct CommandLine(pub String);
 
 impl From<CommandLine> for Annotated<RawContent> {
     fn from(val: CommandLine) -> Self {
-        RawContent::text(format!("Executed command: `{}`", val.0)).annotate(Annotations {
-            audience: Some(vec![Role::User, Role::Assistant]),
+        text_with_description(
+            format!("Executed command: `{}`", val.0),
+            "command line executed by MCP server",
+        )
+        .annotate(Annotations {
+            audience: Some(vec![Role::User]),
             last_modified: None,
             priority: Some(0.5),
         })
@@ -23,7 +30,7 @@ pub(crate) struct Stdout(pub String);
 
 impl From<Stdout> for Annotated<RawContent> {
     fn from(val: Stdout) -> Self {
-        RawContent::text(val.0).annotate(Annotations {
+        text_with_description(val.0, "stdout").annotate(Annotations {
             audience: Some(vec![Role::User, Role::Assistant]),
             last_modified: None,
             priority: Some(0.2),
@@ -36,7 +43,7 @@ pub(crate) struct Stderr(pub String);
 
 impl From<Stderr> for Annotated<RawContent> {
     fn from(val: Stderr) -> Self {
-        RawContent::text(val.0).annotate(Annotations {
+        text_with_description(val.0, "stderr").annotate(Annotations {
             audience: Some(vec![Role::User, Role::Assistant]),
             last_modified: None,
             priority: Some(1.),
@@ -51,11 +58,23 @@ impl ExitStatus {
     fn as_content(&self, tool_name: &str) -> Annotated<RawContent> {
         let status_str = if self.0.success() {
             format!("✅ {tool_name}: Success")
+        } else if let Some(code) = self.0.code() {
+            format!("❌ {tool_name}: Failure, exit code: {code}")
         } else {
             format!("❌ {tool_name}: Failure")
         };
 
-        RawContent::text(status_str).annotate(Annotations {
+        let mut meta = Meta::new().with_description("command exit status");
+        if let Some(code) = self.0.code() {
+            meta = meta.with_i32("exit_code", code);
+        }
+
+        let content = RawContent::Text(RawTextContent {
+            text: status_str,
+            meta: Some(meta.into()),
+        });
+
+        content.annotate(Annotations {
             audience: Some(vec![Role::User, Role::Assistant]),
             last_modified: None,
             priority: Some(1.),
@@ -67,12 +86,24 @@ pub(crate) struct AgentRecommendation(pub String);
 
 impl From<AgentRecommendation> for Annotated<RawContent> {
     fn from(val: AgentRecommendation) -> Self {
-        RawContent::text(format!("RECOMMENDATION: {}", val.0)).annotate(Annotations {
+        let content = text_with_description(
+            format!("RECOMMENDATION: {}", val.0),
+            "recommendation for next action by the agent",
+        );
+
+        content.annotate(Annotations {
             audience: Some(vec![Role::Assistant]),
             last_modified: None,
             priority: Some(1.),
         })
     }
+}
+
+fn text_with_description(text: impl Into<String>, description: impl Into<String>) -> RawContent {
+    RawContent::Text(RawTextContent {
+        text: text.into(),
+        meta: Some(Meta::new().with_description(description).into()),
+    })
 }
 
 pub(crate) struct Output {

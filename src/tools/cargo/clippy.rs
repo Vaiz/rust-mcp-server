@@ -1,12 +1,13 @@
 use std::process::Command;
 
 use crate::{
-    Tool,
-    command::{AgentRecommendation, execute_command},
+    ResultExt, Tool,
+    command::execute_command,
     serde_utils::{
         deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
     },
+    tools::cargo::CargoFmtRmcpTool,
 };
 use rmcp::ErrorData;
 
@@ -296,16 +297,17 @@ impl Tool for CargoClippyRmcpTool {
         let mut call_tool_result: rmcp::model::CallToolResult = output.into();
 
         if add_fix_recommendation {
-            let recommendation = AgentRecommendation(
-                "Run #cargo-clippy with the `fix` and `allow_dirty` options to automatically fix the issues".into(),
-            );
-            call_tool_result.content.push(recommendation.into());
+            call_tool_result.add_recommendation(format!(
+                "Run #{} with the `fix` and `allow_dirty` options to automatically fix the issues",
+                Self::NAME
+            ));
         }
 
         if add_fmt_recommendation {
-            let recommendation =
-                AgentRecommendation("Run #cargo-fmt to format code after applying fixes".into());
-            call_tool_result.content.push(recommendation.into());
+            call_tool_result.add_recommendation(format!(
+                "Run #{} to format code after applying fixes",
+                CargoFmtRmcpTool::NAME
+            ));
         }
 
         Ok(call_tool_result)

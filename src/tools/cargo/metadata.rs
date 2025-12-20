@@ -1,11 +1,12 @@
 use std::process::Command;
 
 use crate::{
-    Tool, execute_command,
+    ResultExt, Tool, execute_command,
     serde_utils::{
         deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
     },
+    tools::cargo::CargoWorkspaceInfoRmcpTool,
 };
 use rmcp::ErrorData;
 #[derive(Debug, ::serde::Deserialize, ::schemars::JsonSchema)]
@@ -136,7 +137,21 @@ impl Tool for CargoMetadataRmcpTool {
         request: Self::RequestArgs,
     ) -> Result<rmcp::model::CallToolResult, ErrorData> {
         let cmd = request.build_cmd()?;
-        execute_command(cmd, Self::NAME).map(Into::into)
+        let mut call_tool_result: rmcp::model::CallToolResult =
+            execute_command(cmd, Self::NAME)?.into();
+
+        if !request.no_deps.unwrap_or(false) {
+            call_tool_result.add_recommendation(
+                "Set no_deps=true to return only workspace member metadata, reducing output size and token usage",
+            );
+        }
+
+        call_tool_result.add_recommendation(format!(
+            "Use #{} if you don't need full metadata",
+            CargoWorkspaceInfoRmcpTool::NAME
+        ));
+
+        Ok(call_tool_result)
     }
 }
 #[cfg(test)]

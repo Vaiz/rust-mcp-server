@@ -1,11 +1,12 @@
 use std::process::Command;
 
 use crate::{
-    Tool, execute_command,
+    ResultExt, Tool, execute_command,
     serde_utils::{
         deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
     },
+    tools::cargo::CargoCheckRmcpTool,
 };
 use rmcp::ErrorData;
 
@@ -287,6 +288,17 @@ impl Tool for CargoBuildRmcpTool {
         request: Self::RequestArgs,
     ) -> Result<rmcp::model::CallToolResult, ErrorData> {
         let cmd = request.build_cmd()?;
-        execute_command(cmd, Self::NAME).map(Into::into)
+        let start_time = std::time::Instant::now();
+        let output = execute_command(cmd, Self::NAME)?;
+        let duration = start_time.elapsed();
+
+        let mut call_tool_result: rmcp::model::CallToolResult = output.into();
+        if duration.as_secs() >= 60 {
+            call_tool_result.add_recommendation(format!(
+                "Consider using #{} tool for faster feedback",
+                CargoCheckRmcpTool::NAME
+            ));
+        }
+        Ok(call_tool_result)
     }
 }

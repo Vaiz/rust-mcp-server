@@ -338,7 +338,9 @@ impl Tool for CargoDocRmcpTool {
         request: Self::RequestArgs,
     ) -> Result<rmcp::model::CallToolResult, ErrorData> {
         let cmd = request.build_cmd()?;
+        let start_time = std::time::Instant::now();
         let mut result: rmcp::model::CallToolResult = execute_command(cmd, Self::NAME)?.into();
+        let duration = start_time.elapsed();
 
         // Add documentation path information only if the command was successful
         if result.is_error != Some(true) {
@@ -361,6 +363,13 @@ impl Tool for CargoDocRmcpTool {
             result
                 .content
                 .push(RawContent::text(doc_info).annotate(annotations));
+
+            if duration.as_secs() >= 30 && !request.no_deps.unwrap_or(false) {
+                use crate::ResultExt;
+                result.add_recommendation(
+                    "For faster documentation builds, consider using `no_deps: true` to build only local documentation"
+                );
+            }
         }
 
         Ok(result)
