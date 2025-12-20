@@ -77,38 +77,40 @@ For a complete list with detailed descriptions and parameters, see [tools.md](to
 The rust-mcp-server supports several command line arguments to customize its behavior:
 
 ### `--log-level <LOG_LEVEL>`
-- **Description**: Sets the logging level for the server
-- **Options**: `error`, `warn`, `info`, `debug`, `trace`
-- **Default**: `info`
-- **Example**: `--log-level debug`
+Sets the logging level for the server
+**Options**: `error`, `warn`, `info`, `debug`, `trace`
+**Default**: `info`
+**Example**: `--log-level debug`
 
 ### `--log-file <LOG_FILE>`
-- **Description**: Specifies a file path for logging output. If not provided, logs are written to stderr
-- **Default**: None (logs to stderr)
-- **Example**: `--log-file /var/log/rust-mcp-server.log`
+- Specifies a file path for logging output. If not provided, logs are written to stderr
+**Default**: None (logs to stderr)
+**Example**: `--log-file /var/log/rust-mcp-server.log`
 
 ### `--disable-tool <TOOL_NAME>`
-- **Description**: Disables a specific tool by name. Can be specified multiple times to disable multiple tools
-- **Default**: None (all tools enabled)
-- **Example**: `--disable-tool cargo-test --disable-tool cargo-clippy`
+- Disables a specific tool by name. Can be specified multiple times to disable multiple tools
+**Default**: None (all tools enabled)
+**Example**: `--disable-tool cargo-test --disable-tool cargo-clippy`
 
 ### `--workspace <WORKSPACE>`
-- **Description**: Specifies the Rust project workspace path for the server to operate in
-- **Default**: Current directory
-- **Example**: `--workspace /path/to/rust/project`
+- Specifies the Rust project workspace path for the server to operate in
+**Default**: Current directory
+**Example**: `--workspace /path/to/rust/project`
 
 ### `--generate-docs <OUTPUT_FILE>`
-- **Description**: Generates markdown documentation file and exits without starting the server
-- **Default**: None
-- **Example**: `--generate-docs tools.md`
+Generates markdown documentation file and exits without starting the server
+**Default**: None
+**Example**: `--generate-docs tools.md`
+
+### `--no-recommendations`
+Disables experimental recommendations for agents in tool responses
+**Default**: Recommendations are enabled
 
 ### `-h, --help`
-- **Description**: Displays help information about available command line arguments
-- **Example**: `rust-mcp-server --help`
+Displays help information about available command line arguments
 
 ### `-V, --version`
-- **Description**: Displays the version information of the server
-- **Example**: `rust-mcp-server --version`
+Displays the version information of the server
 
 ## Configuring with VS Code
 
