@@ -337,7 +337,7 @@ impl Tool for CargoHackRmcpTool {
     const DESCRIPTION: &'static str = "Cargo subcommand to provide various options useful for testing and continuous integration, including feature testing and multi-version compatibility. Available commands: check, test, build, clippy. Recommend using 'check' for fast validation. Example: cargo-hack with \"feature_powerset\": true, \"depth\": 3, \"keep_going\": true";
     type RequestArgs = CargoHackRequest;
 
-    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
+    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<crate::Response, ErrorData> {
         execute_command(request.build_cmd()?, Self::NAME).map(Into::into)
     }
 }
@@ -363,7 +363,7 @@ impl Tool for CargoHackInstallRmcpTool {
         "Installs cargo-hack tool for feature testing and continuous integration";
     type RequestArgs = CargoHackInstallRequest;
 
-    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
+    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<crate::Response, ErrorData> {
         execute_command(request.build_cmd()?, Self::NAME).map(Into::into)
     }
 }

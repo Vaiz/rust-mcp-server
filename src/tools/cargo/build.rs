@@ -2,6 +2,7 @@ use std::process::Command;
 
 use crate::{
     ResultExt, Tool, execute_command,
+    response::Response,
     serde_utils::{
         deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
@@ -283,22 +284,19 @@ impl Tool for CargoBuildRmcpTool {
         "Builds a Rust project using Cargo. Usually, run without any additional arguments.";
     type RequestArgs = CargoBuildRequest;
 
-    fn call_rmcp_tool(
-        &self,
-        request: Self::RequestArgs,
-    ) -> Result<rmcp::model::CallToolResult, ErrorData> {
+    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<crate::Response, ErrorData> {
         let cmd = request.build_cmd()?;
         let start_time = std::time::Instant::now();
         let output = execute_command(cmd, Self::NAME)?;
         let duration = start_time.elapsed();
 
-        let mut call_tool_result: rmcp::model::CallToolResult = output.into();
+        let mut response: Response = output.into();
         if duration.as_secs() >= 60 {
-            call_tool_result.add_recommendation(format!(
+            response.add_recommendation(format!(
                 "Consider using #{} tool for faster feedback",
                 CargoCheckRmcpTool::NAME
             ));
         }
-        Ok(call_tool_result)
+        Ok(response)
     }
 }

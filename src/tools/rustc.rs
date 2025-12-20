@@ -36,7 +36,7 @@ impl Tool for RustcExplainRmcpTool {
     const DESCRIPTION: &'static str = "Provide a detailed explanation of a Rust compiler error code. This tool allows AI agents to request more information about compilation errors by providing the error code (e.g., E0001, E0308, etc.). Very useful for understanding and resolving Rust compilation errors.";
     type RequestArgs = RustcExplainRequest;
 
-    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
+    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<crate::Response, ErrorData> {
         execute_command(request.build_cmd()?, Self::NAME).map(Into::into)
     }
 }

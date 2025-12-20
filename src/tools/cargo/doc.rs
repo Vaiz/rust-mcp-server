@@ -4,7 +4,7 @@ use std::process::Command;
 use rmcp::{ErrorData, model::RawContent};
 
 use crate::{
-    Tool, execute_command,
+    Tool, execute_command, response,
     serde_utils::{
         deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
@@ -333,45 +333,40 @@ impl Tool for CargoDocRmcpTool {
     const DESCRIPTION: &'static str = "Build documentation for a Rust package using Cargo. Recommended to use with no_deps and specific package for faster builds. Returns path to generated documentation index.";
     type RequestArgs = CargoDocRequest;
 
-    fn call_rmcp_tool(
-        &self,
-        request: Self::RequestArgs,
-    ) -> Result<rmcp::model::CallToolResult, ErrorData> {
+    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<crate::Response, ErrorData> {
+        use rmcp::model::{AnnotateAble, Annotations, Role};
+
         let cmd = request.build_cmd()?;
         let start_time = std::time::Instant::now();
-        let mut result: rmcp::model::CallToolResult = execute_command(cmd, Self::NAME)?.into();
+        let output = execute_command(cmd, Self::NAME)?;
         let duration = start_time.elapsed();
 
-        // Add documentation path information only if the command was successful
-        if result.is_error != Some(true) {
-            let doc_path = request.get_doc_path();
-            let doc_info = if let Some(doc_path) = doc_path {
-                format!(
-                    "\n📚 Documentation generated successfully!\n📄 Documentation file: {doc_path}\n💡 Open this file in your browser to view the docs"
-                )
-            } else {
-                "\n📚 Documentation generated successfully!".to_owned()
-            };
-
-            use rmcp::model::{AnnotateAble, Annotations, Role};
-            let annotations = Annotations {
-                audience: Some(vec![Role::User, Role::Assistant]),
-                last_modified: None,
-                priority: Some(0.5),
-            };
-
-            result
-                .content
-                .push(RawContent::text(doc_info).annotate(annotations));
-
-            if duration.as_secs() >= 30 && !request.no_deps.unwrap_or(false) {
-                use crate::ResultExt;
-                result.add_recommendation(
-                    "For faster documentation builds, consider using `no_deps: true` to build only local documentation"
-                );
-            }
+        if !output.success() {
+            return Ok(output.into());
         }
 
-        Ok(result)
+        let mut response: crate::Response = output.into();
+        let doc_path = request.get_doc_path();
+        let doc_info = if let Some(doc_path) = doc_path {
+            format!(
+                "Documentation generated successfully!\nDocumentation file: {doc_path}\nOpen this file in your browser to view the docs"
+            )
+        } else {
+            "Documentation generated successfully!".to_owned()
+        };
+
+        response.add_content(RawContent::text(doc_info).annotate(Annotations {
+            audience: Some(vec![Role::User, Role::Assistant]),
+            last_modified: None,
+            priority: Some(0.5),
+        }));
+
+        if duration.as_secs() >= 30 && !request.no_deps.unwrap_or(false) {
+            response.add_recommendation(
+                "For faster documentation builds, consider using `no_deps: true` to build only local documentation"
+            );
+        }
+
+        Ok(response)
     }
 }

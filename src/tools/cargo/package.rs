@@ -265,7 +265,7 @@ impl Tool for CargoPackageRmcpTool {
     fn call_rmcp_tool(
         &self,
         request: Self::RequestArgs,
-    ) -> Result<rmcp::model::CallToolResult, ErrorData> {
+    ) -> Result<crate::Response, ErrorData> {
         let cmd = request.build_cmd()?;
         execute_command(cmd, Self::NAME).map(Into::into)
     }
