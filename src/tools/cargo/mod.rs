@@ -342,7 +342,7 @@ impl Tool for CargoFmtRmcpTool {
 
         if failed && request.check {
             call_tool_result.add_recommendation(format!(
-                "Run #{} without `check: true` to automatically format the code",
+                "Run #{} with `check: false` to automatically format the code",
                 Self::NAME
             ));
         }
