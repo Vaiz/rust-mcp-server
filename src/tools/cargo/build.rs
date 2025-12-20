@@ -6,6 +6,7 @@ use crate::{
         deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
     },
+    tools::cargo::CargoCheckRmcpTool,
 };
 use rmcp::ErrorData;
 
@@ -293,8 +294,10 @@ impl Tool for CargoBuildRmcpTool {
 
         let mut call_tool_result: rmcp::model::CallToolResult = output.into();
         if duration.as_secs() >= 60 {
-            call_tool_result
-                .add_recommendation("Consider using #cargo-check tool for faster feedback");
+            call_tool_result.add_recommendation(format!(
+                "Consider using #{} tool for faster feedback",
+                CargoCheckRmcpTool::NAME
+            ));
         }
         Ok(call_tool_result)
     }

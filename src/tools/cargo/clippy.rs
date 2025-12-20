@@ -7,6 +7,7 @@ use crate::{
         deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
     },
+    tools::cargo::CargoFmtRmcpTool,
 };
 use rmcp::ErrorData;
 
@@ -296,14 +297,17 @@ impl Tool for CargoClippyRmcpTool {
         let mut call_tool_result: rmcp::model::CallToolResult = output.into();
 
         if add_fix_recommendation {
-            call_tool_result.add_recommendation(
-                "Run #cargo-clippy with the `fix` and `allow_dirty` options to automatically fix the issues",
-            );
+            call_tool_result.add_recommendation(format!(
+                "Run #{} with the `fix` and `allow_dirty` options to automatically fix the issues",
+                Self::NAME
+            ));
         }
 
         if add_fmt_recommendation {
-            call_tool_result
-                .add_recommendation("Run #cargo-fmt to format code after applying fixes");
+            call_tool_result.add_recommendation(format!(
+                "Run #{} to format code after applying fixes",
+                CargoFmtRmcpTool::NAME
+            ));
         }
 
         Ok(call_tool_result)
