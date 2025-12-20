@@ -2,13 +2,15 @@ use rmcp::ErrorData;
 use rmcp::model::{CallToolRequestParam, CallToolResult};
 use schemars::JsonSchema;
 
+use crate::response::Response;
+
 /// Dyn compatible Tool trait
 pub(crate) trait DynTool {
     fn name(&self) -> &'static str;
     fn title(&self) -> &'static str;
     fn description(&self) -> &'static str;
     fn json_schema(&self) -> serde_json::Map<String, serde_json::Value>;
-    fn call_rmcp_tool(&self, request: CallToolRequestParam) -> Result<CallToolResult, ErrorData>;
+    fn call_rmcp_tool(&self, request: CallToolRequestParam) -> Result<Response, ErrorData>;
 }
 
 /// Actual trait that all tools must implement
@@ -18,7 +20,7 @@ pub(crate) trait Tool {
     const DESCRIPTION: &'static str;
     type RequestArgs: serde::de::DeserializeOwned + schemars::JsonSchema;
 
-    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData>;
+    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<Response, ErrorData>;
 }
 
 impl<T> DynTool for T
@@ -41,7 +43,7 @@ where
         json_schema_impl::<T::RequestArgs>()
     }
 
-    fn call_rmcp_tool(&self, request: CallToolRequestParam) -> Result<CallToolResult, ErrorData> {
+    fn call_rmcp_tool(&self, request: CallToolRequestParam) -> Result<Response, ErrorData> {
         let Some(args) = request.arguments else {
             return Err(ErrorData::invalid_params("Missing tool arguments", None));
         };

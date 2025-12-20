@@ -1,5 +1,6 @@
 mod command;
 mod meta;
+mod response;
 mod result_ext;
 mod rmcp_server;
 pub(crate) mod serde_utils;
@@ -10,6 +11,7 @@ mod version;
 use anyhow::Context;
 use clap::Parser;
 use command::execute_command;
+use response::Response;
 use result_ext::ResultExt;
 use rmcp::ServiceExt;
 use rmcp::service::QuitReason;
@@ -40,6 +42,10 @@ struct Args {
     /// Generate tools.md documentation file and exit
     #[arg(long)]
     generate_docs: Option<String>,
+
+    /// Disable experimental recommendations for agent in tool responses
+    #[arg(long)]
+    no_recommendations: bool,
 }
 
 #[tokio::main]
@@ -63,24 +69,24 @@ async fn main() -> anyhow::Result<()> {
             .with_ansi(false)
             .init();
     }
-    tracing::info!("Starting Rust MCP Server: {:?}", args);
+    tracing::info!("Starting Rust MCP Server: {args:?}");
     tracing::info!("Server version: {}", AppVersion::version());
 
     if let Some(workspace) = args.workspace {
-        tracing::info!("Workspace root has been overridden: {}", workspace);
+        tracing::info!("Workspace root has been overridden: {workspace}");
         tools::set_workspace_root(workspace);
     } else {
         tracing::info!("No workspace root specified, using current directory");
     }
 
-    let server = rmcp_server::Server::new(&args.disabled_tools);
+    let server = rmcp_server::Server::new(&args.disabled_tools, args.no_recommendations);
 
     // Handle documentation generation mode
     if let Some(output_file) = args.generate_docs {
-        tracing::info!("Generating documentation to: {}", output_file);
+        tracing::info!("Generating documentation to: {output_file}");
         let docs = server.generate_markdown_docs();
         std::fs::write(&output_file, docs).context("Failed to write documentation file")?;
-        println!("Documentation generated successfully: {}", output_file);
+        println!("Documentation generated successfully: {output_file}");
         return Ok(());
     }
 
