@@ -2,7 +2,7 @@ use rmcp::ErrorData;
 use rmcp::model::CallToolRequestParam;
 use schemars::JsonSchema;
 
-use crate::response::Response;
+use crate::Response;
 
 /// Dyn compatible Tool trait
 pub(crate) trait DynTool {

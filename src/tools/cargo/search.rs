@@ -49,10 +49,7 @@ impl Tool for CargoSearchRmcpTool {
     const DESCRIPTION: &'static str = "Search packages in the registry. Default registry is crates.io. Equivalent to 'cargo search <code>QUERY</code>'.";
     type RequestArgs = CargoSearchRequest;
 
-    fn call_rmcp_tool(
-        &self,
-        request: Self::RequestArgs,
-    ) -> Result<crate::Response, ErrorData> {
+    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<crate::Response, ErrorData> {
         let cmd = request.build_cmd()?;
         execute_command(cmd, Self::NAME).map(Into::into)
     }

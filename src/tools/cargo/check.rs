@@ -281,10 +281,7 @@ impl Tool for CargoCheckRmcpTool {
     const DESCRIPTION: &'static str = "Checks a Rust package and all of its dependencies for errors. Usually, run without any additional arguments.";
     type RequestArgs = CargoCheckRequest;
 
-    fn call_rmcp_tool(
-        &self,
-        request: Self::RequestArgs,
-    ) -> Result<crate::Response, ErrorData> {
+    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<crate::Response, ErrorData> {
         let cmd = request.build_cmd()?;
         execute_command(cmd, Self::NAME).map(Into::into)
     }

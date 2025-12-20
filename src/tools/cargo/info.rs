@@ -86,10 +86,7 @@ impl Tool for CargoInfoRmcpTool {
     const DESCRIPTION: &'static str = "Display information about a package. Information includes package description, list of available features, etc. Equivalent to 'cargo info <SPEC>'.";
     type RequestArgs = CargoInfoRequest;
 
-    fn call_rmcp_tool(
-        &self,
-        request: Self::RequestArgs,
-    ) -> Result<crate::Response, ErrorData> {
+    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<crate::Response, ErrorData> {
         let cmd = request.build_cmd()?;
         execute_command(cmd, Self::NAME).map(Into::into)
     }
