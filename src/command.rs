@@ -70,7 +70,7 @@ impl ExitStatus {
         }
 
         let content = RawContent::Text(RawTextContent {
-            text: status_str.into(),
+            text: status_str,
             meta: Some(meta.into()),
         });
 
@@ -87,7 +87,7 @@ pub(crate) struct AgentRecommendation(pub String);
 impl From<AgentRecommendation> for Annotated<RawContent> {
     fn from(val: AgentRecommendation) -> Self {
         let content = text_with_description(
-            &format!("RECOMMENDATION: {}", val.0),
+            format!("RECOMMENDATION: {}", val.0),
             "recommendation for next action by the agent",
         );
 

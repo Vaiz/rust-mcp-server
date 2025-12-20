@@ -23,8 +23,8 @@ impl Meta {
     }
 }
 
-impl Into<rmcp::model::Meta> for Meta {
-    fn into(self) -> rmcp::model::Meta {
-        rmcp::model::Meta(self.inner)
+impl From<Meta> for rmcp::model::Meta {
+    fn from(val: Meta) -> Self {
+        rmcp::model::Meta(val.inner)
     }
 }
