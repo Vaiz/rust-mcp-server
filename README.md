@@ -77,39 +77,47 @@ For a complete list with detailed descriptions and parameters, see [tools.md](to
 The rust-mcp-server supports several command line arguments to customize its behavior:
 
 ### `--log-level <LOG_LEVEL>`
-Sets the logging level for the server
-**Options**: `error`, `warn`, `info`, `debug`, `trace`
-**Default**: `info`
+
+Sets the logging level for the server</br>
+**Options**: `error`, `warn`, `info`, `debug`, `trace`</br>
+**Default**: `info`</br>
 **Example**: `--log-level debug`
 
 ### `--log-file <LOG_FILE>`
-- Specifies a file path for logging output. If not provided, logs are written to stderr
-**Default**: None (logs to stderr)
+
+Specifies a file path for logging output. If not provided, logs are written to stderr</br>
+**Default**: None (logs to stderr)</br>
 **Example**: `--log-file /var/log/rust-mcp-server.log`
 
 ### `--disable-tool <TOOL_NAME>`
-- Disables a specific tool by name. Can be specified multiple times to disable multiple tools
-**Default**: None (all tools enabled)
+
+Disables a specific tool by name. Can be specified multiple times to disable multiple tools</br>
+**Default**: None (all tools enabled)</br>
 **Example**: `--disable-tool cargo-test --disable-tool cargo-clippy`
 
 ### `--workspace <WORKSPACE>`
-- Specifies the Rust project workspace path for the server to operate in
-**Default**: Current directory
+
+Specifies the Rust project workspace path for the server to operate in</br>
+**Default**: Current directory</br>
 **Example**: `--workspace /path/to/rust/project`
 
 ### `--generate-docs <OUTPUT_FILE>`
-Generates markdown documentation file and exits without starting the server
-**Default**: None
+
+Generates markdown documentation file and exits without starting the server</br>
+**Default**: None</br>
 **Example**: `--generate-docs tools.md`
 
 ### `--no-recommendations`
-Disables experimental recommendations for agents in tool responses
+
+Disables experimental recommendations for agents in tool responses</br>
 **Default**: Recommendations are enabled
 
 ### `-h, --help`
+
 Displays help information about available command line arguments
 
 ### `-V, --version`
+
 Displays the version information of the server
 
 ## Configuring with VS Code
