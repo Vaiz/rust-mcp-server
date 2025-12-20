@@ -30,11 +30,12 @@ use crate::{
 };
 
 pub struct Server {
+    ignore_recommendations: bool,
     tools: HashMap<&'static str, Box<dyn DynTool + Send + Sync>>,
 }
 
 impl Server {
-    pub fn new(disabled_tools: &[String]) -> Self {
+    pub fn new(disabled_tools: &[String], ignore_recommendations: bool) -> Self {
         let mut tools: HashMap<&'static str, Box<dyn DynTool + Send + Sync>> = HashMap::new();
 
         // Cargo tools
@@ -109,7 +110,10 @@ impl Server {
             }
         }
 
-        Self { tools }
+        Self {
+            ignore_recommendations,
+            tools,
+        }
     }
 
     /// Generate markdown documentation for all tools
@@ -239,5 +243,6 @@ impl rmcp::ServerHandler for Server {
         })?;
 
         tool.call_rmcp_tool(request)
+            .map(|r| r.into_rmcp_result(self.ignore_recommendations))
     }
 }

@@ -4,7 +4,7 @@ use crate::{
     Tool, execute_command,
     serde_utils::{deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags},
 };
-use rmcp::{ErrorData, model::CallToolResult};
+use rmcp::ErrorData;
 
 #[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
 pub struct CargoDenyCheckRequest {
@@ -240,7 +240,7 @@ impl Tool for CargoDenyCheckRmcpTool {
     const DESCRIPTION: &'static str = "Checks a project's crate graph for security advisories, license compliance, banned crates.";
     type RequestArgs = CargoDenyCheckRequest;
 
-    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
+    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<crate::Response, ErrorData> {
         execute_command(request.build_cmd()?, Self::NAME).map(Into::into)
     }
 }
@@ -273,7 +273,7 @@ impl Tool for CargoDenyInitRmcpTool {
     const DESCRIPTION: &'static str = "Creates a cargo-deny config from a template";
     type RequestArgs = CargoDenyInitRequest;
 
-    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
+    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<crate::Response, ErrorData> {
         execute_command(request.build_cmd()?, Self::NAME).map(Into::into)
     }
 }
@@ -330,7 +330,7 @@ impl Tool for CargoDenyListRmcpTool {
         "Outputs a listing of all licenses and the crates that use them";
     type RequestArgs = CargoDenyListRequest;
 
-    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
+    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<crate::Response, ErrorData> {
         execute_command(request.build_cmd()?, Self::NAME).map(Into::into)
     }
 }
@@ -356,7 +356,7 @@ impl Tool for CargoDenyInstallRmcpTool {
         "Installs cargo-deny tool for dependency graph analysis and security checks";
     type RequestArgs = CargoDenyInstallRequest;
 
-    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
+    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<crate::Response, ErrorData> {
         execute_command(request.build_cmd()?, Self::NAME).map(Into::into)
     }
 }

@@ -4,7 +4,7 @@ use std::process::Command;
 use crate::{Tool, command::execute_command, serde_utils::deserialize_string};
 use rmcp::{
     ErrorData,
-    model::{AnnotateAble, Annotations, CallToolResult, RawContent, Role},
+    model::{AnnotateAble, Annotations, RawContent, Role},
 };
 use serde::Deserialize;
 
@@ -51,10 +51,7 @@ impl Tool for CargoWorkspaceInfoRmcpTool {
          types, manifest paths, descriptions, features, and optionally dependencies. This is a cut down version of cargo metadata with the goal of saving tokens.";
     type RequestArgs = CargoWorkspaceInfoRequest;
 
-    fn call_rmcp_tool(
-        &self,
-        request: Self::RequestArgs,
-    ) -> Result<rmcp::model::CallToolResult, ErrorData> {
+    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<crate::Response, ErrorData> {
         let cmd = request.build_cmd()?;
         let mut output = execute_command(cmd, Self::NAME)?;
 
@@ -99,7 +96,7 @@ impl Tool for CargoWorkspaceInfoRmcpTool {
             });
         }
 
-        let mut call_tool_result: CallToolResult = output.into();
+        let mut response: crate::Response = output.into();
         let workspace_info = WorkspaceInfo { packages };
         let workspace_info = RawContent::json(workspace_info)?.annotate(Annotations {
             audience: Some(vec![Role::User, Role::Assistant]),
@@ -107,8 +104,8 @@ impl Tool for CargoWorkspaceInfoRmcpTool {
             priority: Some(1.),
         });
 
-        call_tool_result.content.push(workspace_info);
-        Ok(call_tool_result)
+        response.add_content(workspace_info);
+        Ok(response)
     }
 }
 

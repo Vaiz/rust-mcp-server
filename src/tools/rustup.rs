@@ -4,7 +4,7 @@ use crate::{
     Tool, execute_command,
     serde_utils::{deserialize_string, deserialize_string_vec},
 };
-use rmcp::{ErrorData, model::CallToolResult};
+use rmcp::ErrorData;
 
 #[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
 pub struct RustupShowRequest {
@@ -34,7 +34,7 @@ impl Tool for RustupShowRmcpTool {
     const DESCRIPTION: &'static str = "Show the active and installed toolchains or profiles. Shows the name of the active toolchain and the version of rustc. If the active toolchain has installed support for additional compilation targets, then they are listed as well.";
     type RequestArgs = RustupShowRequest;
 
-    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
+    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<crate::Response, ErrorData> {
         execute_command(request.build_cmd()?, Self::NAME).map(Into::into)
     }
 }
@@ -122,7 +122,7 @@ impl Tool for RustupToolchainAddRmcpTool {
     const DESCRIPTION: &'static str = "Install or update the given toolchains, or by default the active toolchain. Toolchain name can be 'stable', 'nightly', or a specific version like '1.8.0'.";
     type RequestArgs = RustupToolchainAddRequest;
 
-    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
+    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<crate::Response, ErrorData> {
         execute_command(request.build_cmd()?, Self::NAME).map(Into::into)
     }
 }
@@ -179,7 +179,7 @@ impl Tool for RustupUpdateRmcpTool {
     const DESCRIPTION: &'static str = "Update Rust toolchains and rustup. With no toolchain specified, updates each of the installed toolchains from the official release channels, then updates rustup itself. If given a toolchain argument then updates that toolchain.";
     type RequestArgs = RustupUpdateRequest;
 
-    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
+    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<crate::Response, ErrorData> {
         execute_command(request.build_cmd()?, Self::NAME).map(Into::into)
     }
 }

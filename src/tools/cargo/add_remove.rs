@@ -1,13 +1,13 @@
 use std::process::Command;
 
 use crate::{
-    Tool, execute_command,
+    Response, Tool, execute_command,
     serde_utils::{
         PackageWithVersion, deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
     },
 };
-use rmcp::{ErrorData, model::CallToolResult};
+use rmcp::ErrorData;
 
 fn dependency_type_to_cli_flag(
     dependency_type: Option<&str>,
@@ -231,7 +231,7 @@ impl Tool for CargoAddRmcpTool {
     const DESCRIPTION: &'static str = "Adds a dependency to a Rust project using cargo add.";
     type RequestArgs = CargoAddRequest;
 
-    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
+    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<Response, ErrorData> {
         execute_command(request.build_cmd()?, Self::NAME).map(Into::into)
     }
 }
@@ -354,7 +354,7 @@ impl Tool for CargoRemoveRmcpTool {
     const DESCRIPTION: &'static str = "Remove dependencies from a Cargo.toml manifest file.";
     type RequestArgs = CargoRemoveRequest;
 
-    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
+    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<Response, ErrorData> {
         execute_command(request.build_cmd()?, Self::NAME).map(Into::into)
     }
 }

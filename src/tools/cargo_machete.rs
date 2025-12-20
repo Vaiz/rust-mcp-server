@@ -1,7 +1,7 @@
 use std::process::Command;
 
 use crate::{Tool, execute_command, serde_utils::deserialize_string_vec};
-use rmcp::{ErrorData, model::CallToolResult};
+use rmcp::ErrorData;
 
 #[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
 pub struct CargoMacheteRequest {
@@ -66,7 +66,7 @@ impl Tool for CargoMacheteRmcpTool {
     const DESCRIPTION: &'static str = "Finds unused dependencies in a fast yet imprecise way. Helps identify dependencies that are declared in Cargo.toml but not actually used in the code.";
     type RequestArgs = CargoMacheteRequest;
 
-    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
+    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<crate::Response, ErrorData> {
         execute_command(request.build_cmd()?, Self::NAME).map(Into::into)
     }
 }
@@ -91,7 +91,7 @@ impl Tool for CargoMacheteInstallRmcpTool {
     const DESCRIPTION: &'static str = "Installs cargo-machete tool for finding unused dependencies";
     type RequestArgs = CargoMacheteInstallRequest;
 
-    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
+    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<crate::Response, ErrorData> {
         execute_command(request.build_cmd()?, Self::NAME).map(Into::into)
     }
 }

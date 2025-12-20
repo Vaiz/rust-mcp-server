@@ -1,7 +1,7 @@
 use std::process::Command;
 
 use crate::{
-    ResultExt, Tool,
+    Tool,
     command::execute_command,
     serde_utils::{
         deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
@@ -285,32 +285,29 @@ impl Tool for CargoClippyRmcpTool {
         "Checks a Rust package to catch common mistakes and improve code quality using Clippy";
     type RequestArgs = CargoClippyRequest;
 
-    fn call_rmcp_tool(
-        &self,
-        request: Self::RequestArgs,
-    ) -> Result<rmcp::model::CallToolResult, ErrorData> {
+    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<crate::Response, ErrorData> {
         let cmd = request.build_cmd()?;
         let output = execute_command(cmd, Self::NAME)?;
 
         let add_fix_recommendation = !request.fix.unwrap_or(false) && output.stderr.is_some();
         let add_fmt_recommendation = request.fix.unwrap_or(false);
-        let mut call_tool_result: rmcp::model::CallToolResult = output.into();
+        let mut response: crate::Response = output.into();
 
         if add_fix_recommendation {
-            call_tool_result.add_recommendation(format!(
+            response.add_recommendation(format!(
                 "Run #{} with the `fix` and `allow_dirty` options to automatically fix the issues",
                 Self::NAME
             ));
         }
 
         if add_fmt_recommendation {
-            call_tool_result.add_recommendation(format!(
+            response.add_recommendation(format!(
                 "Run #{} to format code after applying fixes",
                 CargoFmtRmcpTool::NAME
             ));
         }
 
-        Ok(call_tool_result)
+        Ok(response)
     }
 }
 

@@ -52,7 +52,7 @@ impl From<Stderr> for Annotated<RawContent> {
 }
 
 #[derive(Debug, Clone)]
-pub(crate) struct ExitStatus(std::process::ExitStatus);
+pub(crate) struct ExitStatus(pub std::process::ExitStatus);
 
 impl ExitStatus {
     fn as_content(&self, tool_name: &str) -> Annotated<RawContent> {

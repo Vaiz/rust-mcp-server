@@ -27,13 +27,13 @@ pub use workspace_info::CargoWorkspaceInfoRmcpTool;
 use std::process::Command;
 
 use crate::{
-    ResultExt, Tool, execute_command,
+    Tool, execute_command,
     serde_utils::{
         deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
     },
 };
-use rmcp::{ErrorData, model::CallToolResult};
+use rmcp::ErrorData;
 
 #[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
 pub struct CargoGenerateLockfileRequest {
@@ -106,7 +106,7 @@ impl Tool for CargoGenerateLockfileRmcpTool {
     const DESCRIPTION: &'static str = "Generates or updates the Cargo.lock file for a Rust project. Usually, run without any additional arguments.";
     type RequestArgs = CargoGenerateLockfileRequest;
 
-    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
+    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<crate::Response, ErrorData> {
         execute_command(request.build_cmd()?, Self::NAME).map(Into::into)
     }
 }
@@ -244,7 +244,7 @@ impl Tool for CargoCleanRmcpTool {
     const DESCRIPTION: &'static str = "Cleans the target directory for a Rust project using Cargo. By default, it cleans the entire workspace.";
     type RequestArgs = CargoCleanRequest;
 
-    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
+    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<crate::Response, ErrorData> {
         execute_command(request.build_cmd()?, Self::NAME).map(Into::into)
     }
 }
@@ -335,19 +335,19 @@ impl Tool for CargoFmtRmcpTool {
         "Formats Rust code using rustfmt. Usually, run without any additional arguments.";
     type RequestArgs = CargoFmtRequest;
 
-    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
+    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<crate::Response, ErrorData> {
         let output = execute_command(request.build_cmd()?, Self::NAME)?;
         let failed = !output.success();
-        let mut call_tool_result: CallToolResult = output.into();
+        let mut response: crate::Response = output.into();
 
         if failed && request.check {
-            call_tool_result.add_recommendation(format!(
+            response.add_recommendation(format!(
                 "Run #{} with `check: false` to automatically format the code",
                 Self::NAME
             ));
         }
 
-        Ok(call_tool_result)
+        Ok(response)
     }
 }
 
@@ -461,7 +461,7 @@ impl Tool for CargoNewRmcpTool {
     const DESCRIPTION: &'static str = "Create a new cargo package at <path>. Creates a new Rust project with the specified name and template.";
     type RequestArgs = CargoNewRequest;
 
-    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
+    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<crate::Response, ErrorData> {
         execute_command(request.build_cmd()?, Self::NAME).map(Into::into)
     }
 }
@@ -485,7 +485,7 @@ impl Tool for CargoListRmcpTool {
     const DESCRIPTION: &'static str = "Lists installed cargo commands using 'cargo --list'.";
     type RequestArgs = CargoListRequest;
 
-    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<CallToolResult, ErrorData> {
+    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<crate::Response, ErrorData> {
         execute_command(request.build_cmd()?, Self::NAME).map(Into::into)
     }
 }

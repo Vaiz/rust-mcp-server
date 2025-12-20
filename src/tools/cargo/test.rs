@@ -314,10 +314,7 @@ impl Tool for CargoTestRmcpTool {
         "Run `cargo test` to execute Rust tests in the current project.";
     type RequestArgs = CargoTestRequest;
 
-    fn call_rmcp_tool(
-        &self,
-        request: Self::RequestArgs,
-    ) -> Result<rmcp::model::CallToolResult, ErrorData> {
+    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<crate::Response, ErrorData> {
         let cmd = request.build_cmd()?;
         execute_command(cmd, Self::NAME).map(Into::into)
     }
