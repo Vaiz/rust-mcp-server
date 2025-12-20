@@ -1,7 +1,7 @@
 use std::process::Command;
 
 use crate::{
-    ResultExt, Tool, execute_command,
+    Tool, execute_command,
     serde_utils::{
         deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
