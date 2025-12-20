@@ -1,9 +1,7 @@
 use std::process::Command;
 
 use crate::{
-    Tool,
-    command::AgentRecommendation,
-    execute_command,
+    ResultExt, Tool, execute_command,
     serde_utils::{
         deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
@@ -295,10 +293,8 @@ impl Tool for CargoBuildRmcpTool {
 
         let mut call_tool_result: rmcp::model::CallToolResult = output.into();
         if duration.as_secs() >= 60 {
-            call_tool_result.content.push(
-                AgentRecommendation("Consider using #cargo-check tool for faster feedback".into())
-                    .into(),
-            );
+            call_tool_result
+                .add_recommendation("Consider using #cargo-check tool for faster feedback");
         }
         Ok(call_tool_result)
     }

@@ -1,5 +1,6 @@
 mod command;
 mod meta;
+mod result_ext;
 mod rmcp_server;
 pub(crate) mod serde_utils;
 mod tool;
@@ -9,6 +10,7 @@ mod version;
 use anyhow::Context;
 use clap::Parser;
 use command::execute_command;
+use result_ext::ResultExt;
 use rmcp::ServiceExt;
 use rmcp::service::QuitReason;
 pub(crate) use tool::Tool;
