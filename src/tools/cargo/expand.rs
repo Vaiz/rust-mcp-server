@@ -7,6 +7,25 @@ use crate::{
     serde_utils::{deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags},
 };
 
+fn kind_to_cli_flag(kind: Option<&str>) -> Result<Option<&'static str>, ErrorData> {
+    Ok(match kind {
+        None => None,
+        Some("lib") => Some("--lib"),
+        Some("bin") => Some("--bin"),
+        Some("example") => Some("--example"),
+        Some("test") => Some("--test"),
+        Some("bench") => Some("--bench"),
+        Some(unknown) => {
+            return Err(ErrorData::invalid_params(
+                format!(
+                    "Unknown kind: {unknown}. Valid options are: lib, bin, example, test, bench"
+                ),
+                None,
+            ));
+        }
+    })
+}
+
 /// Request parameters for cargo-expand command.
 /// Shows the result of macro expansion for Rust code.
 #[derive(Debug, ::serde::Deserialize, ::schemars::JsonSchema)]
@@ -23,29 +42,18 @@ pub struct CargoExpandRequest {
     #[serde(default, deserialize_with = "deserialize_string")]
     package: Option<String>,
 
-    /// Expand only this package's library
-    #[serde(default)]
-    lib: Option<bool>,
-
-    /// Expand only the specified binary
+    /// Kind of target to expand. Only one can be specified.
+    /// Valid options: "lib", "bin", "example", "test", "bench"
     #[serde(default, deserialize_with = "deserialize_string")]
-    bin: Option<String>,
+    kind: Option<String>,
 
-    /// Expand only the specified example
+    /// Name of the target (optional for bin, example, test, bench; not allowed for lib)
     #[serde(default, deserialize_with = "deserialize_string")]
-    example: Option<String>,
-
-    /// Expand only the specified test target
-    #[serde(default, deserialize_with = "deserialize_string")]
-    test: Option<String>,
+    name: Option<String>,
 
     /// Include tests when expanding the lib or bin
     #[serde(default)]
     tests: Option<bool>,
-
-    /// Expand only the specified bench target
-    #[serde(default, deserialize_with = "deserialize_string")]
-    bench: Option<String>,
 
     /// Space or comma separated list of features to activate
     #[serde(default, deserialize_with = "deserialize_string_vec")]
@@ -59,11 +67,7 @@ pub struct CargoExpandRequest {
     #[serde(default)]
     no_default_features: Option<bool>,
 
-    /// Build artifacts in release mode, with optimizations
-    #[serde(default)]
-    release: Option<bool>,
-
-    /// Build artifacts with the specified profile
+    /// Build artifacts with the specified profile (e.g., "release", "dev")
     #[serde(default, deserialize_with = "deserialize_string")]
     profile: Option<String>,
 
@@ -79,7 +83,7 @@ pub struct CargoExpandRequest {
     #[serde(default, deserialize_with = "deserialize_string")]
     manifest_path: Option<String>,
 
-    /// Do not attempt to run rustfmt on expanded code
+    /// Do not attempt to run rustfmt on expanded code (often produces smaller but harder to read output)
     #[serde(default)]
     ugly: Option<bool>,
 
@@ -113,29 +117,22 @@ impl CargoExpandRequest {
             cmd.arg("--package").arg(package);
         }
 
-        // Target selection
-        if self.lib.unwrap_or(false) {
-            cmd.arg("--lib");
-        }
-
-        if let Some(bin) = &self.bin {
-            cmd.arg("--bin").arg(bin);
-        }
-
-        if let Some(example) = &self.example {
-            cmd.arg("--example").arg(example);
-        }
-
-        if let Some(test) = &self.test {
-            cmd.arg("--test").arg(test);
+        // Target selection (mutually exclusive)
+        if let Some(flag) = kind_to_cli_flag(self.kind.as_deref())? {
+            cmd.arg(flag);
+            if let Some(name) = &self.name {
+                if self.kind.as_deref() == Some("lib") {
+                    return Err(ErrorData::invalid_params(
+                        "name cannot be specified when kind is \"lib\"",
+                        None,
+                    ));
+                }
+                cmd.arg(name);
+            }
         }
 
         if self.tests.unwrap_or(false) {
             cmd.arg("--tests");
-        }
-
-        if let Some(bench) = &self.bench {
-            cmd.arg("--bench").arg(bench);
         }
 
         // Feature selection
@@ -152,10 +149,6 @@ impl CargoExpandRequest {
         }
 
         // Compilation options
-        if self.release.unwrap_or(false) {
-            cmd.arg("--release");
-        }
-
         if let Some(profile) = &self.profile {
             cmd.arg("--profile").arg(profile);
         }
