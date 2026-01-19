@@ -2,6 +2,7 @@ use std::process::Command;
 
 use crate::{
     Tool, execute_command,
+    response::Response,
     serde_utils::{deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags},
 };
 use rmcp::ErrorData;
@@ -194,10 +195,18 @@ impl Tool for CargoTreeRmcpTool {
 
     fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<crate::Response, ErrorData> {
         let cmd = request.build_cmd()?;
-        let mut response: crate::Response = execute_command(cmd, Self::NAME)?.into();
+        let output = execute_command(cmd, Self::NAME)?;
 
-        // Add helpful recommendations
-        if request.depth.is_none() && request.duplicates.is_none() {
+        let stdout_len = if output.success()
+            && let Some(stdout) = &output.stdout
+        {
+            stdout.0.len()
+        } else {
+            0
+        };
+
+        let mut response: Response = output.into();
+        if stdout_len > 16384 && request.depth.is_none() && request.duplicates.is_none() {
             response.add_recommendation(
                 "Use depth parameter to limit output size for large dependency trees",
             );
