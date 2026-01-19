@@ -1,5 +1,6 @@
 pub mod cargo;
 pub mod cargo_deny;
+pub mod cargo_expand;
 pub mod cargo_hack;
 pub mod cargo_machete;
 pub mod rustc;

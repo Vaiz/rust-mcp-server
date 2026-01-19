@@ -12,16 +12,16 @@ use crate::{
     tools::{
         cargo::{
             CargoAddRmcpTool, CargoBuildRmcpTool, CargoCheckRmcpTool, CargoCleanRmcpTool,
-            CargoClippyRmcpTool, CargoDocRmcpTool, CargoExpandRmcpTool, CargoFmtRmcpTool,
-            CargoGenerateLockfileRmcpTool, CargoInfoRmcpTool, CargoListRmcpTool,
-            CargoMetadataRmcpTool, CargoNewRmcpTool, CargoPackageRmcpTool, CargoRemoveRmcpTool,
-            CargoSearchRmcpTool, CargoTestRmcpTool, CargoTreeRmcpTool, CargoUpdateRmcpTool,
-            CargoWorkspaceInfoRmcpTool,
+            CargoClippyRmcpTool, CargoDocRmcpTool, CargoFmtRmcpTool, CargoGenerateLockfileRmcpTool,
+            CargoInfoRmcpTool, CargoListRmcpTool, CargoMetadataRmcpTool, CargoNewRmcpTool,
+            CargoPackageRmcpTool, CargoRemoveRmcpTool, CargoSearchRmcpTool, CargoTestRmcpTool,
+            CargoTreeRmcpTool, CargoUpdateRmcpTool, CargoWorkspaceInfoRmcpTool,
         },
         cargo_deny::{
             CargoDenyCheckRmcpTool, CargoDenyInitRmcpTool, CargoDenyInstallRmcpTool,
             CargoDenyListRmcpTool,
         },
+        cargo_expand::CargoExpandRmcpTool,
         cargo_hack::{CargoHackInstallRmcpTool, CargoHackRmcpTool},
         cargo_machete::{CargoMacheteInstallRmcpTool, CargoMacheteRmcpTool},
         rustc::RustcExplainRmcpTool,

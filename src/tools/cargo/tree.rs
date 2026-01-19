@@ -220,9 +220,7 @@ mod tests {
         let cmd = request.build_cmd().expect("Should build command");
         let args: Vec<_> = cmd.get_args().map(|s| s.to_str().unwrap()).collect();
 
-        assert!(args.contains(&"tree"));
-        assert!(args.contains(&"--locked"));
-        assert!(args.contains(&"--quiet"));
+        assert_eq!(args, vec!["tree", "--charset", "ascii", "--locked"]);
     }
 
     #[test]
@@ -235,8 +233,17 @@ mod tests {
         let cmd = request.build_cmd().expect("Should build command");
         let args: Vec<_> = cmd.get_args().map(|s| s.to_str().unwrap()).collect();
 
-        assert!(args.contains(&"--package"));
-        assert!(args.contains(&"my-crate"));
+        assert_eq!(
+            args,
+            vec![
+                "tree",
+                "--charset",
+                "ascii",
+                "--package",
+                "my-crate",
+                "--locked"
+            ]
+        );
     }
 
     #[test]
@@ -249,8 +256,17 @@ mod tests {
         let cmd = request.build_cmd().expect("Should build command");
         let args: Vec<_> = cmd.get_args().map(|s| s.to_str().unwrap()).collect();
 
-        assert!(args.contains(&"--invert"));
-        assert!(args.contains(&"tokio"));
+        assert_eq!(
+            args,
+            vec![
+                "tree",
+                "--charset",
+                "ascii",
+                "--invert",
+                "tokio",
+                "--locked"
+            ]
+        );
     }
 
     #[test]
@@ -263,8 +279,10 @@ mod tests {
         let cmd = request.build_cmd().expect("Should build command");
         let args: Vec<_> = cmd.get_args().map(|s| s.to_str().unwrap()).collect();
 
-        assert!(args.contains(&"--depth"));
-        assert!(args.contains(&"3"));
+        assert_eq!(
+            args,
+            vec!["tree", "--charset", "ascii", "--depth", "3", "--locked"]
+        );
     }
 
     #[test]
@@ -277,7 +295,10 @@ mod tests {
         let cmd = request.build_cmd().expect("Should build command");
         let args: Vec<_> = cmd.get_args().map(|s| s.to_str().unwrap()).collect();
 
-        assert!(args.contains(&"--duplicates"));
+        assert_eq!(
+            args,
+            vec!["tree", "--charset", "ascii", "--duplicates", "--locked"]
+        );
     }
 
     #[test]
@@ -290,8 +311,17 @@ mod tests {
         let cmd = request.build_cmd().expect("Should build command");
         let args: Vec<_> = cmd.get_args().map(|s| s.to_str().unwrap()).collect();
 
-        assert!(args.contains(&"--edges"));
-        assert!(args.contains(&"normal,build"));
+        assert_eq!(
+            args,
+            vec![
+                "tree",
+                "--charset",
+                "ascii",
+                "--edges",
+                "normal,build",
+                "--locked"
+            ]
+        );
     }
 
     #[test]
@@ -304,7 +334,10 @@ mod tests {
         let cmd = request.build_cmd().expect("Should build command");
         let args: Vec<_> = cmd.get_args().map(|s| s.to_str().unwrap()).collect();
 
-        assert!(args.contains(&"+nightly"));
+        assert_eq!(
+            args,
+            vec!["+nightly", "tree", "--charset", "ascii", "--locked"]
+        );
     }
 
     #[test]
@@ -319,26 +352,40 @@ mod tests {
         let cmd = request.build_cmd().expect("Should build command");
         let args: Vec<_> = cmd.get_args().map(|s| s.to_str().unwrap()).collect();
 
-        assert!(args.contains(&"--features"));
-        assert!(args.contains(&"serde,tokio"));
-        assert!(args.contains(&"--no-default-features"));
-        assert!(!args.contains(&"--all-features"));
+        assert_eq!(
+            args,
+            vec![
+                "tree",
+                "--charset",
+                "ascii",
+                "--features",
+                "serde,tokio",
+                "--no-default-features",
+                "--locked"
+            ]
+        );
     }
 
     #[test]
-    fn test_with_charset_and_format() {
+    fn test_with_format() {
         let input = json!({
-            "charset": "ascii",
             "format": "{p} {l}"
         });
         let request: CargoTreeRequest =
-            serde_json::from_value(input).expect("Should deserialize request with charset");
+            serde_json::from_value(input).expect("Should deserialize request with format");
         let cmd = request.build_cmd().expect("Should build command");
         let args: Vec<_> = cmd.get_args().map(|s| s.to_str().unwrap()).collect();
 
-        assert!(args.contains(&"--charset"));
-        assert!(args.contains(&"ascii"));
-        assert!(args.contains(&"--format"));
-        assert!(args.contains(&"{p} {l}"));
+        assert_eq!(
+            args,
+            vec![
+                "tree",
+                "--charset",
+                "ascii",
+                "--format",
+                "{p} {l}",
+                "--locked"
+            ]
+        );
     }
 }
