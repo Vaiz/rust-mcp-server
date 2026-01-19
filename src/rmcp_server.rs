@@ -12,10 +12,11 @@ use crate::{
     tools::{
         cargo::{
             CargoAddRmcpTool, CargoBuildRmcpTool, CargoCheckRmcpTool, CargoCleanRmcpTool,
-            CargoClippyRmcpTool, CargoDocRmcpTool, CargoFmtRmcpTool, CargoGenerateLockfileRmcpTool,
-            CargoInfoRmcpTool, CargoListRmcpTool, CargoMetadataRmcpTool, CargoNewRmcpTool,
-            CargoPackageRmcpTool, CargoRemoveRmcpTool, CargoSearchRmcpTool, CargoTestRmcpTool,
-            CargoTreeRmcpTool, CargoUpdateRmcpTool, CargoWorkspaceInfoRmcpTool,
+            CargoClippyRmcpTool, CargoDocRmcpTool, CargoExpandRmcpTool, CargoFmtRmcpTool,
+            CargoGenerateLockfileRmcpTool, CargoInfoRmcpTool, CargoListRmcpTool,
+            CargoMetadataRmcpTool, CargoNewRmcpTool, CargoPackageRmcpTool, CargoRemoveRmcpTool,
+            CargoSearchRmcpTool, CargoTestRmcpTool, CargoTreeRmcpTool, CargoUpdateRmcpTool,
+            CargoWorkspaceInfoRmcpTool,
         },
         cargo_deny::{
             CargoDenyCheckRmcpTool, CargoDenyInitRmcpTool, CargoDenyInstallRmcpTool,
@@ -45,6 +46,7 @@ impl Server {
         tools.insert(CargoCleanRmcpTool::NAME, Box::new(CargoCleanRmcpTool));
         tools.insert(CargoClippyRmcpTool::NAME, Box::new(CargoClippyRmcpTool));
         tools.insert(CargoDocRmcpTool::NAME, Box::new(CargoDocRmcpTool));
+        tools.insert(CargoExpandRmcpTool::NAME, Box::new(CargoExpandRmcpTool));
         tools.insert(CargoFmtRmcpTool::NAME, Box::new(CargoFmtRmcpTool));
         tools.insert(
             CargoGenerateLockfileRmcpTool::NAME,

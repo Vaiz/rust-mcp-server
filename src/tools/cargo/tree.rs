@@ -2,10 +2,7 @@ use std::process::Command;
 
 use crate::{
     Tool, execute_command,
-    serde_utils::{
-        deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
-        output_verbosity_to_cli_flags,
-    },
+    serde_utils::{deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags},
 };
 use rmcp::ErrorData;
 
@@ -55,11 +52,6 @@ pub struct CargoTreeRequest {
     /// Show only dependencies which come in multiple versions (implies -i)
     #[serde(default)]
     duplicates: Option<bool>,
-
-    /// Character set to use in output.
-    /// Possible values: utf8, ascii
-    #[serde(default, deserialize_with = "deserialize_string")]
-    charset: Option<String>,
 
     /// Format string used for printing dependencies (default: {p})
     #[serde(default, deserialize_with = "deserialize_string")]
