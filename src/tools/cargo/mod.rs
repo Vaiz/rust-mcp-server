@@ -8,6 +8,7 @@ mod metadata;
 mod package;
 mod search;
 mod test;
+mod tree;
 mod update;
 mod workspace_info;
 
@@ -21,6 +22,7 @@ pub use metadata::CargoMetadataRmcpTool;
 pub use package::CargoPackageRmcpTool;
 pub use search::CargoSearchRmcpTool;
 pub use test::CargoTestRmcpTool;
+pub use tree::CargoTreeRmcpTool;
 pub use update::CargoUpdateRmcpTool;
 pub use workspace_info::CargoWorkspaceInfoRmcpTool;
 

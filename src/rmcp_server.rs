@@ -15,7 +15,7 @@ use crate::{
             CargoClippyRmcpTool, CargoDocRmcpTool, CargoFmtRmcpTool, CargoGenerateLockfileRmcpTool,
             CargoInfoRmcpTool, CargoListRmcpTool, CargoMetadataRmcpTool, CargoNewRmcpTool,
             CargoPackageRmcpTool, CargoRemoveRmcpTool, CargoSearchRmcpTool, CargoTestRmcpTool,
-            CargoUpdateRmcpTool, CargoWorkspaceInfoRmcpTool,
+            CargoTreeRmcpTool, CargoUpdateRmcpTool, CargoWorkspaceInfoRmcpTool,
         },
         cargo_deny::{
             CargoDenyCheckRmcpTool, CargoDenyInitRmcpTool, CargoDenyInstallRmcpTool,
@@ -58,6 +58,7 @@ impl Server {
         tools.insert(CargoRemoveRmcpTool::NAME, Box::new(CargoRemoveRmcpTool));
         tools.insert(CargoSearchRmcpTool::NAME, Box::new(CargoSearchRmcpTool));
         tools.insert(CargoTestRmcpTool::NAME, Box::new(CargoTestRmcpTool));
+        tools.insert(CargoTreeRmcpTool::NAME, Box::new(CargoTreeRmcpTool));
         tools.insert(CargoUpdateRmcpTool::NAME, Box::new(CargoUpdateRmcpTool));
         tools.insert(
             CargoWorkspaceInfoRmcpTool::NAME,
