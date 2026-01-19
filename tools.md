@@ -1,8 +1,8 @@
 ## Rust MCP Server
-| 🟢 Tools (30) | 🟢 Prompts (0) | 🟢 Resources (0) | <span style="opacity:0.6">🔴 Logging</span> | <span style="opacity:0.6">🔴 Completions</span> | <span style="opacity:0.6">🔴 Experimental</span> |
+| 🟢 Tools (32) | 🟢 Prompts (0) | 🟢 Resources (0) | <span style="opacity:0.6">🔴 Logging</span> | <span style="opacity:0.6">🔴 Completions</span> | <span style="opacity:0.6">🔴 Experimental</span> |
 | --- | --- | --- | --- | --- | --- |
 
-## 🛠️ Tools (30)
+## 🛠️ Tools (32)
 
 
 - **cargo-add**
@@ -222,6 +222,26 @@
       - <code>toolchain</code> : string<br />
       - <code>workspace</code> : boolean<br />
 
+- **cargo-expand**
+  - Show the result of macro expansion for Rust code. Requires cargo-expand to be installed (cargo install cargo-expand). Useful for debugging procedural macros, derive macros, and understanding what code macros generate.
+  - **Inputs:**
+      - <code>all_features</code> : boolean<br />
+      - <code>features</code> : string [ ]<br />
+      - <code>item</code> : string<br />
+      - <code>kind</code> : string<br />
+      - <code>locking_mode</code> : string<br />
+      - <code>manifest_path</code> : string<br />
+      - <code>name</code> : string<br />
+      - <code>no_default_features</code> : boolean<br />
+      - <code>package</code> : string<br />
+      - <code>profile</code> : string<br />
+      - <code>target</code> : string<br />
+      - <code>target_dir</code> : string<br />
+      - <code>tests</code> : boolean<br />
+      - <code>toolchain</code> : string<br />
+      - <code>ugly</code> : boolean<br />
+      - <code>verbose</code> : boolean<br />
+
 - **cargo-fmt**
   - Formats Rust code using rustfmt. Usually, run without any additional arguments.
   - **Inputs:**
@@ -420,6 +440,28 @@
       - <code>test_args</code> : string [ ]<br />
       - <code>testname</code> : string<br />
       - <code>tests</code> : boolean<br />
+      - <code>toolchain</code> : string<br />
+      - <code>workspace</code> : boolean<br />
+
+- **cargo-tree**
+  - Display a tree visualization of a dependency graph. Useful for understanding dependency relationships, finding duplicate dependencies, and debugging dependency resolution issues.
+  - **Inputs:**
+      - <code>all_features</code> : boolean<br />
+      - <code>depth</code> : integer<br />
+      - <code>duplicates</code> : boolean<br />
+      - <code>edges</code> : string [ ]<br />
+      - <code>exclude</code> : string [ ]<br />
+      - <code>features</code> : string [ ]<br />
+      - <code>format</code> : string<br />
+      - <code>invert</code> : string<br />
+      - <code>locking_mode</code> : string<br />
+      - <code>manifest_path</code> : string<br />
+      - <code>no_dedupe</code> : boolean<br />
+      - <code>no_default_features</code> : boolean<br />
+      - <code>package</code> : string [ ]<br />
+      - <code>prefix</code> : string<br />
+      - <code>prune</code> : string [ ]<br />
+      - <code>target</code> : string<br />
       - <code>toolchain</code> : string<br />
       - <code>workspace</code> : boolean<br />
 
