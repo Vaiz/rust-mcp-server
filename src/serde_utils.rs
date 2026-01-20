@@ -2,8 +2,7 @@ use rmcp::ErrorData;
 
 use crate::globals;
 
-/// Registry that defaults to the global default when not explicitly specified.
-#[derive(Debug, Clone, Default, PartialEq, Eq, serde::Deserialize, schemars::JsonSchema)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, serde::Deserialize)]
 #[serde(transparent)]
 pub struct Registry(Option<String>);
 
@@ -12,6 +11,24 @@ impl Registry {
         self.0
             .as_deref()
             .or_else(|| globals::get_default_registry())
+    }
+}
+
+impl schemars::JsonSchema for Registry {
+    fn schema_name() -> std::borrow::Cow<'static, str> {
+        std::borrow::Cow::Borrowed("string")
+    }
+
+    fn schema_id() -> std::borrow::Cow<'static, str> {
+        std::borrow::Cow::Borrowed("string")
+    }
+
+    fn inline_schema() -> bool {
+        true
+    }
+
+    fn json_schema(_gen: &mut schemars::SchemaGenerator) -> schemars::Schema {
+        schemars::json_schema!({ "type": "string", "default": null })
     }
 }
 

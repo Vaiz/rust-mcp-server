@@ -399,15 +399,6 @@ mod tests {
     fn test_cargo_add_schema() {
         const EXPECTED_SCHEMA: &str = r##"
         {
-  "$defs": {
-    "Registry": {
-      "description": "Registry that defaults to the global default when not explicitly specified.",
-      "type": [
-        "string",
-        "null"
-      ]
-    }
-  },
   "description": "Adds a dependency to a Rust project using cargo add.",
   "properties": {
     "branch": {
@@ -488,8 +479,9 @@ mod tests {
       "type": "string"
     },
     "registry": {
-      "$ref": "#/$defs/Registry",
-      "description": "Package registry for this dependency"
+      "default": null,
+      "description": "Package registry for this dependency",
+      "type": "string"
     },
     "rename": {
       "default": null,

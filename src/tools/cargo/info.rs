@@ -101,15 +101,6 @@ mod tests {
     #[test]
     fn test_cargo_info_schema() {
         const EXPECTED_SCHEMA: &str = r##"{
-  "$defs": {
-    "Registry": {
-      "description": "Registry that defaults to the global default when not explicitly specified.",
-      "type": [
-        "string",
-        "null"
-      ]
-    }
-  },
   "description": "Display information about a package. Information includes package description, list of available features, etc. Equivalent to 'cargo info <SPEC>'.",
   "properties": {
     "config": {
@@ -137,8 +128,9 @@ mod tests {
       "type": "string"
     },
     "registry": {
-      "$ref": "#/$defs/Registry",
-      "description": "Registry to search packages in"
+      "default": null,
+      "description": "Registry to search packages in",
+      "type": "string"
     },
     "version": {
       "default": null,
