@@ -6,7 +6,7 @@ use crate::{
         PackageWithVersion, deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
     },
-    tools::effective_registry,
+    tools::Registry,
 };
 use rmcp::ErrorData;
 
@@ -86,8 +86,8 @@ pub struct CargoAddRequest {
     pub rev: Option<String>,
 
     /// Package registry for this dependency
-    #[serde(default, deserialize_with = "deserialize_string")]
-    pub registry: Option<String>,
+    #[serde(default)]
+    pub registry: Registry,
 
     /// Add as dependency to the given target platform
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -180,7 +180,7 @@ impl CargoAddRequest {
         }
 
         // Registry options
-        if let Some(registry) = effective_registry(self.registry.as_deref()) {
+        if let Some(registry) = self.registry.value() {
             cmd.arg("--registry").arg(registry);
         }
 
@@ -399,6 +399,15 @@ mod tests {
     fn test_cargo_add_schema() {
         const EXPECTED_SCHEMA: &str = r##"
         {
+  "$defs": {
+    "Registry": {
+      "description": "Registry that defaults to the global default when not explicitly specified.",
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
   "description": "Adds a dependency to a Rust project using cargo add.",
   "properties": {
     "branch": {
@@ -479,9 +488,8 @@ mod tests {
       "type": "string"
     },
     "registry": {
-      "default": null,
-      "description": "Package registry for this dependency",
-      "type": "string"
+      "$ref": "#/$defs/Registry",
+      "description": "Package registry for this dependency"
     },
     "rename": {
       "default": null,

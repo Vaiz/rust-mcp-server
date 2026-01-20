@@ -3,7 +3,7 @@ use std::process::Command;
 use crate::{
     Tool, execute_command,
     serde_utils::{deserialize_string, output_verbosity_to_cli_flags},
-    tools::effective_registry,
+    tools::Registry,
 };
 use rmcp::ErrorData;
 
@@ -14,8 +14,8 @@ pub struct CargoSearchRequest {
     /// Limit the number of results (default: 10, max: 100)
     pub limit: Option<u32>,
     /// Registry to search packages in
-    #[serde(default, deserialize_with = "deserialize_string")]
-    pub registry: Option<String>,
+    #[serde(default)]
+    pub registry: Registry,
     /// Output verbosity level.
     ///
     /// Valid options:
@@ -33,7 +33,7 @@ impl CargoSearchRequest {
         if let Some(limit) = self.limit {
             cmd.arg("--limit").arg(limit.to_string());
         }
-        if let Some(registry) = effective_registry(self.registry.as_deref()) {
+        if let Some(registry) = self.registry.value() {
             cmd.arg("--registry").arg(registry);
         }
         let output_flags = output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;

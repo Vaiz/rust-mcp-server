@@ -1,4 +1,5 @@
 mod command;
+mod globals;
 mod meta;
 mod response;
 mod rmcp_server;
@@ -76,14 +77,14 @@ async fn main() -> anyhow::Result<()> {
 
     if let Some(workspace) = args.workspace {
         tracing::info!("Workspace root has been overridden: {workspace}");
-        tools::set_workspace_root(workspace);
+        globals::set_workspace_root(workspace);
     } else {
         tracing::info!("No workspace root specified, using current directory");
     }
 
     if let Some(registry) = args.registry {
         tracing::info!("Default cargo registry has been set: {registry}");
-        tools::set_default_registry(registry);
+        globals::set_default_registry(registry);
     }
 
     let server = rmcp_server::Server::new(&args.disabled_tools, args.no_recommendations);

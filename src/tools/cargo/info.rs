@@ -6,7 +6,7 @@ use crate::{
         PackageWithVersion, deserialize_string, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
     },
-    tools::effective_registry,
+    tools::Registry,
 };
 use rmcp::ErrorData;
 
@@ -22,8 +22,8 @@ pub struct CargoInfoRequest {
     pub index: Option<String>,
 
     /// Registry to search packages in
-    #[serde(default, deserialize_with = "deserialize_string")]
-    pub registry: Option<String>,
+    #[serde(default)]
+    pub registry: Registry,
 
     /// Output verbosity level.
     ///
@@ -59,7 +59,7 @@ impl CargoInfoRequest {
             cmd.arg("--index").arg(index);
         }
 
-        if let Some(registry) = effective_registry(self.registry.as_deref()) {
+        if let Some(registry) = self.registry.value() {
             cmd.arg("--registry").arg(registry);
         }
 
@@ -101,6 +101,15 @@ mod tests {
     #[test]
     fn test_cargo_info_schema() {
         const EXPECTED_SCHEMA: &str = r##"{
+  "$defs": {
+    "Registry": {
+      "description": "Registry that defaults to the global default when not explicitly specified.",
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
   "description": "Display information about a package. Information includes package description, list of available features, etc. Equivalent to 'cargo info <SPEC>'.",
   "properties": {
     "config": {
@@ -128,9 +137,8 @@ mod tests {
       "type": "string"
     },
     "registry": {
-      "default": null,
-      "description": "Registry to search packages in",
-      "type": "string"
+      "$ref": "#/$defs/Registry",
+      "description": "Registry to search packages in"
     },
     "version": {
       "default": null,

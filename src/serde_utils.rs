@@ -1,5 +1,20 @@
 use rmcp::ErrorData;
 
+use crate::globals;
+
+/// Registry that defaults to the global default when not explicitly specified.
+#[derive(Debug, Clone, Default, PartialEq, Eq, serde::Deserialize, schemars::JsonSchema)]
+#[serde(transparent)]
+pub struct Registry(Option<String>);
+
+impl Registry {
+    pub fn value(&self) -> Option<&str> {
+        self.0
+            .as_deref()
+            .or_else(|| globals::get_default_registry())
+    }
+}
+
 /// Utility function for parsing Option<String> fields in serde,
 /// returning None if the string is "null" (case-insensitive) or empty.
 pub fn deserialize_string<'de, D>(deserializer: D) -> Result<Option<String>, D::Error>
