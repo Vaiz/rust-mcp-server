@@ -9,7 +9,7 @@ use crate::{
         deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
     },
-    tools::WORKSPACE_ROOT,
+    tools::get_workspace_root,
 };
 
 #[derive(Debug, ::serde::Deserialize, ::schemars::JsonSchema)]
@@ -274,7 +274,7 @@ impl CargoDocRequest {
         };
 
         // Get the absolute path using workspace root
-        let absolute_doc_dir = if let Some(workspace_root) = WORKSPACE_ROOT.get() {
+        let absolute_doc_dir = if let Some(workspace_root) = get_workspace_root() {
             Path::new(workspace_root).join(&doc_dir)
         } else {
             Path::new(&doc_dir).to_path_buf()

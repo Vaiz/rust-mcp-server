@@ -6,6 +6,7 @@ use crate::{
         PackageWithVersion, deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
     },
+    tools::Registry,
 };
 use rmcp::ErrorData;
 
@@ -85,8 +86,8 @@ pub struct CargoAddRequest {
     pub rev: Option<String>,
 
     /// Package registry for this dependency
-    #[serde(default, deserialize_with = "deserialize_string")]
-    pub registry: Option<String>,
+    #[serde(default)]
+    pub registry: Registry,
 
     /// Add as dependency to the given target platform
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -179,7 +180,7 @@ impl CargoAddRequest {
         }
 
         // Registry options
-        if let Some(registry) = &self.registry {
+        if let Some(registry) = self.registry.value() {
             cmd.arg("--registry").arg(registry);
         }
 

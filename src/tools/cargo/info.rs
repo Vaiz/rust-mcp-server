@@ -6,6 +6,7 @@ use crate::{
         PackageWithVersion, deserialize_string, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
     },
+    tools::Registry,
 };
 use rmcp::ErrorData;
 
@@ -21,8 +22,8 @@ pub struct CargoInfoRequest {
     pub index: Option<String>,
 
     /// Registry to search packages in
-    #[serde(default, deserialize_with = "deserialize_string")]
-    pub registry: Option<String>,
+    #[serde(default)]
+    pub registry: Registry,
 
     /// Output verbosity level.
     ///
@@ -58,7 +59,7 @@ impl CargoInfoRequest {
             cmd.arg("--index").arg(index);
         }
 
-        if let Some(registry) = &self.registry {
+        if let Some(registry) = self.registry.value() {
             cmd.arg("--registry").arg(registry);
         }
 

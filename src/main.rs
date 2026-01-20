@@ -1,4 +1,5 @@
 mod command;
+mod globals;
 mod meta;
 mod response;
 mod rmcp_server;
@@ -37,6 +38,10 @@ struct Args {
     #[arg(long)]
     workspace: Option<String>,
 
+    /// Default cargo registry to use for commands that support registry option
+    #[arg(long)]
+    registry: Option<String>,
+
     /// Generate tools.md documentation file and exit
     #[arg(long)]
     generate_docs: Option<String>,
@@ -72,9 +77,14 @@ async fn main() -> anyhow::Result<()> {
 
     if let Some(workspace) = args.workspace {
         tracing::info!("Workspace root has been overridden: {workspace}");
-        tools::set_workspace_root(workspace);
+        globals::set_workspace_root(workspace);
     } else {
         tracing::info!("No workspace root specified, using current directory");
+    }
+
+    if let Some(registry) = args.registry {
+        tracing::info!("Default cargo registry has been set: {registry}");
+        globals::set_default_registry(registry);
     }
 
     let server = rmcp_server::Server::new(&args.disabled_tools, args.no_recommendations);

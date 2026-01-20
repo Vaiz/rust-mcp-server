@@ -1,5 +1,40 @@
 use rmcp::ErrorData;
 
+use crate::globals;
+
+#[derive(Debug, Clone, Default, PartialEq, Eq, serde::Deserialize)]
+#[serde(transparent)]
+pub struct Registry {
+    #[serde(deserialize_with = "deserialize_string")]
+    value: Option<String>,
+}
+
+impl Registry {
+    pub fn value(&self) -> Option<&str> {
+        self.value
+            .as_deref()
+            .or_else(|| globals::get_default_registry())
+    }
+}
+
+impl schemars::JsonSchema for Registry {
+    fn schema_name() -> std::borrow::Cow<'static, str> {
+        std::borrow::Cow::Borrowed("string")
+    }
+
+    fn schema_id() -> std::borrow::Cow<'static, str> {
+        std::borrow::Cow::Borrowed("string")
+    }
+
+    fn inline_schema() -> bool {
+        true
+    }
+
+    fn json_schema(_gen: &mut schemars::SchemaGenerator) -> schemars::Schema {
+        schemars::json_schema!({ "type": "string", "default": null })
+    }
+}
+
 /// Utility function for parsing Option<String> fields in serde,
 /// returning None if the string is "null" (case-insensitive) or empty.
 pub fn deserialize_string<'de, D>(deserializer: D) -> Result<Option<String>, D::Error>

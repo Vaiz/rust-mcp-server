@@ -34,6 +34,7 @@ use crate::{
         deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
     },
+    tools::Registry,
 };
 use rmcp::ErrorData;
 
@@ -385,8 +386,8 @@ pub struct CargoNewRequest {
     pub vcs: Option<String>,
 
     /// Registry to use
-    #[serde(default, deserialize_with = "deserialize_string")]
-    pub registry: Option<String>,
+    #[serde(default)]
+    pub registry: Registry,
 
     /// Locking mode for dependency resolution.
     ///
@@ -434,7 +435,7 @@ impl CargoNewRequest {
         if let Some(edition) = &self.edition {
             cmd.arg("--edition").arg(edition);
         }
-        if let Some(registry) = &self.registry {
+        if let Some(registry) = self.registry.value() {
             cmd.arg("--registry").arg(registry);
         }
 

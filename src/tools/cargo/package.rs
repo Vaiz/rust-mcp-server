@@ -6,6 +6,7 @@ use crate::{
         deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
     },
+    tools::Registry,
 };
 use rmcp::ErrorData;
 
@@ -121,8 +122,8 @@ pub struct CargoPackageRequest {
     index: Option<String>,
 
     /// [Optional] Registry to prepare the package for (unstable)
-    #[serde(default, deserialize_with = "deserialize_string")]
-    registry: Option<String>,
+    #[serde(default)]
+    registry: Registry,
 
     /// [Optional] Output representation (unstable) [possible values: human, json]
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -238,7 +239,7 @@ impl CargoPackageRequest {
             cmd.arg("--index").arg(index);
         }
 
-        if let Some(registry) = &self.registry {
+        if let Some(registry) = self.registry.value() {
             cmd.arg("--registry").arg(registry);
         }
 

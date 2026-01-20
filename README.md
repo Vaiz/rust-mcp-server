@@ -101,6 +101,12 @@ Specifies the Rust project workspace path for the server to operate in</br>
 **Default**: Current directory</br>
 **Example**: `--workspace /path/to/rust/project`
 
+### `--registry <REGISTRY>`
+
+Sets the default cargo registry for commands that support registry options (e.g., `cargo-search`, `cargo-info`, `cargo-add`). This allows you to use a custom registry defined in your `.cargo/config.toml` without specifying it for each command</br>
+**Default**: None (uses crates.io)</br>
+**Example**: `--registry my-private-registry`
+
 ### `--generate-docs <OUTPUT_FILE>`
 
 Generates markdown documentation file and exits without starting the server</br>
