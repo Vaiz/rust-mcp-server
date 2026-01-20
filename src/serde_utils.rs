@@ -4,11 +4,14 @@ use crate::globals;
 
 #[derive(Debug, Clone, Default, PartialEq, Eq, serde::Deserialize)]
 #[serde(transparent)]
-pub struct Registry(Option<String>);
+pub struct Registry {
+    #[serde(deserialize_with = "deserialize_string")]
+    value: Option<String>,
+}
 
 impl Registry {
     pub fn value(&self) -> Option<&str> {
-        self.0
+        self.value
             .as_deref()
             .or_else(|| globals::get_default_registry())
     }
