@@ -6,6 +6,7 @@ use crate::{
         PackageWithVersion, deserialize_string, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
     },
+    tools::effective_registry,
 };
 use rmcp::ErrorData;
 
@@ -58,7 +59,7 @@ impl CargoInfoRequest {
             cmd.arg("--index").arg(index);
         }
 
-        if let Some(registry) = &self.registry {
+        if let Some(registry) = effective_registry(self.registry.as_deref()) {
             cmd.arg("--registry").arg(registry);
         }
 

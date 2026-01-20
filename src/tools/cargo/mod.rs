@@ -34,6 +34,7 @@ use crate::{
         deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
     },
+    tools::effective_registry,
 };
 use rmcp::ErrorData;
 
@@ -434,7 +435,7 @@ impl CargoNewRequest {
         if let Some(edition) = &self.edition {
             cmd.arg("--edition").arg(edition);
         }
-        if let Some(registry) = &self.registry {
+        if let Some(registry) = effective_registry(self.registry.as_deref()) {
             cmd.arg("--registry").arg(registry);
         }
 
