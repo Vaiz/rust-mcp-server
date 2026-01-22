@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.2](https://github.com/Vaiz/rust-mcp-server/compare/v0.3.1...v0.3.2) - 2026-01-20
+
+### Added
+
+- add cli option to set default registry ([#85](https://github.com/Vaiz/rust-mcp-server/pull/85))
+- add cargo-tree and cargo-expand tools ([#84](https://github.com/Vaiz/rust-mcp-server/pull/84))
+
 ## [0.3.1](https://github.com/Vaiz/rust-mcp-server/compare/v0.3.0...v0.3.1) - 2025-12-20
 
 ### Added
