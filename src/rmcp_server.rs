@@ -2,7 +2,7 @@ use std::{collections::HashMap, sync::Arc};
 
 use rmcp::{
     ErrorData,
-    model::{ListToolsResult, PaginatedRequestParam, ServerInfo},
+    model::{ListToolsResult, PaginatedRequestParams, ServerInfo},
     service::RequestContext,
 };
 
@@ -210,7 +210,7 @@ impl rmcp::ServerHandler for Server {
     }
     async fn list_tools(
         &self,
-        _request: Option<PaginatedRequestParam>,
+        _request: Option<PaginatedRequestParams>,
         _context: RequestContext<rmcp::RoleServer>,
     ) -> Result<ListToolsResult, ErrorData> {
         let mut tools: Vec<rmcp::model::Tool> = Vec::new();
@@ -238,7 +238,7 @@ impl rmcp::ServerHandler for Server {
 
     async fn call_tool(
         &self,
-        request: rmcp::model::CallToolRequestParam,
+        request: rmcp::model::CallToolRequestParams,
         _context: RequestContext<rmcp::RoleServer>,
     ) -> Result<rmcp::model::CallToolResult, ErrorData> {
         let tool = self.tools.get(request.name.as_ref()).ok_or_else(|| {
