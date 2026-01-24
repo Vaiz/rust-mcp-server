@@ -19,6 +19,8 @@ use tracing_appender::rolling;
 use tracing_subscriber::{EnvFilter, fmt};
 use version::AppVersion;
 
+const RMCP_VERSION: &str = env!("RMCP_VERSION");
+
 #[derive(Parser, Debug)]
 #[command(author, version = AppVersion, about = "Rust MCP Server", long_about = None)]
 struct Args {
@@ -74,6 +76,7 @@ async fn main() -> anyhow::Result<()> {
     }
     tracing::info!("Starting Rust MCP Server: {args:?}");
     tracing::info!("Server version: {}", AppVersion::version());
+    tracing::info!("RMCP crate version: {RMCP_VERSION}");
 
     if let Some(workspace) = args.workspace {
         tracing::info!("Workspace root has been overridden: {workspace}");
