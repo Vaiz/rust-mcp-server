@@ -200,9 +200,13 @@ impl rmcp::ServerHandler for Server {
             },
             server_info: Implementation {
                 name: "Rust MCP Server".to_owned(),
+                title: Some("Rust MCP Server".to_owned()),
+                description: Some(
+                    "Provides access to cargo, rustc, rustup, and other Rust-related tools via the MCP protocol"
+                        .to_owned(),
+                ),
                 version: AppVersion::version(),
                 icons: None,
-                title: Some("Rust MCP Server".to_owned()),
                 website_url: Some("https://github.com/Vaiz/rust-mcp-server".to_owned()),
             },
             instructions: Some(include_str!("../docs/instructions.md").to_owned()),
@@ -214,6 +218,9 @@ impl rmcp::ServerHandler for Server {
         _context: RequestContext<rmcp::RoleServer>,
     ) -> Result<ListToolsResult, ErrorData> {
         let mut tools: Vec<rmcp::model::Tool> = Vec::new();
+        // currently none of the tools support tasking
+        let execution = rmcp::model::ToolExecution::new()
+            .with_task_support(rmcp::model::TaskSupport::Forbidden);
 
         for tool in self.tools.values() {
             let schema = Arc::new(tool.json_schema());
@@ -226,6 +233,7 @@ impl rmcp::ServerHandler for Server {
                 annotations: None,
                 icons: None,
                 meta: None,
+                execution: Some(execution.clone()),
             });
         }
 
