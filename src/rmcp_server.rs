@@ -218,6 +218,9 @@ impl rmcp::ServerHandler for Server {
         _context: RequestContext<rmcp::RoleServer>,
     ) -> Result<ListToolsResult, ErrorData> {
         let mut tools: Vec<rmcp::model::Tool> = Vec::new();
+        // currently none of the tools support tasking
+        let execution = rmcp::model::ToolExecution::new()
+            .with_task_support(rmcp::model::TaskSupport::Forbidden);
 
         for tool in self.tools.values() {
             let schema = Arc::new(tool.json_schema());
@@ -230,6 +233,7 @@ impl rmcp::ServerHandler for Server {
                 annotations: None,
                 icons: None,
                 meta: None,
+                execution: Some(execution.clone()),
             });
         }
 
