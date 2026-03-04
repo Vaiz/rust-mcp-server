@@ -1,0 +1,11 @@
+---
+source: src/tools/cargo_insta.rs
+expression: args
+---
+[
+    "insta",
+    "test",
+    "--accept",
+    "--workspace",
+    "--all-features",
+]
