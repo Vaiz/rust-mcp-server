@@ -85,13 +85,8 @@ mod tests {
             exit_status: ExitStatus(std::process::ExitStatus::default()),
         };
         let mut response: Response = output.into();
-        response.add_content(
-            RawContent::text("additional content").annotate(Annotations {
-                audience: None,
-                priority: None,
-                last_modified: None,
-            }),
-        );
+        response
+            .add_content(RawContent::text("additional content").annotate(Annotations::default()));
         response.add_recommendation("Consider checking the logs.");
 
         let rmcp_result = response.into_rmcp_result(false);

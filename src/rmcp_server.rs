@@ -199,25 +199,25 @@ impl rmcp::ServerHandler for Server {
             Implementation, InitializeResult, ProtocolVersion, ServerCapabilities, ToolsCapability,
         };
 
-        InitializeResult {
-            protocol_version: ProtocolVersion::LATEST,
-            capabilities: ServerCapabilities {
-                tools: Some(ToolsCapability { list_changed: None }),
-                ..Default::default()
-            },
-            server_info: Implementation {
-                name: "Rust MCP Server".to_owned(),
-                title: Some("Rust MCP Server".to_owned()),
-                description: Some(
-                    "Provides access to cargo, rustc, rustup, and other Rust-related tools via the MCP protocol"
-                        .to_owned(),
-                ),
-                version: AppVersion::version(),
-                icons: None,
-                website_url: Some("https://github.com/Vaiz/rust-mcp-server".to_owned()),
-            },
-            instructions: Some(include_str!("../docs/instructions.md").to_owned()),
-        }
+        let mut capabilities = ServerCapabilities::default();
+        capabilities.tools = Some(ToolsCapability { list_changed: None });
+
+        let mut server_info = Implementation::default();
+        server_info.name = "Rust MCP Server".to_owned();
+        server_info.title = Some("Rust MCP Server".to_owned());
+        server_info.description = Some(
+            "Provides access to cargo, rustc, rustup, and other Rust-related tools via the MCP protocol"
+                .to_owned(),
+        );
+        server_info.version = AppVersion::version();
+        server_info.website_url = Some("https://github.com/Vaiz/rust-mcp-server".to_owned());
+
+        let mut result = InitializeResult::default();
+        result.protocol_version = ProtocolVersion::LATEST;
+        result.capabilities = capabilities;
+        result.server_info = server_info;
+        result.instructions = Some(include_str!("../docs/instructions.md").to_owned());
+        result
     }
     async fn list_tools(
         &self,
@@ -231,17 +231,13 @@ impl rmcp::ServerHandler for Server {
 
         for tool in self.tools.values() {
             let schema = Arc::new(tool.json_schema());
-            tools.push(rmcp::model::Tool {
-                name: tool.name().into(),
-                title: Some(tool.title().into()),
-                description: Some(tool.description().trim().trim_matches('\n').into()),
-                input_schema: schema,
-                output_schema: None,
-                annotations: None,
-                icons: None,
-                meta: None,
-                execution: Some(execution.clone()),
-            });
+            let mut tool_def = rmcp::model::Tool::default();
+            tool_def.name = tool.name().into();
+            tool_def.title = Some(tool.title().into());
+            tool_def.description = Some(tool.description().trim().trim_matches('\n').into());
+            tool_def.input_schema = schema;
+            tool_def.execution = Some(execution.clone());
+            tools.push(tool_def);
         }
 
         Ok(ListToolsResult {

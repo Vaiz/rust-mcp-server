@@ -13,15 +13,15 @@ pub(crate) struct CommandLine(pub String);
 
 impl From<CommandLine> for Annotated<RawContent> {
     fn from(val: CommandLine) -> Self {
+        let mut annotations = Annotations::default();
+        annotations.audience = Some(vec![Role::User]);
+        annotations.priority = Some(0.5);
+
         text_with_description(
             format!("Executed command: `{}`", val.0),
             "command line executed by MCP server",
         )
-        .annotate(Annotations {
-            audience: Some(vec![Role::User]),
-            last_modified: None,
-            priority: Some(0.5),
-        })
+        .annotate(annotations)
     }
 }
 
@@ -30,11 +30,11 @@ pub(crate) struct Stdout(pub String);
 
 impl From<Stdout> for Annotated<RawContent> {
     fn from(val: Stdout) -> Self {
-        text_with_description(val.0, "stdout").annotate(Annotations {
-            audience: Some(vec![Role::User, Role::Assistant]),
-            last_modified: None,
-            priority: Some(0.2),
-        })
+        let mut annotations = Annotations::default();
+        annotations.audience = Some(vec![Role::User, Role::Assistant]);
+        annotations.priority = Some(0.2);
+
+        text_with_description(val.0, "stdout").annotate(annotations)
     }
 }
 
@@ -43,11 +43,11 @@ pub(crate) struct Stderr(pub String);
 
 impl From<Stderr> for Annotated<RawContent> {
     fn from(val: Stderr) -> Self {
-        text_with_description(val.0, "stderr").annotate(Annotations {
-            audience: Some(vec![Role::User, Role::Assistant]),
-            last_modified: None,
-            priority: Some(1.),
-        })
+        let mut annotations = Annotations::default();
+        annotations.audience = Some(vec![Role::User, Role::Assistant]);
+        annotations.priority = Some(1.);
+
+        text_with_description(val.0, "stderr").annotate(annotations)
     }
 }
 
@@ -74,11 +74,11 @@ impl ExitStatus {
             meta: Some(meta.into()),
         });
 
-        content.annotate(Annotations {
-            audience: Some(vec![Role::User, Role::Assistant]),
-            last_modified: None,
-            priority: Some(1.),
-        })
+        let mut annotations = Annotations::default();
+        annotations.audience = Some(vec![Role::User, Role::Assistant]);
+        annotations.priority = Some(1.);
+
+        content.annotate(annotations)
     }
 }
 
@@ -91,11 +91,11 @@ impl From<AgentRecommendation> for Annotated<RawContent> {
             "recommendation for next action by the agent",
         );
 
-        content.annotate(Annotations {
-            audience: Some(vec![Role::Assistant]),
-            last_modified: None,
-            priority: Some(1.),
-        })
+        let mut annotations = Annotations::default();
+        annotations.audience = Some(vec![Role::Assistant]);
+        annotations.priority = Some(1.);
+
+        content.annotate(annotations)
     }
 }
 
@@ -165,12 +165,10 @@ impl From<Output> for CallToolResult {
 
         content.push(val.exit_status.as_content(&val.tool_name));
 
-        CallToolResult {
-            content,
-            is_error: Some(!val.exit_status.0.success()),
-            meta: None,
-            structured_content: None,
-        }
+        let mut result = CallToolResult::default();
+        result.content = content;
+        result.is_error = Some(!val.exit_status.0.success());
+        result
     }
 }
 

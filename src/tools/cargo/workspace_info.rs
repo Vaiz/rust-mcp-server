@@ -98,11 +98,11 @@ impl Tool for CargoWorkspaceInfoRmcpTool {
 
         let mut response: crate::Response = output.into();
         let workspace_info = WorkspaceInfo { packages };
-        let workspace_info = RawContent::json(workspace_info)?.annotate(Annotations {
-            audience: Some(vec![Role::User, Role::Assistant]),
-            last_modified: None,
-            priority: Some(1.),
-        });
+        let mut annotations = Annotations::default();
+        annotations.audience = Some(vec![Role::User, Role::Assistant]);
+        annotations.priority = Some(1.);
+
+        let workspace_info = RawContent::json(workspace_info)?.annotate(annotations);
 
         response.add_content(workspace_info);
         Ok(response)
