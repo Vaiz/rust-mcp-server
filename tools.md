@@ -1,8 +1,8 @@
 ## Rust MCP Server
-| 🟢 Tools (32) | 🟢 Prompts (0) | 🟢 Resources (0) | <span style="opacity:0.6">🔴 Logging</span> | <span style="opacity:0.6">🔴 Completions</span> | <span style="opacity:0.6">🔴 Experimental</span> |
+| 🟢 Tools (33) | 🟢 Prompts (0) | 🟢 Resources (0) | <span style="opacity:0.6">🔴 Logging</span> | <span style="opacity:0.6">🔴 Completions</span> | <span style="opacity:0.6">🔴 Experimental</span> |
 | --- | --- | --- | --- | --- | --- |
 
-## 🛠️ Tools (32)
+## 🛠️ Tools (33)
 
 
 - **cargo-add**
@@ -313,6 +313,12 @@
       - <code>package</code> : string<br />
       - <code>registry</code> : string<br />
       - <code>version</code> : string<br />
+
+- **cargo-insta-update-snapshots**
+  - Generates and updates `cargo insta` snapshot files fixing tests with outdated snapshots
+  - **Inputs:**
+      - <code>manifest_path</code> : string<br />
+      - <code>workspace_root</code> : string<br />
 
 - **cargo-list**
   - Lists installed cargo commands using 'cargo --list'.

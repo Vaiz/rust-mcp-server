@@ -23,6 +23,7 @@ use crate::{
         },
         cargo_expand::CargoExpandRmcpTool,
         cargo_hack::{CargoHackInstallRmcpTool, CargoHackRmcpTool},
+        cargo_insta::CargoInstaUpdateSnapshotsRmcpTool,
         cargo_machete::{CargoMacheteInstallRmcpTool, CargoMacheteRmcpTool},
         rustc::RustcExplainRmcpTool,
         rustup::{RustupShowRmcpTool, RustupToolchainAddRmcpTool, RustupUpdateRmcpTool},
@@ -84,6 +85,12 @@ impl Server {
         tools.insert(
             CargoHackInstallRmcpTool::NAME,
             Box::new(CargoHackInstallRmcpTool),
+        );
+
+        // Cargo-insta tools
+        tools.insert(
+            CargoInstaUpdateSnapshotsRmcpTool::NAME,
+            Box::new(CargoInstaUpdateSnapshotsRmcpTool),
         );
 
         // Cargo-machete tools

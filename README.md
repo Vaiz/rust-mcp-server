@@ -59,6 +59,7 @@ rust-mcp-server exposes a comprehensive set of Rust development tools to the LLM
 *   **`cargo-deny-init`**: Create a cargo-deny config from a template
 *   **`cargo-deny-list`**: List all licenses and the crates that use them
 *   **`cargo-deny-install`**: Install cargo-deny tool
+*   **`cargo-insta-update-snapshots`**: Generate and update insta snapshots in one command
 *   **`cargo-machete`**: Find unused dependencies
 *   **`cargo-machete-install`**: Install cargo-machete tool
 *   **`cargo-hack`**: Advanced testing and feature validation with powerset testing, version compatibility checks, and CI optimization
