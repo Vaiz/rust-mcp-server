@@ -355,11 +355,11 @@ impl Tool for CargoDocRmcpTool {
             "Documentation generated successfully!".to_owned()
         };
 
-        response.add_content(RawContent::text(doc_info).annotate(Annotations {
-            audience: Some(vec![Role::User, Role::Assistant]),
-            last_modified: None,
-            priority: Some(0.5),
-        }));
+        let mut annotations = Annotations::default();
+        annotations.audience = Some(vec![Role::User, Role::Assistant]);
+        annotations.priority = Some(0.5);
+
+        response.add_content(RawContent::text(doc_info).annotate(annotations));
 
         if duration.as_secs() >= 30 && !request.no_deps.unwrap_or(false) {
             response.add_recommendation(

@@ -117,6 +117,9 @@ async fn main() -> anyhow::Result<()> {
             tracing::error!("Server join error: {error}");
             return Err(error.into());
         }
+        Ok(reason) => {
+            tracing::info!("Server exited with reason: {reason:?}");
+        }
         Err(error) => {
             tracing::error!("Server encountered an error: {error}");
             return Err(error.into());
