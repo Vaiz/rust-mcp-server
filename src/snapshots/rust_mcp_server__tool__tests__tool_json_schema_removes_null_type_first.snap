@@ -1,0 +1,14 @@
+---
+source: src/tool.rs
+expression: schema
+---
+{
+    "properties": Object {
+        "value": Object {
+            "default": Null,
+            "type": String("string"),
+        },
+    },
+    "title": String("Example"),
+    "type": String("object"),
+}

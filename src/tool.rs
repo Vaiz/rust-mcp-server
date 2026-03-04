@@ -91,6 +91,7 @@ fn json_schema_impl<T: JsonSchema>() -> serde_json::Map<String, serde_json::Valu
 #[cfg(test)]
 mod tests {
     use super::json_schema_impl;
+    use insta::assert_debug_snapshot;
 
     #[test]
     fn test_tool_json_schema_removes_null_type_first() {
@@ -101,15 +102,7 @@ mod tests {
         }
 
         let schema = json_schema_impl::<Example>();
-        let props = schema.get("properties").unwrap();
-        let value_schema = props.get("value").unwrap();
-        if let serde_json::Value::Object(obj) = value_schema {
-            // Should not be an array of types, just "string"
-            let ty = obj.get("type").unwrap();
-            assert_eq!(ty, "string");
-        } else {
-            panic!("Expected value property to be an object");
-        }
+        assert_debug_snapshot!("tool_json_schema_removes_null_type_first", schema);
     }
 
     #[test]
@@ -160,23 +153,7 @@ mod tests {
         }
 
         let schema = json_schema_impl::<Example>();
-        let props = schema.get("properties").unwrap();
-        let opt_schema = props.get("opt").unwrap();
-        let num_schema = props.get("num").unwrap();
-
-        if let serde_json::Value::Object(obj) = opt_schema {
-            let ty = obj.get("type").unwrap();
-            assert_eq!(ty, "string");
-        } else {
-            panic!("Expected opt property to be an object");
-        }
-
-        if let serde_json::Value::Object(obj) = num_schema {
-            let ty = obj.get("type").unwrap();
-            assert_eq!(ty, "integer");
-        } else {
-            panic!("Expected num property to be an object");
-        }
+        assert_debug_snapshot!("tool_json_schema_handles_multiple_properties", schema);
     }
 
     #[test]

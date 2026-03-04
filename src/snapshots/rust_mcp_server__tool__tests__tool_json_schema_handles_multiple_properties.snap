@@ -1,0 +1,21 @@
+---
+source: src/tool.rs
+expression: schema
+---
+{
+    "properties": Object {
+        "num": Object {
+            "format": String("int32"),
+            "type": String("integer"),
+        },
+        "opt": Object {
+            "default": Null,
+            "type": String("string"),
+        },
+    },
+    "required": Array [
+        String("num"),
+    ],
+    "title": String("Example"),
+    "type": String("object"),
+}
