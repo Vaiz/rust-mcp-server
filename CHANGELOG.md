@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.6](https://github.com/Vaiz/rust-mcp-server/compare/v0.3.5...v0.3.6) - 2026-03-09
+
+### Added
+
+- enhance cargo-insta with additional options ([#98](https://github.com/Vaiz/rust-mcp-server/pull/98))
+- add cargo-insta-update-snapshots tool ([#95](https://github.com/Vaiz/rust-mcp-server/pull/95))
+
+### Other
+
+- bump rmpc to 1.1.1 and remove docker.yml ([#102](https://github.com/Vaiz/rust-mcp-server/pull/102))
+- update rmcp version to 1.1.0 ([#97](https://github.com/Vaiz/rust-mcp-server/pull/97))
+
 ## [0.3.5](https://github.com/Vaiz/rust-mcp-server/compare/v0.3.4...v0.3.5) - 2026-02-28
 
 ### Other
