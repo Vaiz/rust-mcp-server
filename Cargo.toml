@@ -22,7 +22,7 @@ include = [
 
 [dependencies]
 anyhow = "1.0.98"
-clap = { version = "4.5.40", default-features = false, features = ["std", "help", "error-context", "usage", "suggestions", "derive", "string"] }
+clap = { version = "4.6.0", default-features = false, features = ["std", "help", "error-context", "usage", "suggestions", "derive", "string"] }
 rmcp = { version = "1.1.1", default-features = false, features = ["server", "transport-io"] }
 schemars = "1.1.0"
 serde = { version ="1.0.219", features = ["derive"] }
