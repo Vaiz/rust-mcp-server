@@ -2,6 +2,13 @@ use rmcp::{model::Root, service::NotificationContext};
 
 use crate::globals;
 
+/// Applies the workspace root to a command if it is set
+pub fn apply_workspace_root(cmd: &mut std::process::Command) {
+    if let Some(root) = globals::get_workspace_root() {
+        cmd.current_dir(root);
+    }
+}
+
 /// Decides whether automatic workspace detection is needed and, if so,
 /// tries to find a Cargo project through the MCP client's roots capability.
 ///
@@ -84,34 +91,79 @@ pub fn detect_rust_workspace(context: NotificationContext<rmcp::RoleServer>) {
 /// Handles:
 /// - `file:///path/to/dir` (Unix)
 /// - `file:///C:/path/to/dir` (Windows, leading slash before drive letter stripped)
+/// - `file:///d%3A/path` (Windows, percent-encoded colon in drive letter)
 /// - `file://localhost/path` (optional localhost authority)
 fn file_uri_to_path(uri: &str) -> Option<std::path::PathBuf> {
-    let after_scheme = uri.strip_prefix("file://")?;
-    // Strip optional "localhost" authority (file://localhost/path)
-    let path_str = after_scheme
-        .strip_prefix("localhost")
-        .unwrap_or(after_scheme);
-    let path_str = strip_windows_drive_slash(path_str);
-    Some(std::path::PathBuf::from(path_str))
+    let path = uri.strip_prefix("file://")?;
+    // Strip optional "localhost" authority
+    let path = path.strip_prefix("localhost").unwrap_or(path);
+    // Percent-decode the path component
+    let decoded = percent_encoding::percent_decode_str(path)
+        .decode_utf8()
+        .ok()?;
+    // On Windows, strip the leading slash before the drive letter (/C:/ -> C:/)
+    #[cfg(windows)]
+    let decoded = {
+        let b = decoded.as_bytes();
+        // `/C:`
+        if b.len() >= 3 && b[0] == b'/' && b[1].is_ascii_alphabetic() && b[2] == b':' {
+            std::borrow::Cow::Borrowed(&decoded[1..])
+        } else {
+            decoded
+        }
+    };
+    Some(std::path::PathBuf::from(decoded.as_ref()))
 }
 
-#[cfg(windows)]
-fn strip_windows_drive_slash(path: &str) -> &str {
-    let bytes = path.as_bytes();
-    if bytes.len() >= 3 && bytes[0] == b'/' && bytes[1].is_ascii_alphabetic() && bytes[2] == b':' {
-        &path[1..]
-    } else {
-        path
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_non_file_uri_returns_none() {
+        assert!(file_uri_to_path("https://example.com/path").is_none());
     }
-}
 
-#[cfg(not(windows))]
-fn strip_windows_drive_slash(path: &str) -> &str {
-    path
-}
+    #[cfg(windows)]
+    #[test]
+    fn test_windows_drive_letter() {
+        let path = file_uri_to_path("file:///C:/Users/user/project").unwrap();
+        assert_eq!(path, std::path::PathBuf::from("C:\\Users\\user\\project"));
+    }
 
-pub fn apply_workspace_root(cmd: &mut std::process::Command) {
-    if let Some(root) = globals::get_workspace_root() {
-        cmd.current_dir(root);
+    #[cfg(windows)]
+    #[test]
+    fn test_windows_percent_encoded_colon() {
+        let path = file_uri_to_path("file:///d%3A/projects/myapp").unwrap();
+        assert_eq!(path, std::path::PathBuf::from("d:\\projects\\myapp"));
+    }
+
+    #[cfg(windows)]
+    #[test]
+    fn test_windows_percent_encoded_colon_uppercase() {
+        let path = file_uri_to_path("file:///D%3A/projects/myapp").unwrap();
+        assert_eq!(path, std::path::PathBuf::from("D:\\projects\\myapp"));
+    }
+
+    #[cfg(not(windows))]
+    #[test]
+    fn test_path_with_spaces() {
+        // Spaces encoded as %20
+        let path = file_uri_to_path("file:///path%20with%20spaces").unwrap();
+        assert_eq!(path, std::path::PathBuf::from("/path with spaces"));
+    }
+
+    #[cfg(not(windows))]
+    #[test]
+    fn test_unix_path() {
+        let path = file_uri_to_path("file:///home/user/project").unwrap();
+        assert_eq!(path, std::path::PathBuf::from("/home/user/project"));
+    }
+
+    #[cfg(not(windows))]
+    #[test]
+    fn test_localhost_authority() {
+        let path = file_uri_to_path("file://localhost/home/user/project").unwrap();
+        assert_eq!(path, std::path::PathBuf::from("/home/user/project"));
     }
 }
