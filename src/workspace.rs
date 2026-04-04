@@ -96,6 +96,7 @@ fn file_uri_to_path(uri: &str) -> Option<std::path::PathBuf> {
     let decoded = percent_encoding::percent_decode_str(path)
         .decode_utf8()
         .ok()?;
+    let decoded = decoded.as_ref();
     // On Windows, strip the leading slash before the drive letter (/C:/ -> C:/)
     #[cfg(windows)]
     let decoded = {
