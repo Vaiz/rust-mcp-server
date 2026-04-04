@@ -7,6 +7,7 @@ mod serde_utils;
 mod tool;
 mod tools;
 mod version;
+mod workspace;
 
 use anyhow::Context;
 use clap::Parser;
@@ -78,11 +79,12 @@ async fn main() -> anyhow::Result<()> {
     tracing::info!("Server version: {}", AppVersion::version());
     tracing::info!("RMCP crate version: {RMCP_VERSION}");
 
+    let detect_workspace = args.workspace.is_none();
     if let Some(workspace) = args.workspace {
         tracing::info!("Workspace root has been overridden: {workspace}");
         globals::set_workspace_root(workspace);
     } else {
-        tracing::info!("No workspace root specified, using current directory");
+        tracing::info!("No workspace root specified, workspace auto-detection enabled");
     }
 
     if let Some(registry) = args.registry {
@@ -90,7 +92,11 @@ async fn main() -> anyhow::Result<()> {
         globals::set_default_registry(registry);
     }
 
-    let server = rmcp_server::Server::new(&args.disabled_tools, args.no_recommendations);
+    let server = rmcp_server::Server::new(
+        &args.disabled_tools,
+        args.no_recommendations,
+        detect_workspace,
+    );
 
     // Handle documentation generation mode
     if let Some(output_file) = args.generate_docs {
