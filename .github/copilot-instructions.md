@@ -1,7 +1,5 @@
 # Copilot Instructions for Rust MCP Server
 
-<!-- Use this file to provide workspace-specific custom instructions to Copilot. For more details, visit https://code.visualstudio.com/docs/copilot/copilot-customization#_use-a-githubcopilotinstructionsmd-file -->
-
 This is a Rust implementation of a Model Context Protocol (MCP) server.
 
 ## Project Context
@@ -26,7 +24,7 @@ This is a Rust implementation of a Model Context Protocol (MCP) server.
 ## Dependencies
 - `tokio`: Async runtime
 - `serde`: Serialization/deserialization
-- `rust-mcp-sdk`: MCP protocol handling
+- `rmcp`: MCP protocol handling
 - `anyhow`: Error handling
 - `tracing`: Structured logging
 
@@ -34,29 +32,33 @@ This is a Rust implementation of a Model Context Protocol (MCP) server.
 
 ### 1. Always Use Rust MCP Tools
 
-- **DO**: Use `Rust-cargo-build` instead of direct `bash` commands like `cargo build`
-- **DO**: Use `Rust-cargo-check` for quick code validation
-- **DO**: Use `Rust-cargo-clippy` for linting instead of manual clippy commands
-- **WHY**: MCP tools provide better defaults, structured output, and superior error handling
+- Use `#cargo-check` for quick code validation
+- Use `#cargo-clippy` for linting
+- Use `#cargo-fmt` for code formatting
+- Use `#cargo-test` for running tests
+
+### 2. use @rust-docs subagent
+
+- For any questions about public API for dependencies or standard library, consult the `@rust-docs` subagent. Just ask it what you looking for in natural language, and it will fetch the relevant documentation for you.
 
 ### 2. Development Workflow
 
 Follow this systematic approach when working on code changes:
 
-1. **Check current state**: Use `Rust-cargo-check` with `all_targets: true, all_features: true`
+1. **Check current state**: Use `#cargo-check` with `all_targets: true, all_features: true`
 2. **Make changes**: Edit code using appropriate development tools
-3. **Validate**: Use `Rust-cargo-clippy` with `workspace: true, all_targets: true`
-4. **Format**: Use `Rust-cargo-fmt` with `all: true`
-5. **Test**: Use `Rust-cargo-test` with `all_features: true`
-6. **Build**: Use `Rust-cargo-build` with `all_targets: true, all_features: true` for final verification
-7. **Check unused dependencies**: Use `Rust-cargo-machete` to identify unused dependencies
-8. **Verify security compliance**: Use `Rust-cargo-deny-check` to ensure security and licensing compliance
+3. **Validate**: Use `#cargo-clippy` with `workspace: true, all_targets: true`
+4. **Format**: Use `#cargo-fmt` with `all: true`
+5. **Test**: Use `#cargo-test` with `all_features: true`
+6. **Build**: Use `#cargo-build` with `all_targets: true, all_features: true` for final verification
+7. **Check unused dependencies**: Use `#cargo-machete` to identify unused dependencies
+8. **Verify security compliance**: Use `#cargo-deny-check` to ensure security and licensing compliance
 
 ### 3. Dependency Management
 
 - When adding dependencies, prefer workspace-level dependencies in the root `Cargo.toml`
-- Use `Rust-cargo-add` and `Rust-cargo-remove` for dependency management
-- Regularly run `Rust-cargo-update` to keep dependencies current
+- Use `#cargo-add` and `#cargo-remove` for dependency management
+- Regularly run `#cargo-update` to keep dependencies current
 
 ### 4. Code Quality Standards
 
