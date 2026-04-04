@@ -3,7 +3,12 @@
         "rust-mcp-server": {
             "type": "stdio",
             "command": "./tmp/rust-mcp-server.exe",
-            "args": ["--log-file", "./tmp/rust-mcp-server.log"],
+            "args": [
+                "--log-file",
+                "./tmp/rust-mcp-server.log",
+                "--log-level",
+                "debug"
+            ],
         }
     }
 }
