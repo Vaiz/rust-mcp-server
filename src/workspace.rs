@@ -67,11 +67,14 @@ pub fn detect_rust_workspace(context: NotificationContext<rmcp::RoleServer>) {
             result.roots
         );
         for Root { uri, .. } in result.roots {
-            tracing::info!("Checking root for Cargo project: {uri}");
             let Some(path) = file_uri_to_path(&uri) else {
                 tracing::warn!("Could not convert root URI to a filesystem path: {uri}");
                 continue;
             };
+            tracing::info!(
+                "Checking root for Cargo project: {uri} -> {}",
+                path.display()
+            );
             if path.join("Cargo.toml").exists() {
                 tracing::info!(
                     "Found Cargo project in root, setting as workspace: {}",
