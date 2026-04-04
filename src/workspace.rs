@@ -95,9 +95,7 @@ pub fn detect_rust_workspace(context: NotificationContext<rmcp::RoleServer>) {
 /// - `file://localhost/path` (optional localhost authority)
 fn file_uri_to_path(uri: &str) -> Option<std::path::PathBuf> {
     let path = uri.strip_prefix("file://")?;
-    // Strip optional "localhost" authority
     let path = path.strip_prefix("localhost").unwrap_or(path);
-    // Percent-decode the path component
     let decoded = percent_encoding::percent_decode_str(path)
         .decode_utf8()
         .ok()?;
@@ -107,12 +105,12 @@ fn file_uri_to_path(uri: &str) -> Option<std::path::PathBuf> {
         let b = decoded.as_bytes();
         // `/C:`
         if b.len() >= 3 && b[0] == b'/' && b[1].is_ascii_alphabetic() && b[2] == b':' {
-            std::borrow::Cow::Borrowed(&decoded[1..])
+            &decoded[1..]
         } else {
-            decoded
+            &decoded
         }
     };
-    Some(std::path::PathBuf::from(decoded.as_ref()))
+    Some(std::path::PathBuf::from(decoded))
 }
 
 #[cfg(test)]
