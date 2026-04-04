@@ -41,17 +41,10 @@ pub fn detect_rust_workspace(context: NotificationContext<rmcp::RoleServer>) {
         .is_some();
     tracing::info!("Checking client roots capability: supports_roots={supports_roots}");
 
-    if !supports_roots {
-        tracing::warn!(
-            "Client does not support roots capability; workspace auto-detection is not possible"
-        );
-        return;
-    }
-
     // Spawn onto a separate task to avoid blocking the notification handler,
     // which would deadlock if the client waits for the server to finish
     // processing this notification before responding to roots/list.
-    tokio::spawn(async move {
+    let fut = async move {
         tracing::info!("Requesting workspace roots from client");
         let result = match context.peer.list_roots().await {
             Ok(result) => result,
@@ -86,6 +79,14 @@ pub fn detect_rust_workspace(context: NotificationContext<rmcp::RoleServer>) {
             tracing::debug!("No Cargo.toml found in root: {}", path.display());
         }
         tracing::warn!("No Cargo project found in any client root; workspace unset");
+    };
+
+    tokio::spawn(async move {
+        let _ = tokio::time::timeout(std::time::Duration::from_secs(10), fut)
+            .await
+            .inspect_err(|_| {
+                tracing::warn!("Workspace detection timed out after 10 seconds");
+            });
     });
 }
 
