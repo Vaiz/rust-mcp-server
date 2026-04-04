@@ -275,7 +275,7 @@ impl CargoDocRequest {
 
         // Get the absolute path using workspace root
         let absolute_doc_dir = if let Some(workspace_root) = get_workspace_root() {
-            Path::new(workspace_root).join(&doc_dir)
+            workspace_root.join(&doc_dir)
         } else {
             Path::new(&doc_dir).to_path_buf()
         };

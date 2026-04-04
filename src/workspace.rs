@@ -66,9 +66,11 @@ pub fn detect_rust_workspace(context: NotificationContext<rmcp::RoleServer>) {
                 continue;
             };
             if path.join("Cargo.toml").exists() {
-                let path_str = path.to_str().expect("Invalid UTF-8 in path").to_owned();
-                tracing::info!("Found Cargo project in root, setting as workspace: {path_str}");
-                globals::try_set_workspace_root(path_str);
+                tracing::info!(
+                    "Found Cargo project in root, setting as workspace: {}",
+                    path.display()
+                );
+                globals::try_set_workspace_root(path);
                 return;
             }
             tracing::debug!("No Cargo.toml found in root: {}", path.display());
