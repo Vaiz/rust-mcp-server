@@ -9,13 +9,7 @@ pub fn apply_workspace_root(cmd: &mut std::process::Command) {
     }
 }
 
-/// Decides whether automatic workspace detection is needed and, if so,
-/// tries to find a Cargo project through the MCP client's roots capability.
-///
-/// Decision tree:
-/// 1. CWD contains `Cargo.toml`      -> already in a Cargo project, nothing to do.
-/// 2. Client supports roots          -> spawn a task that iterates the roots and
-///    sets the first one that contains a `Cargo.toml` as the workspace root.
+/// If CWD contains `Cargo.toml` then function does nothing. Otherwise it tries to detect workspace root from client roots.
 pub fn detect_rust_workspace(context: NotificationContext<rmcp::RoleServer>) {
     let cwd = std::env::current_dir().ok();
     tracing::info!("Checking current working directory for Cargo project: {cwd:?}");
@@ -33,7 +27,6 @@ pub fn detect_rust_workspace(context: NotificationContext<rmcp::RoleServer>) {
         );
     }
 
-    // Step 3: ask the client for its workspace roots
     let supports_roots = context
         .peer
         .peer_info()
