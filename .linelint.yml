@@ -1,6 +1,6 @@
 ignore:
 - .git/
-- *.json
+- .json
 
 rules:
   end-of-file:
