@@ -6,7 +6,7 @@ use rmcp::{
 };
 
 use crate::meta::Meta;
-use crate::tools::apply_workspace_root;
+use crate::workspace::apply_workspace_root;
 
 #[derive(Debug, Clone)]
 pub(crate) struct CommandLine(pub String);

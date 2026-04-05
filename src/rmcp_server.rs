@@ -3,7 +3,7 @@ use std::{collections::HashMap, sync::Arc};
 use rmcp::{
     ErrorData,
     model::{ListToolsResult, PaginatedRequestParams, ServerInfo},
-    service::RequestContext,
+    service::{NotificationContext, RequestContext},
 };
 
 use crate::{
@@ -33,11 +33,16 @@ use crate::{
 
 pub struct Server {
     ignore_recommendations: bool,
+    detect_workspace: bool,
     tools: HashMap<&'static str, Box<dyn DynTool + Send + Sync>>,
 }
 
 impl Server {
-    pub fn new(disabled_tools: &[String], ignore_recommendations: bool) -> Self {
+    pub fn new(
+        disabled_tools: &[String],
+        ignore_recommendations: bool,
+        detect_workspace: bool,
+    ) -> Self {
         let mut tools: HashMap<&'static str, Box<dyn DynTool + Send + Sync>> = HashMap::new();
 
         // Cargo tools
@@ -122,6 +127,7 @@ impl Server {
 
         Self {
             ignore_recommendations,
+            detect_workspace,
             tools,
         }
     }
@@ -219,6 +225,14 @@ impl rmcp::ServerHandler for Server {
         result.instructions = Some(include_str!("../docs/instructions.md").to_owned());
         result
     }
+
+    async fn on_initialized(&self, context: NotificationContext<rmcp::RoleServer>) {
+        tracing::info!("MCP client initialized");
+        if self.detect_workspace {
+            crate::workspace::detect_rust_workspace(context);
+        }
+    }
+
     async fn list_tools(
         &self,
         _request: Option<PaginatedRequestParams>,

@@ -7,5 +7,5 @@ pub mod cargo_machete;
 pub mod rustc;
 pub mod rustup;
 
-pub use crate::globals::{apply_workspace_root, get_workspace_root};
+pub use crate::globals::get_workspace_root;
 pub use crate::serde_utils::Registry;

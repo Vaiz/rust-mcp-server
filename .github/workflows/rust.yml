@@ -88,12 +88,3 @@ jobs:
 
     - name: cargo-deny
       run: cargo deny check --allow license-not-encountered
-
-  linelint:
-    runs-on: ubuntu-latest
-    name: Linelint
-
-    steps:
-      - uses: actions/checkout@v6
-      - uses: fernandrone/linelint@0.0.6
-        id: linelint
