@@ -110,7 +110,7 @@ fn file_uri_to_path(uri: &str) -> Option<std::path::PathBuf> {
         if b.len() >= 3 && b[0] == b'/' && b[1].is_ascii_alphabetic() && b[2] == b':' {
             &decoded[1..]
         } else {
-            &decoded
+            decoded
         }
     };
     Some(std::path::PathBuf::from(decoded))
