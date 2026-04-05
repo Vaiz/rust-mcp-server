@@ -4,30 +4,19 @@ use rmcp::ErrorData;
 
 use crate::{
     Tool, execute_command,
-    serde_utils::{deserialize_string, deserialize_string_vec},
+    serde_utils::{deserialize_string, deserialize_string_vec, output_verbosity_to_cli_flags},
 };
 
 #[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
 pub struct CargoInstaUpdateSnapshotsRequest {
+    /// Forcibly updates snapshot files, even if assertions pass (`INSTA_UPDATE=force`).
+    /// When `false` (default), uses `INSTA_UPDATE=always` to update failing snapshots.
+    #[serde(default)]
+    force: Option<bool>,
+
     /// Path to `Cargo.toml`
     #[serde(default, deserialize_with = "deserialize_string")]
     manifest_path: Option<String>,
-
-    /// Explicit path to the workspace root
-    #[serde(default, deserialize_with = "deserialize_string")]
-    workspace_root: Option<String>,
-
-    /// Handle unreferenced snapshots after a successful test run.
-    ///
-    /// Valid options: auto, reject, delete, warn, ignore
-    #[serde(default, deserialize_with = "deserialize_string")]
-    unreferenced: Option<String>,
-
-    /// Picks the test runner.
-    ///
-    /// Valid options: auto (default), cargo-test, nextest
-    #[serde(default, deserialize_with = "deserialize_string")]
-    test_runner: Option<String>,
 
     // ── Package / target selection ────────────────────────────────────────────
     /// Package(s) to run tests for
@@ -70,12 +59,29 @@ pub struct CargoInstaUpdateSnapshotsRequest {
     /// Number of parallel jobs, defaults to # of CPUs
     #[serde(default)]
     jobs: Option<u32>,
+
+    /// Output verbosity level.
+    ///
+    /// Valid options:
+    /// - "quiet" (default): Show only the essential command output
+    /// - "normal": Show standard output (no additional flags)
+    /// - "verbose": Show detailed output including build information
+    #[serde(default, deserialize_with = "deserialize_string")]
+    output_verbosity: Option<String>,
 }
 
 impl CargoInstaUpdateSnapshotsRequest {
     pub fn build_cmd(&self) -> Result<Command, ErrorData> {
         let mut cmd = Command::new("cargo");
-        cmd.arg("insta").arg("test").arg("--accept");
+        cmd.arg("test");
+
+        // Set INSTA_UPDATE env var (defaults to "always" to bypass review)
+        let insta_update = if self.force.unwrap_or(false) {
+            "force"
+        } else {
+            "always"
+        };
+        cmd.env("INSTA_UPDATE", insta_update);
 
         // Workspace / manifest selection
         if let Some(manifest_path) = &self.manifest_path {
@@ -83,19 +89,6 @@ impl CargoInstaUpdateSnapshotsRequest {
         } else {
             // by default, run in workspace mode to update snapshots for all members
             cmd.arg("--workspace");
-        }
-
-        if let Some(workspace_root) = &self.workspace_root {
-            cmd.arg("--workspace-root").arg(workspace_root);
-        }
-
-        // Insta-specific flags
-        if let Some(unreferenced) = &self.unreferenced {
-            cmd.arg("--unreferenced").arg(unreferenced);
-        }
-
-        if let Some(test_runner) = &self.test_runner {
-            cmd.arg("--test-runner").arg(test_runner);
         }
 
         // Package selection
@@ -147,6 +140,10 @@ impl CargoInstaUpdateSnapshotsRequest {
             cmd.arg("--jobs").arg(jobs.to_string());
         }
 
+        // Output options
+        let output_flags = output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
+        cmd.args(output_flags);
+
         Ok(cmd)
     }
 }
@@ -156,8 +153,7 @@ pub struct CargoInstaUpdateSnapshotsRmcpTool;
 impl Tool for CargoInstaUpdateSnapshotsRmcpTool {
     const NAME: &'static str = "cargo-insta-update-snapshots";
     const TITLE: &'static str = "Update insta snapshots";
-    const DESCRIPTION: &'static str =
-        "Generates and updates `cargo insta` snapshot files fixing tests with outdated snapshots";
+    const DESCRIPTION: &'static str = "Runs `cargo test` with the `INSTA_UPDATE` environment variable to update insta snapshot files.";
     type RequestArgs = CargoInstaUpdateSnapshotsRequest;
 
     fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<crate::Response, ErrorData> {
@@ -171,7 +167,7 @@ mod tests {
     use insta::assert_debug_snapshot;
     use serde_json::json;
 
-    fn cmd_args(request: CargoInstaUpdateSnapshotsRequest) -> Vec<String> {
+    fn cmd_args(request: &CargoInstaUpdateSnapshotsRequest) -> Vec<String> {
         request
             .build_cmd()
             .expect("Should build command")
@@ -180,27 +176,35 @@ mod tests {
             .collect()
     }
 
+    fn cmd_env_insta_update(request: &CargoInstaUpdateSnapshotsRequest) -> String {
+        request
+            .build_cmd()
+            .expect("Should build command")
+            .get_envs()
+            .find(|(k, _)| k == &"INSTA_UPDATE")
+            .and_then(|(_, v)| v)
+            .map(|v| v.to_string_lossy().to_string())
+            .unwrap_or_default()
+    }
+
     #[test]
     fn test_update_snapshots_default_args() {
         let request: CargoInstaUpdateSnapshotsRequest =
             serde_json::from_value(json!({})).expect("Should deserialize empty request");
-        let args = cmd_args(request);
+        let args = cmd_args(&request);
         assert_debug_snapshot!("cargo_insta_update_snapshots_default_args", args);
+        assert_eq!(cmd_env_insta_update(&request), "always");
     }
 
     #[test]
-    fn test_update_snapshots_with_manifest_and_workspace_root() {
+    fn test_update_snapshots_with_manifest_path() {
         let request: CargoInstaUpdateSnapshotsRequest = serde_json::from_value(json!({
-            "manifest_path": "Cargo.toml",
-            "workspace_root": "."
+            "manifest_path": "Cargo.toml"
         }))
         .expect("Should deserialize request");
 
-        let args = cmd_args(request);
-        assert_debug_snapshot!(
-            "cargo_insta_update_snapshots_manifest_workspace_root_args",
-            args
-        );
+        let args = cmd_args(&request);
+        assert_debug_snapshot!("cargo_insta_update_snapshots_manifest_path_args", args);
     }
 
     #[test]
@@ -209,7 +213,7 @@ mod tests {
             "all_features": true
         }))
         .expect("Should deserialize request");
-        let args = cmd_args(request);
+        let args = cmd_args(&request);
         assert_debug_snapshot!("cargo_insta_update_snapshots_all_features_args", args);
     }
 
@@ -222,7 +226,7 @@ mod tests {
             "jobs": 4
         }))
         .expect("Should deserialize request");
-        let args = cmd_args(request);
+        let args = cmd_args(&request);
         assert_debug_snapshot!(
             "cargo_insta_update_snapshots_features_and_targets_args",
             args
@@ -230,13 +234,11 @@ mod tests {
     }
 
     #[test]
-    fn test_update_snapshots_nextest_runner() {
+    fn test_update_snapshots_force_flag() {
         let request: CargoInstaUpdateSnapshotsRequest = serde_json::from_value(json!({
-            "test_runner": "nextest",
-            "unreferenced": "delete"
+            "force": true
         }))
         .expect("Should deserialize request");
-        let args = cmd_args(request);
-        assert_debug_snapshot!("cargo_insta_update_snapshots_nextest_runner_args", args);
+        assert_eq!(cmd_env_insta_update(&request), "force");
     }
 }

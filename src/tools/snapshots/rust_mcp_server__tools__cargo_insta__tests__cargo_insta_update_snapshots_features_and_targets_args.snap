@@ -3,9 +3,7 @@ source: src/tools/cargo_insta.rs
 expression: args
 ---
 [
-    "insta",
     "test",
-    "--accept",
     "--workspace",
     "--lib",
     "--features",
@@ -13,4 +11,5 @@ expression: args
     "--no-default-features",
     "--jobs",
     "4",
+    "--quiet",
 ]

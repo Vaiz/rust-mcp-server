@@ -32,7 +32,12 @@ pub fn detect_rust_workspace(context: NotificationContext<rmcp::RoleServer>) {
         .peer_info()
         .and_then(|info| info.capabilities.roots.as_ref())
         .is_some();
+
     tracing::info!("Checking client roots capability: supports_roots={supports_roots}");
+    if !supports_roots {
+        tracing::warn!("Client does not support roots capability; cannot auto-detect workspace");
+        return;
+    }
 
     // Spawn onto a separate task to avoid blocking the notification handler,
     // which would deadlock if the client waits for the server to finish
@@ -105,7 +110,7 @@ fn file_uri_to_path(uri: &str) -> Option<std::path::PathBuf> {
         if b.len() >= 3 && b[0] == b'/' && b[1].is_ascii_alphabetic() && b[2] == b':' {
             &decoded[1..]
         } else {
-            &decoded
+            decoded
         }
     };
     Some(std::path::PathBuf::from(decoded))

@@ -315,22 +315,21 @@
       - <code>version</code> : string<br />
 
 - **cargo-insta-update-snapshots**
-  - Generates and updates `cargo insta` snapshot files fixing tests with outdated snapshots
+  - Runs `cargo test` with the `INSTA_UPDATE` environment variable to update insta snapshot files.
   - **Inputs:**
       - <code>all_features</code> : boolean<br />
       - <code>all_targets</code> : boolean<br />
       - <code>exclude</code> : string [ ]<br />
       - <code>features</code> : string [ ]<br />
+      - <code>force</code> : boolean<br />
       - <code>jobs</code> : integer<br />
       - <code>lib</code> : boolean<br />
       - <code>manifest_path</code> : string<br />
       - <code>no_default_features</code> : boolean<br />
+      - <code>output_verbosity</code> : string<br />
       - <code>package</code> : string [ ]<br />
       - <code>test</code> : string<br />
-      - <code>test_runner</code> : string<br />
       - <code>tests</code> : boolean<br />
-      - <code>unreferenced</code> : string<br />
-      - <code>workspace_root</code> : string<br />
 
 - **cargo-list**
   - Lists installed cargo commands using 'cargo --list'.
