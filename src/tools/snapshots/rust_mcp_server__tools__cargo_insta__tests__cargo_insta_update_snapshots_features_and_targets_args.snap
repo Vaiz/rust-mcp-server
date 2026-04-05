@@ -11,4 +11,5 @@ expression: args
     "--no-default-features",
     "--jobs",
     "4",
+    "--quiet",
 ]

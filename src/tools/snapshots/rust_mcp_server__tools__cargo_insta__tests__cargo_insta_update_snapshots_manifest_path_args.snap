@@ -6,4 +6,5 @@ expression: args
     "test",
     "--manifest-path",
     "Cargo.toml",
+    "--quiet",
 ]

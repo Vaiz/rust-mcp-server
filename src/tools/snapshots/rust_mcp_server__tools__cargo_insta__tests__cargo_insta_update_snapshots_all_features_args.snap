@@ -6,4 +6,5 @@ expression: args
     "test",
     "--workspace",
     "--all-features",
+    "--quiet",
 ]

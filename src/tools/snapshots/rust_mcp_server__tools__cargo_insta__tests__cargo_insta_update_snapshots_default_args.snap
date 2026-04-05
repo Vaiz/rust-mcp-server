@@ -5,4 +5,5 @@ expression: args
 [
     "test",
     "--workspace",
+    "--quiet",
 ]

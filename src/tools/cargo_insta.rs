@@ -4,7 +4,7 @@ use rmcp::ErrorData;
 
 use crate::{
     Tool, execute_command,
-    serde_utils::{deserialize_string, deserialize_string_vec},
+    serde_utils::{deserialize_string, deserialize_string_vec, output_verbosity_to_cli_flags},
 };
 
 #[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
@@ -59,6 +59,15 @@ pub struct CargoInstaUpdateSnapshotsRequest {
     /// Number of parallel jobs, defaults to # of CPUs
     #[serde(default)]
     jobs: Option<u32>,
+
+    /// Output verbosity level.
+    ///
+    /// Valid options:
+    /// - "quiet" (default): Show only the essential command output
+    /// - "normal": Show standard output (no additional flags)
+    /// - "verbose": Show detailed output including build information
+    #[serde(default, deserialize_with = "deserialize_string")]
+    output_verbosity: Option<String>,
 }
 
 impl CargoInstaUpdateSnapshotsRequest {
@@ -130,6 +139,10 @@ impl CargoInstaUpdateSnapshotsRequest {
         if let Some(jobs) = self.jobs {
             cmd.arg("--jobs").arg(jobs.to_string());
         }
+
+        // Output options
+        let output_flags = output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
+        cmd.args(output_flags);
 
         Ok(cmd)
     }
