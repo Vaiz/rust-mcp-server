@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.7](https://github.com/Vaiz/rust-mcp-server/compare/v0.3.6...v0.3.7) - 2026-04-05
+
+### Added
+
+- reduce `cargo-insta-update-snapshots` tool verbosity ([#110](https://github.com/Vaiz/rust-mcp-server/pull/110))
+- use roots/list to automatically detect workspace directory ([#108](https://github.com/Vaiz/rust-mcp-server/pull/108))
+
 ## [0.3.6](https://github.com/Vaiz/rust-mcp-server/compare/v0.3.5...v0.3.6) - 2026-03-09
 
 ### Added
