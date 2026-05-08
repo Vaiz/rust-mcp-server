@@ -1,8 +1,10 @@
 ---
 source: src/tools/cargo_insta.rs
+assertion_line: 222
 expression: args
 ---
 [
     "test",
+    "--all-features",
     "--quiet",
 ]

@@ -1,5 +1,6 @@
 ---
 source: src/tools/cargo_insta.rs
+assertion_line: 200
 expression: args
 ---
 [

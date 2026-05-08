@@ -43,6 +43,10 @@ pub struct CargoInstaUpdateSnapshotsRequest {
     #[serde(default)]
     all_targets: Option<bool>,
 
+    /// Test all packages in the workspace
+    #[serde(default)]
+    workspace: Option<bool>,
+
     // ── Feature selection ─────────────────────────────────────────────────────
     /// Space or comma separated list of features to activate
     #[serde(default, deserialize_with = "deserialize_string_vec")]
@@ -86,9 +90,6 @@ impl CargoInstaUpdateSnapshotsRequest {
         // Workspace / manifest selection
         if let Some(manifest_path) = &self.manifest_path {
             cmd.arg("--manifest-path").arg(manifest_path);
-        } else {
-            // by default, run in workspace mode to update snapshots for all members
-            cmd.arg("--workspace");
         }
 
         // Package selection
@@ -96,6 +97,10 @@ impl CargoInstaUpdateSnapshotsRequest {
             for p in packages {
                 cmd.arg("--package").arg(p);
             }
+        }
+
+        if self.workspace.unwrap_or(false) {
+            cmd.arg("--workspace");
         }
 
         if let Some(excludes) = &self.exclude {

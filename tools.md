@@ -331,6 +331,7 @@
       - <code>package</code> : string [ ]<br />
       - <code>test</code> : string<br />
       - <code>tests</code> : boolean<br />
+      - <code>workspace</code> : boolean<br />
 
 - **cargo-list**
   - Lists installed cargo commands using 'cargo --list'.
