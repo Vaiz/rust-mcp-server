@@ -220,6 +220,7 @@
       - <code>target</code> : string<br />
       - <code>target_dir</code> : string<br />
       - <code>toolchain</code> : string<br />
+      - <code>warnings_as_errors</code> : boolean<br />
       - <code>workspace</code> : boolean<br />
 
 - **cargo-expand**
