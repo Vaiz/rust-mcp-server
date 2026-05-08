@@ -130,6 +130,10 @@ pub struct CargoDocRequest {
     #[serde(default, deserialize_with = "deserialize_string")]
     output_verbosity: Option<String>,
 
+    /// Treat warnings as errors
+    #[serde(default)]
+    warnings_as_errors: Option<bool>,
+
     /// Error format
     #[serde(default, deserialize_with = "deserialize_string")]
     message_format: Option<String>,
@@ -169,9 +173,16 @@ impl CargoDocRequest {
             cmd.arg("--document-private-items");
         }
 
-        // Set RUSTDOCFLAGS for docs.rs configuration if enabled
+        // Set RUSTDOCFLAGS based on options
+        let mut rustdocflags = Vec::new();
         if self.docsrs_config.unwrap_or(false) {
-            cmd.env("RUSTDOCFLAGS", "--cfg docsrs");
+            rustdocflags.push("--cfg docsrs");
+        }
+        if self.warnings_as_errors.unwrap_or(false) {
+            rustdocflags.push("-D warnings");
+        }
+        if !rustdocflags.is_empty() {
+            cmd.env("RUSTDOCFLAGS", rustdocflags.join(" "));
         }
 
         // Target selection
