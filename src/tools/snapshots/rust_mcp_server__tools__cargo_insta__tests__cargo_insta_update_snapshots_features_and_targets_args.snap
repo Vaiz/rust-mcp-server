@@ -4,7 +4,6 @@ expression: args
 ---
 [
     "test",
-    "--workspace",
     "--lib",
     "--features",
     "serde,async",
