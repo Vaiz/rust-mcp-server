@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.8](https://github.com/Vaiz/rust-mcp-server/compare/v0.3.7...v0.3.8) - 2026-05-08
+
+### Added
+
+- add option to treat warnings as errors in CargoDocRequest ([#112](https://github.com/Vaiz/rust-mcp-server/pull/112))
+
+### Fixed
+
+- don't run tests on the whole workspace when package is specified ([#114](https://github.com/Vaiz/rust-mcp-server/pull/114))
+
 ## [0.3.7](https://github.com/Vaiz/rust-mcp-server/compare/v0.3.6...v0.3.7) - 2026-04-05
 
 ### Added
