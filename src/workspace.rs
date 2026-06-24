@@ -10,6 +10,10 @@ pub fn apply_workspace_root(cmd: &mut std::process::Command) {
 }
 
 /// If CWD contains `Cargo.toml` then function does nothing. Otherwise it tries to detect workspace root from client roots.
+#[expect(
+    deprecated,
+    reason = "we will use it while it lasts, but eventually the whole feature will go away"
+)]
 pub fn detect_rust_workspace(context: NotificationContext<rmcp::RoleServer>) {
     let cwd = std::env::current_dir().ok();
     tracing::info!("Checking current working directory for Cargo project: {cwd:?}");
@@ -30,7 +34,7 @@ pub fn detect_rust_workspace(context: NotificationContext<rmcp::RoleServer>) {
     let supports_roots = context
         .peer
         .peer_info()
-        .and_then(|info| info.capabilities.roots.as_ref())
+        .and_then(|info| info.capabilities.roots.clone())
         .is_some();
 
     tracing::info!("Checking client roots capability: supports_roots={supports_roots}");
