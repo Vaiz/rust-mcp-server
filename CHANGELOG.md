@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+<<<<<<< Updated upstream
+=======
+## [0.3.9](https://github.com/Vaiz/rust-mcp-server/compare/v0.3.8...v0.3.9) - 2026-06-30
+
+### Added
+
+- switch error handling from anyhow to ohno::AppError ([#123](https://github.com/Vaiz/rust-mcp-server/pull/123))
+
+### Other
+
+- update rmcp to 1.8.0 ([#117](https://github.com/Vaiz/rust-mcp-server/pull/117))
+
+### Changed
+
+- switch from `anyhow` to `ohno::AppError` for error handling ([#122](https://github.com/Vaiz/rust-mcp-server/issues/122))
+
+>>>>>>> Stashed changes
 ## [0.3.8](https://github.com/Vaiz/rust-mcp-server/compare/v0.3.7...v0.3.8) - 2026-05-08
 
 ### Added
