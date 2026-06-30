@@ -10,7 +10,7 @@ This is a Rust implementation of a Model Context Protocol (MCP) server.
 
 ## Key Guidelines
 1. Follow Rust best practices and idioms
-2. Use proper error handling with `Result<T, E>` and `anyhow` for error propagation
+2. Use proper error handling with `Result<T, E>` and `ohno::AppError` for error propagation
 3. Implement MCP protocol methods according to the specification
 4. Use structured logging with the `tracing` crate
 5. Ensure all async operations are properly awaited
@@ -25,7 +25,7 @@ This is a Rust implementation of a Model Context Protocol (MCP) server.
 - `tokio`: Async runtime
 - `serde`: Serialization/deserialization
 - `rmcp`: MCP protocol handling
-- `anyhow`: Error handling
+- `ohno`: Error handling
 - `tracing`: Structured logging
 
 ## AI Agent Guidelines

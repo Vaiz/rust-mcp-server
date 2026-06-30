@@ -2,7 +2,7 @@
 name = "rust-mcp-server"
 version = "0.3.8"
 edition = "2024"
-rust-version = "1.90"
+rust-version = "1.93"
 description = "An MCP server for Rust development"
 authors = ["Vaiz"]
 license = "Unlicense"
@@ -21,8 +21,8 @@ include = [
 ]
 
 [dependencies]
-anyhow = "1.0.98"
 clap = { version = "4.5.40", default-features = false, features = ["std", "help", "error-context", "usage", "suggestions", "derive", "string"] }
+ohno = { version = "0.3.8", features = ["app-err"] }
 percent-encoding = "2.3.2"
 rmcp = { version = "1.8.0", default-features = false, features = ["server", "transport-io"] }
 schemars = "1.1.0"
