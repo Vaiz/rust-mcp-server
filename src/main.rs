@@ -9,9 +9,9 @@ mod tools;
 mod version;
 mod workspace;
 
-use anyhow::Context;
 use clap::Parser;
 use command::execute_command;
+use ohno::IntoAppError;
 use response::Response;
 use rmcp::ServiceExt;
 use rmcp::service::QuitReason;
@@ -55,7 +55,7 @@ struct Args {
 }
 
 #[tokio::main]
-async fn main() -> anyhow::Result<()> {
+async fn main() -> Result<(), ohno::AppError> {
     let args = Args::parse();
 
     // Set up logging
@@ -102,7 +102,7 @@ async fn main() -> anyhow::Result<()> {
     if let Some(output_file) = args.generate_docs {
         tracing::info!("Generating documentation to: {output_file}");
         let docs = server.generate_markdown_docs();
-        std::fs::write(&output_file, docs).context("Failed to write documentation file")?;
+        std::fs::write(&output_file, docs).into_app_err("Failed to write documentation file")?;
         println!("Documentation generated successfully: {output_file}");
         return Ok(());
     }
@@ -110,7 +110,7 @@ async fn main() -> anyhow::Result<()> {
     let service = server
         .serve(rmcp::transport::stdio())
         .await
-        .context("Failed to start server")?;
+        .into_app_err("Failed to start server")?;
 
     eprintln!("Rust MCP Server started on stdio");
 

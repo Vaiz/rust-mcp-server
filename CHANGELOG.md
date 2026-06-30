@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- switch from `anyhow` to `ohno::AppError` for error handling ([#122](https://github.com/Vaiz/rust-mcp-server/issues/122))
+
 ## [0.3.8](https://github.com/Vaiz/rust-mcp-server/compare/v0.3.7...v0.3.8) - 2026-05-08
 
 ### Added
