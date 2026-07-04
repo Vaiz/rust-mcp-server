@@ -8,6 +8,7 @@ authors.workspace = true
 license.workspace = true
 repository.workspace = true
 homepage.workspace = true
+readme = "README.md"
 publish = false # temporary
 
 [dependencies]

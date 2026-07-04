@@ -15,6 +15,7 @@ use ohno::IntoAppError;
 use response::Response;
 use rmcp::ServiceExt;
 use rmcp::service::QuitReason;
+use std::path::Path;
 use tool::Tool;
 use tracing_appender::rolling;
 use tracing_subscriber::{EnvFilter, fmt};
@@ -93,8 +94,6 @@ async fn main() -> Result<(), ohno::AppError> {
 fn init_logging(args: &Args) {
     let env_filter = EnvFilter::new(&args.log_level);
     if let Some(path) = args.log_file.as_deref() {
-        // Use rolling log file (daily rotation, keep old logs)
-        use std::path::Path;
         let log_path = Path::new(path);
         let (dir, file_name) = match (log_path.parent(), log_path.file_name()) {
             (Some(d), Some(f)) => (d, f),
