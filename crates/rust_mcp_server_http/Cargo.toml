@@ -14,5 +14,5 @@ publish = false # temporary
 [dependencies]
 axum = { workspace = true }
 rmcp = { workspace = true, features = ["transport-streamable-http-server"] }
-tokio = { workspace = true }
+tokio = { workspace = true, features = ["net"] }
 tracing = { workspace = true }
