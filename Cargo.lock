@@ -764,7 +764,7 @@ dependencies = [
  "ohno",
  "percent-encoding",
  "rmcp",
- "rust-mcp-server-http",
+ "rust_mcp_server_http",
  "schemars",
  "serde",
  "serde_json",
@@ -775,8 +775,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "rust-mcp-server-http"
-version = "0.3.8"
+name = "rust_mcp_server_http"
+version = "0.1.0"
 dependencies = [
  "axum",
  "rmcp",

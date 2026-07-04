@@ -3,7 +3,6 @@ resolver = "3"
 members = ["crates/*"]
 
 [workspace.package]
-version = "0.3.8"
 edition = "2024"
 rust-version = "1.93"
 authors = ["Vaiz"]
@@ -13,7 +12,7 @@ homepage = "https://github.com/Vaiz/rust-mcp-server"
 
 [workspace.dependencies]
 # Internal crates
-rust-mcp-server-http = { version = "0.3.8", path = "crates/rust-mcp-server-http" }
+rust_mcp_server_http = { version = "0.1.0", path = "crates/rust_mcp_server_http" }
 
 # External dependencies
 axum = { version = "0.8.4", default-features = false, features = ["tokio", "http1"] }

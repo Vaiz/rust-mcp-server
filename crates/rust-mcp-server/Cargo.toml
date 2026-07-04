@@ -1,6 +1,6 @@
 [package]
 name = "rust-mcp-server"
-version.workspace = true
+version = "0.3.8"
 edition.workspace = true
 rust-version.workspace = true
 description = "An MCP server for Rust development"
@@ -22,10 +22,10 @@ include = [
 [features]
 default = []
 # Enables the localhost HTTP streamable transport for MCP.
-http = ["dep:rust-mcp-server-http"]
+http = ["dep:rust_mcp_server_http"]
 
 [dependencies]
-rust-mcp-server-http = { workspace = true, optional = true }
+rust_mcp_server_http = { workspace = true, optional = true }
 
 clap = { workspace = true }
 ohno = { workspace = true }
