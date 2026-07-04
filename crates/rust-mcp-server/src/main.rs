@@ -103,14 +103,13 @@ async fn main() -> Result<(), ohno::AppError> {
         globals::set_default_registry(registry);
     }
 
-    let server = rmcp_server::Server::new(
-        &args.disabled_tools,
-        args.no_recommendations,
-        detect_workspace,
-    );
-
     // Handle documentation generation mode
     if let Some(output_file) = args.generate_docs {
+        let server = rmcp_server::Server::new(
+            &args.disabled_tools,
+            args.no_recommendations,
+            detect_workspace,
+        );
         tracing::info!("Generating documentation to: {output_file}");
         let docs = server.generate_markdown_docs();
         std::fs::write(&output_file, docs).into_app_err("Failed to write documentation file")?;
@@ -122,7 +121,6 @@ async fn main() -> Result<(), ohno::AppError> {
     if args.http {
         use std::net::{Ipv4Addr, SocketAddr};
 
-        drop(server);
         let addr = SocketAddr::from((Ipv4Addr::LOCALHOST, args.port));
         let disabled_tools = args.disabled_tools.clone();
         let no_recommendations = args.no_recommendations;
@@ -141,6 +139,11 @@ async fn main() -> Result<(), ohno::AppError> {
         return Ok(());
     }
 
+    let server = rmcp_server::Server::new(
+        &args.disabled_tools,
+        args.no_recommendations,
+        detect_workspace,
+    );
     let service = server
         .serve(rmcp::transport::stdio())
         .await

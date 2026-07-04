@@ -14,6 +14,7 @@ use std::net::SocketAddr;
 use std::sync::Arc;
 
 use rmcp::service::{RoleServer, Service};
+use rmcp::transport::StreamableHttpServerConfig;
 use rmcp::transport::streamable_http_server::{
     StreamableHttpService, session::local::LocalSessionManager,
 };
@@ -38,7 +39,7 @@ where
     let service = StreamableHttpService::new(
         service_factory,
         Arc::new(LocalSessionManager::default()),
-        Default::default(),
+        StreamableHttpServerConfig::default(),
     );
 
     let router = axum::Router::new().route_service("/", service);
