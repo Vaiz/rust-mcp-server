@@ -30,7 +30,7 @@ struct Args {
     #[arg(long, default_value = "info")]
     log_level: String,
 
-    /// Log file path (if not set, logs to stderr)
+    /// Enables logging to a file at the specified path
     #[arg(long)]
     log_file: Option<String>,
 
