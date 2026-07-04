@@ -1,0 +1,16 @@
+[package]
+name = "rust-mcp-server-http"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+description = "Localhost HTTP streamable transport for the Rust MCP server"
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+
+[dependencies]
+axum = { workspace = true }
+rmcp = { workspace = true, features = ["transport-streamable-http-server"] }
+tokio = { workspace = true, features = ["net"] }
+tracing = { workspace = true }

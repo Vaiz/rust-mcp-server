@@ -1,8 +1,8 @@
 {
     "servers": {
-        "rust-mcp-server": {
+        "rust-mcp-linux": {
             "type": "stdio",
-            "command": "./tmp/rust-mcp-server.exe",
+            "command": "~/.cargo/bin/rust-mcp-server",
             "args": [
                 "--log-file",
                 "./tmp/rust-mcp-server.log",
