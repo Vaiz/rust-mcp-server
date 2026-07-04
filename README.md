@@ -15,6 +15,7 @@ By exposing local tools and project context to the LLM, rust-mcp-server allows t
   - [Rust Toolchain Management](#rust-toolchain-management)
 - [Command Line Arguments](#command-line-arguments)
 - [Configuring with VS Code](#configuring-with-vs-code)
+- [HTTP Mode](#http-mode)
 - [GitHub Copilot Coding Agent Integration](#github-copilot-coding-agent-integration)
 
 ## Why use `rust-mcp-server`?
@@ -119,6 +120,17 @@ Generates markdown documentation file and exits without starting the server</br>
 Disables experimental recommendations for agents in tool responses</br>
 **Default**: Recommendations are enabled
 
+### `--http`
+
+Serves the MCP streamable HTTP transport on localhost instead of stdio. Requires building with the `http` feature (see [HTTP Mode](#http-mode))</br>
+**Default**: Disabled (uses stdio)
+
+### `-p, --port <PORT>`
+
+Port for the HTTP transport (used with `--http`). Requires the `http` feature</br>
+**Default**: `7270`</br>
+**Example**: `--http --port 8000`
+
 ### `-h, --help`
 
 Displays help information about available command line arguments
@@ -132,7 +144,7 @@ Displays the version information of the server
 To make GitHub Copilot in VS Code use this MCP server, you need to update your VS Code settings.
 
 1.  Install `rust-mcp-server`</br>
-    `cargo install rust-mcp-server`
+    `cargo install rust-mcp-server` or `cargo install rust-mcp-server --features http`
 1.  Enable MCP server in VS Code settings - [⚙️chat.mcp.enabled](vscode://settings/chat.mcp.enabled)
 1.  Add new MCP server into `.vscode/mcp.json`.
 
@@ -148,10 +160,31 @@ To make GitHub Copilot in VS Code use this MCP server, you need to update your V
     }
     ```
 1. Start the server
-   ![mcp.json](docs/mcp.json.png)
+   ![mcp.json](crates/rust-mcp-server/docs/mcp.json.png)
 
 More information you can find by this [link](https://code.visualstudio.com/docs/copilot/chat/mcp-servers).
 
+## HTTP Mode
+
+By default the server communicates over stdio. It can optionally serve the MCP streamable HTTP transport bound to localhost. This is gated behind the `http` feature and is restricted to `127.0.0.1` with no HTTPS or authentication.
+
+1.  Install with the `http` feature</br>
+    `cargo install rust-mcp-server --features http`
+1.  Start the server in HTTP mode (defaults to port `7270`)</br>
+    `rust-mcp-server --http --port 7270`
+1.  Point `.vscode/mcp.json` at the HTTP endpoint:
+
+    ```json
+    {
+        "servers": {
+            "rust-mcp-server": {
+                "type": "http",
+                "url": "http://127.0.0.1:7270/"
+            }
+        }
+    }
+    ```
+
 ## GitHub Copilot Coding Agent Integration
 
-The Rust MCP Server can be integrated with GitHub Copilot's coding agent to create a powerful autonomous development workflow. For detailed setup instructions for using the Rust MCP Server with GitHub Copilot's coding agent, see [copilot-coding-agent.md](docs/copilot-coding-agent.md).
+The Rust MCP Server can be integrated with GitHub Copilot's coding agent to create a powerful autonomous development workflow. For detailed setup instructions for using the Rust MCP Server with GitHub Copilot's coding agent, see [copilot-coding-agent.md](crates/rust-mcp-server/docs/copilot-coding-agent.md).
