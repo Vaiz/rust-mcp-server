@@ -22,11 +22,10 @@ include = [
 [features]
 default = []
 # Enables the localhost HTTP streamable transport for MCP.
-http = ["dep:rust_mcp_server_http"]
+http = ["dep:axum", "rmcp/transport-streamable-http-server", "tokio/net"]
 
 [dependencies]
-rust_mcp_server_http = { workspace = true, optional = true }
-
+axum = { workspace = true, optional = true }
 clap = { workspace = true }
 ohno = { workspace = true }
 percent-encoding = { workspace = true }

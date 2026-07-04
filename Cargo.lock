@@ -759,12 +759,12 @@ dependencies = [
 name = "rust-mcp-server"
 version = "0.3.8"
 dependencies = [
+ "axum",
  "clap",
  "insta",
  "ohno",
  "percent-encoding",
  "rmcp",
- "rust_mcp_server_http",
  "schemars",
  "serde",
  "serde_json",
@@ -772,16 +772,6 @@ dependencies = [
  "tracing",
  "tracing-appender",
  "tracing-subscriber",
-]
-
-[[package]]
-name = "rust_mcp_server_http"
-version = "0.1.0"
-dependencies = [
- "axum",
- "rmcp",
- "tokio",
- "tracing",
 ]
 
 [[package]]
