@@ -53,11 +53,16 @@ struct Args {
     #[arg(long)]
     no_recommendations: bool,
 
-    /// Serve over the localhost HTTP streamable transport on the given port
-    /// instead of stdio. Only available when built with the `http` feature.
+    /// Serve over the localhost HTTP streamable transport instead of stdio.
+    /// Only available when built with the `http` feature.
     #[cfg(feature = "http")]
-    #[arg(long, value_name = "PORT")]
-    http: Option<u16>,
+    #[arg(long)]
+    http: bool,
+
+    /// Port for the HTTP streamable transport (used with --http).
+    #[cfg(feature = "http")]
+    #[arg(long, short = 'p', value_name = "PORT", default_value_t = 7270)]
+    port: u16,
 }
 
 #[tokio::main]
@@ -114,8 +119,11 @@ async fn main() -> Result<(), ohno::AppError> {
     }
 
     #[cfg(feature = "http")]
-    if let Some(port) = args.http {
+    if args.http {
+        use std::net::{Ipv4Addr, SocketAddr};
+
         drop(server);
+        let addr = SocketAddr::from((Ipv4Addr::LOCALHOST, args.port));
         let disabled_tools = args.disabled_tools.clone();
         let no_recommendations = args.no_recommendations;
         let factory = move || {
@@ -125,9 +133,9 @@ async fn main() -> Result<(), ohno::AppError> {
                 detect_workspace,
             ))
         };
-        tracing::info!("Starting HTTP transport on 127.0.0.1:{port}");
-        eprintln!("Rust MCP Server started on http://127.0.0.1:{port}/mcp");
-        rust_mcp_server_http::serve(port, factory)
+        tracing::info!("Starting HTTP transport on {addr}");
+        eprintln!("Rust MCP Server started on http://{addr}/");
+        rust_mcp_server_http::serve(addr, factory)
             .await
             .into_app_err("HTTP server failed")?;
         return Ok(());
