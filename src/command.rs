@@ -1,8 +1,6 @@
 use rmcp::{
     ErrorData,
-    model::{
-        AnnotateAble, Annotated, Annotations, CallToolResult, RawContent, RawTextContent, Role,
-    },
+    model::{Annotations, CallToolResult, ContentBlock, Role, TextContent},
 };
 
 use crate::meta::Meta;
@@ -11,43 +9,45 @@ use crate::workspace::apply_workspace_root;
 #[derive(Debug, Clone)]
 pub(crate) struct CommandLine(pub String);
 
-impl From<CommandLine> for Annotated<RawContent> {
+impl From<CommandLine> for ContentBlock {
     fn from(val: CommandLine) -> Self {
         let mut annotations = Annotations::default();
         annotations.audience = Some(vec![Role::User]);
         annotations.priority = Some(0.5);
 
-        text_with_description(
-            format!("Executed command: `{}`", val.0),
-            "command line executed by MCP server",
+        ContentBlock::Text(
+            text_with_description(
+                format!("Executed command: `{}`", val.0),
+                "command line executed by MCP server",
+            )
+            .with_annotations(annotations),
         )
-        .annotate(annotations)
     }
 }
 
 #[derive(Debug, Clone)]
 pub(crate) struct Stdout(pub String);
 
-impl From<Stdout> for Annotated<RawContent> {
+impl From<Stdout> for ContentBlock {
     fn from(val: Stdout) -> Self {
         let mut annotations = Annotations::default();
         annotations.audience = Some(vec![Role::User, Role::Assistant]);
         annotations.priority = Some(0.2);
 
-        text_with_description(val.0, "stdout").annotate(annotations)
+        ContentBlock::Text(text_with_description(val.0, "stdout").with_annotations(annotations))
     }
 }
 
 #[derive(Debug, Clone)]
 pub(crate) struct Stderr(pub String);
 
-impl From<Stderr> for Annotated<RawContent> {
+impl From<Stderr> for ContentBlock {
     fn from(val: Stderr) -> Self {
         let mut annotations = Annotations::default();
         annotations.audience = Some(vec![Role::User, Role::Assistant]);
         annotations.priority = Some(1.);
 
-        text_with_description(val.0, "stderr").annotate(annotations)
+        ContentBlock::Text(text_with_description(val.0, "stderr").with_annotations(annotations))
     }
 }
 
@@ -55,7 +55,7 @@ impl From<Stderr> for Annotated<RawContent> {
 pub(crate) struct ExitStatus(pub std::process::ExitStatus);
 
 impl ExitStatus {
-    fn as_content(&self, tool_name: &str) -> Annotated<RawContent> {
+    fn as_content(&self, tool_name: &str) -> ContentBlock {
         let status_str = if self.0.success() {
             format!("✅ {tool_name}: Success")
         } else if let Some(code) = self.0.code() {
@@ -69,22 +69,19 @@ impl ExitStatus {
             meta = meta.with_i32("exit_code", code);
         }
 
-        let content = RawContent::Text(RawTextContent {
-            text: status_str,
-            meta: Some(meta.into()),
-        });
+        let content = TextContent::new(status_str).with_meta(meta.into());
 
         let mut annotations = Annotations::default();
         annotations.audience = Some(vec![Role::User, Role::Assistant]);
         annotations.priority = Some(1.);
 
-        content.annotate(annotations)
+        ContentBlock::Text(content.with_annotations(annotations))
     }
 }
 
 pub(crate) struct AgentRecommendation(pub String);
 
-impl From<AgentRecommendation> for Annotated<RawContent> {
+impl From<AgentRecommendation> for ContentBlock {
     fn from(val: AgentRecommendation) -> Self {
         let content = text_with_description(
             format!("RECOMMENDATION: {}", val.0),
@@ -95,15 +92,12 @@ impl From<AgentRecommendation> for Annotated<RawContent> {
         annotations.audience = Some(vec![Role::Assistant]);
         annotations.priority = Some(1.);
 
-        content.annotate(annotations)
+        ContentBlock::Text(content.with_annotations(annotations))
     }
 }
 
-fn text_with_description(text: impl Into<String>, description: impl Into<String>) -> RawContent {
-    RawContent::Text(RawTextContent {
-        text: text.into(),
-        meta: Some(Meta::new().with_description(description).into()),
-    })
+fn text_with_description(text: impl Into<String>, description: impl Into<String>) -> TextContent {
+    TextContent::new(text).with_meta(Meta::new().with_description(description).into())
 }
 
 pub(crate) struct Output {
@@ -152,7 +146,7 @@ impl Output {
 
 impl From<Output> for CallToolResult {
     fn from(val: Output) -> Self {
-        let mut content: Vec<Annotated<RawContent>> = Vec::new();
+        let mut content: Vec<ContentBlock> = Vec::new();
 
         content.push(val.cmd_line.into());
 

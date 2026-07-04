@@ -1,7 +1,7 @@
 use std::path::Path;
 use std::process::Command;
 
-use rmcp::{ErrorData, model::RawContent};
+use rmcp::{ErrorData, model::ContentBlock};
 
 use crate::{
     Tool, execute_command,
@@ -345,7 +345,7 @@ impl Tool for CargoDocRmcpTool {
     type RequestArgs = CargoDocRequest;
 
     fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<crate::Response, ErrorData> {
-        use rmcp::model::{AnnotateAble, Annotations, Role};
+        use rmcp::model::{Annotations, Role, TextContent};
 
         let cmd = request.build_cmd()?;
         let start_time = std::time::Instant::now();
@@ -370,7 +370,9 @@ impl Tool for CargoDocRmcpTool {
         annotations.audience = Some(vec![Role::User, Role::Assistant]);
         annotations.priority = Some(0.5);
 
-        response.add_content(RawContent::text(doc_info).annotate(annotations));
+        response.add_content(ContentBlock::Text(
+            TextContent::new(doc_info).with_annotations(annotations),
+        ));
 
         if duration.as_secs() >= 30 && !request.no_deps.unwrap_or(false) {
             response.add_recommendation(

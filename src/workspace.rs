@@ -1,4 +1,4 @@
-use rmcp::{model::Root, service::NotificationContext};
+use rmcp::service::NotificationContext;
 
 use crate::globals;
 
@@ -61,7 +61,7 @@ pub fn detect_rust_workspace(context: NotificationContext<rmcp::RoleServer>) {
             result.roots.len(),
             result.roots
         );
-        for Root { uri, .. } in result.roots {
+        for rmcp::model::Root { uri, .. } in result.roots {
             let Some(path) = file_uri_to_path(&uri) else {
                 tracing::warn!("Could not convert root URI to a filesystem path: {uri}");
                 continue;
