@@ -15,7 +15,7 @@ homepage = "https://github.com/Vaiz/rust-mcp-server"
 rust_mcp_server_http = { version = "0.1.0", path = "crates/rust_mcp_server_http" }
 
 # External dependencies
-axum = { version = "0.8.4", default-features = false, features = ["tokio", "http1"] }
+axum = { version = "0.8.9", default-features = false, features = ["tokio", "http1"] }
 clap = { version = "4.5.40", default-features = false, features = ["std", "help", "error-context", "usage", "suggestions", "derive", "string"] }
 ohno = { version = "0.3.8", features = ["app-err"] }
 percent-encoding = "2.3.2"
