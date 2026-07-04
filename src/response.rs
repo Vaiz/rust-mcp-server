@@ -1,15 +1,15 @@
-use rmcp::model::Annotated;
+use rmcp::model::ContentBlock;
 
 use crate::command::{AgentRecommendation, Output};
 
 pub(crate) struct Response {
     output: Output,
-    additional_content: Vec<Annotated<rmcp::model::RawContent>>,
+    additional_content: Vec<ContentBlock>,
     recommendations: Vec<AgentRecommendation>,
 }
 
 impl Response {
-    pub(crate) fn add_content(&mut self, content: Annotated<rmcp::model::RawContent>) {
+    pub(crate) fn add_content(&mut self, content: ContentBlock) {
         self.additional_content.push(content);
     }
 
@@ -45,7 +45,7 @@ impl From<Output> for Response {
 
 #[cfg(test)]
 mod tests {
-    use rmcp::model::{AnnotateAble, Annotations, RawContent};
+    use rmcp::model::{Annotations, ContentBlock, TextContent};
 
     use crate::command::{CommandLine, ExitStatus, Stdout};
 
@@ -85,8 +85,9 @@ mod tests {
             exit_status: ExitStatus(std::process::ExitStatus::default()),
         };
         let mut response: Response = output.into();
-        response
-            .add_content(RawContent::text("additional content").annotate(Annotations::default()));
+        response.add_content(ContentBlock::Text(
+            TextContent::new("additional content").with_annotations(Annotations::default()),
+        ));
         response.add_recommendation("Consider checking the logs.");
 
         let rmcp_result = response.into_rmcp_result(false);

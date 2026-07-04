@@ -206,7 +206,7 @@ impl rmcp::ServerHandler for Server {
         };
 
         let mut capabilities = ServerCapabilities::default();
-        capabilities.tools = Some(ToolsCapability { list_changed: None });
+        capabilities.tools = Some(ToolsCapability::default());
 
         let mut server_info = Implementation::default();
         server_info.name = "Rust MCP Server".to_owned();
