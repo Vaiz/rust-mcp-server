@@ -7,9 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0](https://github.com/Vaiz/rust-mcp-server/compare/v0.3.8...v0.4.0) - 2026-07-05
+
+### Added
+
+- add support for the streamable HTTP transport mode ([#128](https://github.com/Vaiz/rust-mcp-server/pull/128))
+
 ### Changed
 
-- switch from `anyhow` to `ohno::AppError` for error handling ([#122](https://github.com/Vaiz/rust-mcp-server/issues/122))
+- run cargo command execution on blocking threads to avoid stalling the async runtime ([#132](https://github.com/Vaiz/rust-mcp-server/pull/132))
+- switch error handling from `anyhow` to `ohno::AppError` ([#123](https://github.com/Vaiz/rust-mcp-server/pull/123))
+- update `rmcp` to 2.1 ([#126](https://github.com/Vaiz/rust-mcp-server/pull/126))
 
 ## [0.3.8](https://github.com/Vaiz/rust-mcp-server/compare/v0.3.7...v0.3.8) - 2026-05-08
 

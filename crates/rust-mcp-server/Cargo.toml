@@ -1,6 +1,6 @@
 [package]
 name = "rust-mcp-server"
-version = "0.3.8"
+version = "0.4.0"
 edition.workspace = true
 rust-version.workspace = true
 description = "An MCP server for Rust development"
@@ -12,11 +12,8 @@ readme = "../../README.md"
 keywords = ["mcp", "cli"]
 include = [
     "/src/**",
-    "/docs/**",
-    "/prompts/**",
+    "/docs/instructions.md",
     "build.rs",
-    "!docker/**",
-    "!*.png"
 ]
 
 [features]
