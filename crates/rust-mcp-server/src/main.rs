@@ -68,8 +68,18 @@ struct Args {
     port: u16,
 }
 
-#[tokio::main]
-async fn main() -> Result<(), ohno::AppError> {
+/// Number of async worker threads. The async workload is limited to MCP
+/// protocol handling, so a small pool is sufficient; the heavy lifting happens
+/// on the blocking pool (see [`MAX_BLOCKING_THREADS`]).
+const WORKER_THREADS: usize = 2;
+
+/// Upper bound on blocking threads. Every tool invocation (cargo, rustc,
+/// rustup, etc.) runs on a blocking thread (via `spawn_blocking`), so this caps
+/// how many commands execute concurrently while leaving headroom for tokio's
+/// internal blocking work.
+const MAX_BLOCKING_THREADS: usize = 4;
+
+fn main() -> Result<(), ohno::AppError> {
     let args = Args::parse();
 
     if let Some(output_file) = args.generate_docs.as_deref() {
@@ -77,6 +87,18 @@ async fn main() -> Result<(), ohno::AppError> {
         return generate_docs(&server, output_file);
     }
 
+    let runtime = tokio::runtime::Builder::new_multi_thread()
+        .worker_threads(WORKER_THREADS)
+        .max_blocking_threads(MAX_BLOCKING_THREADS)
+        .thread_name("rust-mcp-server")
+        .enable_all()
+        .build()
+        .into_app_err("Failed to build tokio runtime")?;
+
+    runtime.block_on(run(args))
+}
+
+async fn run(args: Args) -> Result<(), ohno::AppError> {
     init_logging(&args);
     tracing::info!("Starting Rust MCP Server: {args:?}");
     tracing::info!("Server version: {}", AppVersion::version());
