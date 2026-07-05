@@ -12,12 +12,8 @@ readme = "../../README.md"
 keywords = ["mcp", "cli"]
 include = [
     "/src/**",
-    "/docs/**",
-    "/prompts/**",
+    "/docs/instructions.md",
     "build.rs",
-    "CHANGELOG.md",
-    "!docker/**",
-    "!*.png"
 ]
 
 [features]
