@@ -73,9 +73,10 @@ struct Args {
 /// on the blocking pool (see [`MAX_BLOCKING_THREADS`]).
 const WORKER_THREADS: usize = 2;
 
-/// Upper bound on blocking threads. Each cargo command runs on a blocking
-/// thread (via `spawn_blocking`), so this caps how many commands execute
-/// concurrently while leaving headroom for tokio's internal blocking work.
+/// Upper bound on blocking threads. Every tool invocation (cargo, rustc,
+/// rustup, etc.) runs on a blocking thread (via `spawn_blocking`), so this caps
+/// how many commands execute concurrently while leaving headroom for tokio's
+/// internal blocking work.
 const MAX_BLOCKING_THREADS: usize = 4;
 
 fn main() -> Result<(), ohno::AppError> {

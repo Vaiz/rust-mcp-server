@@ -266,9 +266,13 @@ impl rmcp::ServerHandler for Server {
         request: rmcp::model::CallToolRequestParams,
         _context: RequestContext<rmcp::RoleServer>,
     ) -> Result<rmcp::model::CallToolResult, ErrorData> {
-        let tool = Arc::clone(self.tools.get(request.name.as_ref()).ok_or_else(|| {
-            ErrorData::invalid_request(format!("Tool '{}' not found", request.name), None)
-        })?);
+        let (&tool_name, tool) =
+            self.tools
+                .get_key_value(request.name.as_ref())
+                .ok_or_else(|| {
+                    ErrorData::invalid_request(format!("Tool '{}' not found", request.name), None)
+                })?;
+        let tool = Arc::clone(tool);
         let ignore_recommendations = self.ignore_recommendations;
 
         tokio::task::spawn_blocking(move || {
@@ -276,6 +280,11 @@ impl rmcp::ServerHandler for Server {
                 .map(|r| r.into_rmcp_result(ignore_recommendations))
         })
         .await
-        .map_err(|e| ErrorData::internal_error(format!("Tool execution task failed: {e}"), None))?
+        .map_err(|e| {
+            ErrorData::internal_error(
+                format!("Tool execution task failed for '{tool_name}': {e}"),
+                None,
+            )
+        })?
     }
 }
