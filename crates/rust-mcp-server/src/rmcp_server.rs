@@ -34,7 +34,7 @@ use crate::{
 pub struct Server {
     ignore_recommendations: bool,
     detect_workspace: bool,
-    tools: HashMap<&'static str, Box<dyn DynTool + Send + Sync>>,
+    tools: HashMap<&'static str, Arc<dyn DynTool + Send + Sync>>,
 }
 
 impl Server {
@@ -43,78 +43,78 @@ impl Server {
         ignore_recommendations: bool,
         detect_workspace: bool,
     ) -> Self {
-        let mut tools: HashMap<&'static str, Box<dyn DynTool + Send + Sync>> = HashMap::new();
+        let mut tools: HashMap<&'static str, Arc<dyn DynTool + Send + Sync>> = HashMap::new();
 
         // Cargo tools
-        tools.insert(CargoAddRmcpTool::NAME, Box::new(CargoAddRmcpTool));
-        tools.insert(CargoBuildRmcpTool::NAME, Box::new(CargoBuildRmcpTool));
-        tools.insert(CargoCheckRmcpTool::NAME, Box::new(CargoCheckRmcpTool));
-        tools.insert(CargoCleanRmcpTool::NAME, Box::new(CargoCleanRmcpTool));
-        tools.insert(CargoClippyRmcpTool::NAME, Box::new(CargoClippyRmcpTool));
-        tools.insert(CargoDocRmcpTool::NAME, Box::new(CargoDocRmcpTool));
-        tools.insert(CargoExpandRmcpTool::NAME, Box::new(CargoExpandRmcpTool));
-        tools.insert(CargoFmtRmcpTool::NAME, Box::new(CargoFmtRmcpTool));
+        tools.insert(CargoAddRmcpTool::NAME, Arc::new(CargoAddRmcpTool));
+        tools.insert(CargoBuildRmcpTool::NAME, Arc::new(CargoBuildRmcpTool));
+        tools.insert(CargoCheckRmcpTool::NAME, Arc::new(CargoCheckRmcpTool));
+        tools.insert(CargoCleanRmcpTool::NAME, Arc::new(CargoCleanRmcpTool));
+        tools.insert(CargoClippyRmcpTool::NAME, Arc::new(CargoClippyRmcpTool));
+        tools.insert(CargoDocRmcpTool::NAME, Arc::new(CargoDocRmcpTool));
+        tools.insert(CargoExpandRmcpTool::NAME, Arc::new(CargoExpandRmcpTool));
+        tools.insert(CargoFmtRmcpTool::NAME, Arc::new(CargoFmtRmcpTool));
         tools.insert(
             CargoGenerateLockfileRmcpTool::NAME,
-            Box::new(CargoGenerateLockfileRmcpTool),
+            Arc::new(CargoGenerateLockfileRmcpTool),
         );
-        tools.insert(CargoInfoRmcpTool::NAME, Box::new(CargoInfoRmcpTool));
-        tools.insert(CargoListRmcpTool::NAME, Box::new(CargoListRmcpTool));
-        tools.insert(CargoMetadataRmcpTool::NAME, Box::new(CargoMetadataRmcpTool));
-        tools.insert(CargoNewRmcpTool::NAME, Box::new(CargoNewRmcpTool));
-        tools.insert(CargoPackageRmcpTool::NAME, Box::new(CargoPackageRmcpTool));
-        tools.insert(CargoRemoveRmcpTool::NAME, Box::new(CargoRemoveRmcpTool));
-        tools.insert(CargoSearchRmcpTool::NAME, Box::new(CargoSearchRmcpTool));
-        tools.insert(CargoTestRmcpTool::NAME, Box::new(CargoTestRmcpTool));
-        tools.insert(CargoTreeRmcpTool::NAME, Box::new(CargoTreeRmcpTool));
-        tools.insert(CargoUpdateRmcpTool::NAME, Box::new(CargoUpdateRmcpTool));
+        tools.insert(CargoInfoRmcpTool::NAME, Arc::new(CargoInfoRmcpTool));
+        tools.insert(CargoListRmcpTool::NAME, Arc::new(CargoListRmcpTool));
+        tools.insert(CargoMetadataRmcpTool::NAME, Arc::new(CargoMetadataRmcpTool));
+        tools.insert(CargoNewRmcpTool::NAME, Arc::new(CargoNewRmcpTool));
+        tools.insert(CargoPackageRmcpTool::NAME, Arc::new(CargoPackageRmcpTool));
+        tools.insert(CargoRemoveRmcpTool::NAME, Arc::new(CargoRemoveRmcpTool));
+        tools.insert(CargoSearchRmcpTool::NAME, Arc::new(CargoSearchRmcpTool));
+        tools.insert(CargoTestRmcpTool::NAME, Arc::new(CargoTestRmcpTool));
+        tools.insert(CargoTreeRmcpTool::NAME, Arc::new(CargoTreeRmcpTool));
+        tools.insert(CargoUpdateRmcpTool::NAME, Arc::new(CargoUpdateRmcpTool));
         tools.insert(
             CargoWorkspaceInfoRmcpTool::NAME,
-            Box::new(CargoWorkspaceInfoRmcpTool),
+            Arc::new(CargoWorkspaceInfoRmcpTool),
         );
 
         // Cargo-deny tools
         tools.insert(
             CargoDenyCheckRmcpTool::NAME,
-            Box::new(CargoDenyCheckRmcpTool),
+            Arc::new(CargoDenyCheckRmcpTool),
         );
-        tools.insert(CargoDenyInitRmcpTool::NAME, Box::new(CargoDenyInitRmcpTool));
+        tools.insert(CargoDenyInitRmcpTool::NAME, Arc::new(CargoDenyInitRmcpTool));
         tools.insert(
             CargoDenyInstallRmcpTool::NAME,
-            Box::new(CargoDenyInstallRmcpTool),
+            Arc::new(CargoDenyInstallRmcpTool),
         );
-        tools.insert(CargoDenyListRmcpTool::NAME, Box::new(CargoDenyListRmcpTool));
+        tools.insert(CargoDenyListRmcpTool::NAME, Arc::new(CargoDenyListRmcpTool));
 
         // Cargo-hack tools
-        tools.insert(CargoHackRmcpTool::NAME, Box::new(CargoHackRmcpTool));
+        tools.insert(CargoHackRmcpTool::NAME, Arc::new(CargoHackRmcpTool));
         tools.insert(
             CargoHackInstallRmcpTool::NAME,
-            Box::new(CargoHackInstallRmcpTool),
+            Arc::new(CargoHackInstallRmcpTool),
         );
 
         // Cargo-insta tools
         tools.insert(
             CargoInstaUpdateSnapshotsRmcpTool::NAME,
-            Box::new(CargoInstaUpdateSnapshotsRmcpTool),
+            Arc::new(CargoInstaUpdateSnapshotsRmcpTool),
         );
 
         // Cargo-machete tools
-        tools.insert(CargoMacheteRmcpTool::NAME, Box::new(CargoMacheteRmcpTool));
+        tools.insert(CargoMacheteRmcpTool::NAME, Arc::new(CargoMacheteRmcpTool));
         tools.insert(
             CargoMacheteInstallRmcpTool::NAME,
-            Box::new(CargoMacheteInstallRmcpTool),
+            Arc::new(CargoMacheteInstallRmcpTool),
         );
 
         // Rustc tools
-        tools.insert(RustcExplainRmcpTool::NAME, Box::new(RustcExplainRmcpTool));
+        tools.insert(RustcExplainRmcpTool::NAME, Arc::new(RustcExplainRmcpTool));
 
         // Rustup tools
-        tools.insert(RustupShowRmcpTool::NAME, Box::new(RustupShowRmcpTool));
+        tools.insert(RustupShowRmcpTool::NAME, Arc::new(RustupShowRmcpTool));
         tools.insert(
             RustupToolchainAddRmcpTool::NAME,
-            Box::new(RustupToolchainAddRmcpTool),
+            Arc::new(RustupToolchainAddRmcpTool),
         );
-        tools.insert(RustupUpdateRmcpTool::NAME, Box::new(RustupUpdateRmcpTool));
+        tools.insert(RustupUpdateRmcpTool::NAME, Arc::new(RustupUpdateRmcpTool));
 
         if !disabled_tools.is_empty() {
             tracing::info!("Disabled tools: {}", disabled_tools.join(", "));
@@ -266,11 +266,16 @@ impl rmcp::ServerHandler for Server {
         request: rmcp::model::CallToolRequestParams,
         _context: RequestContext<rmcp::RoleServer>,
     ) -> Result<rmcp::model::CallToolResult, ErrorData> {
-        let tool = self.tools.get(request.name.as_ref()).ok_or_else(|| {
+        let tool = Arc::clone(self.tools.get(request.name.as_ref()).ok_or_else(|| {
             ErrorData::invalid_request(format!("Tool '{}' not found", request.name), None)
-        })?;
+        })?);
+        let ignore_recommendations = self.ignore_recommendations;
 
-        tool.call_rmcp_tool(request)
-            .map(|r| r.into_rmcp_result(self.ignore_recommendations))
+        tokio::task::spawn_blocking(move || {
+            tool.call_rmcp_tool(request)
+                .map(|r| r.into_rmcp_result(ignore_recommendations))
+        })
+        .await
+        .map_err(|e| ErrorData::internal_error(format!("Tool execution task failed: {e}"), None))?
     }
 }
