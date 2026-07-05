@@ -1,5 +1,7 @@
 mod command;
 mod globals;
+#[cfg(feature = "http")]
+mod http;
 mod meta;
 mod response;
 mod rmcp_server;
@@ -162,7 +164,7 @@ async fn serve_http(args: &Args, detect_workspace: bool) -> Result<(), ohno::App
     };
     tracing::info!("Starting HTTP transport on {addr}");
     eprintln!("Rust MCP Server started on http://{addr}/");
-    rust_mcp_server_http::serve(addr, factory)
+    http::serve(addr, factory)
         .await
         .into_app_err("HTTP server failed")
 }

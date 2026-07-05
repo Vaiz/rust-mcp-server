@@ -1,9 +1,8 @@
 //! HTTP streamable transport for the Rust MCP server.
 //!
-//! This crate isolates all HTTP transport dependencies (axum, the rmcp
-//! streamable HTTP server transport and its transitive dependencies) so that
-//! they are only compiled when the `http` feature of `rust-mcp-server` is
-//! enabled.
+//! This module isolates all HTTP transport dependencies (axum, the rmcp
+//! streamable HTTP server transport and its transitive dependencies) behind the
+//! `http` feature so that they are only compiled when that feature is enabled.
 //!
 //! The MCP endpoint is served at the root path (`/`). rmcp's default
 //! DNS-rebinding protection (loopback-only allowed hosts) is kept enabled, so
