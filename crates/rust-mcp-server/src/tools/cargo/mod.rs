@@ -262,9 +262,10 @@ pub struct CargoFmtRequest {
     #[serde(default, deserialize_with = "deserialize_string_vec")]
     package: Option<Vec<String>>,
 
-    /// Format all packages, and also their local path-based dependencies
+    /// Format all packages, and also their local path-based dependencies.
+    /// When unset, `--all` is added automatically for virtual workspace manifests.
     #[serde(default)]
-    all: bool,
+    all: Option<bool>,
 
     /// Run rustfmt in check mode (don't write changes, just check if formatting is needed)
     #[serde(default)]
@@ -306,20 +307,22 @@ impl CargoFmtRequest {
         // `cargo fmt` fails with "Failed to find targets" when pointed at a
         // virtual workspace manifest (a `[workspace]` root without a
         // `[package]`) unless `--all` or an explicit `--package` is provided.
-        // Detect that case and add `--all` automatically.
-        let auto_all = !self.all
-            && self.package.is_none()
-            && self
-                .manifest_path
-                .as_deref()
-                .is_some_and(is_virtual_manifest);
-        if auto_all {
-            tracing::info!(
-                "Detected virtual workspace manifest; adding --all to cargo fmt automatically"
-            );
-        }
+        // When `all` is unset, detect that case and add `--all` automatically.
+        let use_all = self.all.unwrap_or_else(|| {
+            let auto = self.package.is_none()
+                && self
+                    .manifest_path
+                    .as_deref()
+                    .is_some_and(is_virtual_manifest);
+            if auto {
+                tracing::info!(
+                    "Detected virtual workspace manifest; adding --all to cargo fmt automatically"
+                );
+            }
+            auto
+        });
 
-        if self.all || auto_all {
+        if use_all {
             cmd.arg("--all");
         }
 
