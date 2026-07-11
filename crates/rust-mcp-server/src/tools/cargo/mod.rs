@@ -262,9 +262,10 @@ pub struct CargoFmtRequest {
     #[serde(default, deserialize_with = "deserialize_string_vec")]
     package: Option<Vec<String>>,
 
-    /// Format all packages, and also their local path-based dependencies
+    /// Format all packages, and also their local path-based dependencies.
+    /// When unset, `--all` is added automatically for virtual workspace manifests.
     #[serde(default)]
-    all: bool,
+    all: Option<bool>,
 
     /// Run rustfmt in check mode (don't write changes, just check if formatting is needed)
     #[serde(default)]
@@ -303,7 +304,26 @@ impl CargoFmtRequest {
             }
         }
 
-        if self.all {
+        // `cargo fmt` fails with "Failed to find targets" when pointed at a
+        // virtual workspace manifest (a `[workspace]` root without a
+        // `[package]`) unless `--all` or an explicit `--package` is provided.
+        // When `all` is unset, detect that case and add `--all` automatically.
+        let use_all = self.all.unwrap_or_else(|| {
+            let no_package = self.package.as_ref().is_none_or(|p| p.is_empty());
+            let auto = no_package
+                && self
+                    .manifest_path
+                    .as_deref()
+                    .is_some_and(is_virtual_manifest);
+            if auto {
+                tracing::info!(
+                    "Detected virtual workspace manifest; adding --all to cargo fmt automatically"
+                );
+            }
+            auto
+        });
+
+        if use_all {
             cmd.arg("--all");
         }
 
@@ -327,6 +347,36 @@ impl CargoFmtRequest {
 
         Ok(cmd)
     }
+}
+
+/// Returns `true` if the given `Cargo.toml` is a virtual manifest, i.e. a
+/// workspace root that contains a `[workspace]` table but no `[package]`.
+///
+/// Returns `false` when the file cannot be read, so callers fall back to
+/// cargo's default behavior.
+fn is_virtual_manifest(manifest_path: &str) -> bool {
+    let Ok(contents) = std::fs::read_to_string(manifest_path) else {
+        return false;
+    };
+    manifest_contents_are_virtual(&contents)
+}
+
+/// Returns `true` if the manifest contents describe a virtual manifest, i.e.
+/// they contain a `[workspace]` table but no `[package]` table (matching
+/// cargo's definition of a virtual manifest). Sub-tables such as
+/// `[workspace.package]` and `[package.metadata]` are recognized as well.
+fn manifest_contents_are_virtual(contents: &str) -> bool {
+    let mut has_workspace = false;
+    let mut has_package = false;
+    for line in contents.lines() {
+        let line = line.trim();
+        if line.starts_with("[workspace]") || line.starts_with("[workspace.") {
+            has_workspace = true;
+        } else if line.starts_with("[package]") || line.starts_with("[package.") {
+            has_package = true;
+        }
+    }
+    has_workspace && !has_package
 }
 
 pub struct CargoFmtRmcpTool;
@@ -490,5 +540,31 @@ impl Tool for CargoListRmcpTool {
 
     fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<crate::Response, ErrorData> {
         execute_command(request.build_cmd()?, Self::NAME).map(Into::into)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn virtual_manifest_detection() {
+        assert!(manifest_contents_are_virtual(
+            "[workspace]\nmembers = [\"crates/*\"]\n"
+        ));
+        assert!(manifest_contents_are_virtual("[workspace.package]\n"));
+        assert!(!manifest_contents_are_virtual(
+            "[package]\nname = \"foo\"\n"
+        ));
+        assert!(!manifest_contents_are_virtual(
+            "  [package]  # inline comment\nname = \"foo\"\n"
+        ));
+        assert!(!manifest_contents_are_virtual(
+            "[workspace]\n\n[package.metadata]\nkey = \"value\"\n"
+        ));
+        // Neither `[package]` nor `[workspace]`: not a virtual manifest.
+        assert!(!manifest_contents_are_virtual(
+            "[dependencies]\nfoo = \"1\"\n"
+        ));
     }
 }
