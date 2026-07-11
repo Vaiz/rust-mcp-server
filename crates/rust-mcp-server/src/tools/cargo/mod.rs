@@ -309,7 +309,8 @@ impl CargoFmtRequest {
         // `[package]`) unless `--all` or an explicit `--package` is provided.
         // When `all` is unset, detect that case and add `--all` automatically.
         let use_all = self.all.unwrap_or_else(|| {
-            let auto = self.package.is_none()
+            let no_package = self.package.as_ref().is_none_or(|p| p.is_empty());
+            let auto = no_package
                 && self
                     .manifest_path
                     .as_deref()
@@ -361,13 +362,21 @@ fn is_virtual_manifest(manifest_path: &str) -> bool {
 }
 
 /// Returns `true` if the manifest contents describe a virtual manifest, i.e.
-/// they contain no `[package]` table (including sub-tables such as
-/// `[package.metadata]`).
+/// they contain a `[workspace]` table but no `[package]` table (matching
+/// cargo's definition of a virtual manifest). Sub-tables such as
+/// `[workspace.package]` and `[package.metadata]` are recognized as well.
 fn manifest_contents_are_virtual(contents: &str) -> bool {
-    !contents.lines().any(|line| {
+    let mut has_workspace = false;
+    let mut has_package = false;
+    for line in contents.lines() {
         let line = line.trim();
-        line.starts_with("[package]") || line.starts_with("[package.")
-    })
+        if line.starts_with("[workspace]") || line.starts_with("[workspace.") {
+            has_workspace = true;
+        } else if line.starts_with("[package]") || line.starts_with("[package.") {
+            has_package = true;
+        }
+    }
+    has_workspace && !has_package
 }
 
 pub struct CargoFmtRmcpTool;
@@ -552,6 +561,10 @@ mod tests {
         ));
         assert!(!manifest_contents_are_virtual(
             "[workspace]\n\n[package.metadata]\nkey = \"value\"\n"
+        ));
+        // Neither `[package]` nor `[workspace]`: not a virtual manifest.
+        assert!(!manifest_contents_are_virtual(
+            "[dependencies]\nfoo = \"1\"\n"
         ));
     }
 }
