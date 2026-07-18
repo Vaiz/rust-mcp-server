@@ -355,6 +355,14 @@ impl CargoFmtRequest {
 /// Returns `false` when the file cannot be read, so callers fall back to
 /// cargo's default behavior.
 fn is_virtual_manifest(manifest_path: &str) -> bool {
+    // Reject paths containing parent-directory traversal components to prevent
+    // reading files outside the intended workspace scope.
+    if std::path::Path::new(manifest_path)
+        .components()
+        .any(|c| c == std::path::Component::ParentDir)
+    {
+        return false;
+    }
     let Ok(contents) = std::fs::read_to_string(manifest_path) else {
         return false;
     };

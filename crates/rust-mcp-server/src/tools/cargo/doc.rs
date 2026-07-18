@@ -297,9 +297,17 @@ impl CargoDocRequest {
         {
             // Convert package name to the format used in file paths (hyphens to underscores)
             let package_path_name = first_package.replace('-', "_");
-            let package_index = absolute_doc_dir.join(&package_path_name).join("index.html");
-            if package_index.exists() {
-                return Some(Self::normalize_path(&package_index));
+            // Validate that the resulting path component contains only safe characters
+            // (alphanumeric, hyphen, underscore) to prevent path traversal.
+            let is_safe = package_path_name
+                .chars()
+                .all(|c| c.is_alphanumeric() || c == '-' || c == '_');
+            if is_safe {
+                let package_index =
+                    absolute_doc_dir.join(&package_path_name).join("index.html");
+                if package_index.exists() {
+                    return Some(Self::normalize_path(&package_index));
+                }
             }
         }
 

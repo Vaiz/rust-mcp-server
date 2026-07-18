@@ -66,6 +66,17 @@ pub fn detect_rust_workspace(context: NotificationContext<rmcp::RoleServer>) {
                 tracing::warn!("Could not convert root URI to a filesystem path: {uri}");
                 continue;
             };
+            // Reject paths that contain parent-directory traversal components to
+            // prevent accessing files outside the supplied root.
+            if path
+                .components()
+                .any(|c| c == std::path::Component::ParentDir)
+            {
+                tracing::warn!(
+                    "Root URI contains path traversal component, skipping: {uri}"
+                );
+                continue;
+            }
             tracing::info!(
                 "Checking root for Cargo project: {uri} -> {}",
                 path.display()
