@@ -1,12 +1,31 @@
+use std::path::Path;
+
 use rmcp::service::NotificationContext;
 
-use crate::globals;
+use crate::globals::{self, WorkspaceRoot};
 
-/// Applies the workspace root to a command if it is set
-pub fn apply_workspace_root(cmd: &mut std::process::Command) {
-    if let Some(root) = globals::get_workspace_root() {
-        cmd.current_dir(root);
+/// Resolves the working directory a cargo command should run in, given the
+/// request's `--manifest-path` (if any). Priority:
+///
+/// 1. An explicitly configured workspace root (e.g. via the CLI) always wins.
+/// 2. Otherwise, the directory of the manifest, so cargo discovers that
+///    project's local `.cargo/config.toml`. Config discovery walks up from the
+///    working directory, not from the manifest path, so `--manifest-path` alone
+///    would silently ignore the project's own config.
+/// 3. Otherwise, an auto-detected workspace root.
+pub fn command_cwd(manifest_path: Option<&str>) -> Option<&Path> {
+    if let Some(root @ WorkspaceRoot::Explicit(_)) = globals::get_workspace_root() {
+        return Some(root.path());
     }
+
+    // Only absolute manifest paths select the manifest's directory: a relative
+    // one would no longer resolve once the working directory changes, and MCP
+    // clients pass absolute paths.
+    manifest_path
+        .map(Path::new)
+        .filter(|path| path.is_absolute())
+        .and_then(Path::parent)
+        .or_else(|| globals::get_workspace_root().map(WorkspaceRoot::path))
 }
 
 /// If CWD contains `Cargo.toml` then function does nothing. Otherwise it tries to detect workspace root from client roots.

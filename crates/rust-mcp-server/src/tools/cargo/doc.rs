@@ -4,7 +4,7 @@ use std::process::Command;
 use rmcp::{ErrorData, model::ContentBlock};
 
 use crate::{
-    Tool, execute_command,
+    Tool, command_cwd, execute_command,
     serde_utils::{
         deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
@@ -286,7 +286,7 @@ impl CargoDocRequest {
 
         // Get the absolute path using workspace root
         let absolute_doc_dir = if let Some(workspace_root) = get_workspace_root() {
-            workspace_root.join(&doc_dir)
+            workspace_root.path().join(&doc_dir)
         } else {
             Path::new(&doc_dir).to_path_buf()
         };
@@ -348,8 +348,9 @@ impl Tool for CargoDocRmcpTool {
         use rmcp::model::{Annotations, Role, TextContent};
 
         let cmd = request.build_cmd()?;
+        let cwd = command_cwd(request.manifest_path.as_deref());
         let start_time = std::time::Instant::now();
-        let output = execute_command(cmd, Self::NAME)?;
+        let output = execute_command(cmd, Self::NAME, cwd)?;
         let duration = start_time.elapsed();
 
         if !output.success() {

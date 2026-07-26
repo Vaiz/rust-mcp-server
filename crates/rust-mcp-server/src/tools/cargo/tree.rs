@@ -1,7 +1,7 @@
 use std::process::Command;
 
 use crate::{
-    Tool, execute_command,
+    Tool, command_cwd, execute_command,
     response::Response,
     serde_utils::{deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags},
 };
@@ -195,7 +195,8 @@ impl Tool for CargoTreeRmcpTool {
 
     fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<crate::Response, ErrorData> {
         let cmd = request.build_cmd()?;
-        let output = execute_command(cmd, Self::NAME)?;
+        let cwd = command_cwd(request.manifest_path.as_deref());
+        let output = execute_command(cmd, Self::NAME, cwd)?;
 
         let stdout_len = if output.success()
             && let Some(stdout) = &output.stdout

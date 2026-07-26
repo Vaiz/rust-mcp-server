@@ -4,7 +4,6 @@ use rmcp::{
 };
 
 use crate::meta::Meta;
-use crate::workspace::apply_workspace_root;
 
 #[derive(Debug, Clone)]
 pub(crate) struct CommandLine(pub String);
@@ -169,8 +168,11 @@ impl From<Output> for CallToolResult {
 pub(crate) fn execute_command(
     mut cmd: std::process::Command,
     tool_name: &str,
+    cwd: Option<&std::path::Path>,
 ) -> Result<Output, ErrorData> {
-    apply_workspace_root(&mut cmd);
+    if let Some(cwd) = cwd {
+        cmd.current_dir(cwd);
+    }
 
     let cmd_line = format!(
         "{} {}",

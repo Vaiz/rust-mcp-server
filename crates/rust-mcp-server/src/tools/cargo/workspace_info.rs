@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::process::Command;
 
-use crate::{Tool, command::execute_command, serde_utils::deserialize_string};
+use crate::{Tool, command::execute_command, command_cwd, serde_utils::deserialize_string};
 use rmcp::{
     ErrorData,
     model::{Annotations, ContentBlock, Role, TextContent},
@@ -53,7 +53,8 @@ impl Tool for CargoWorkspaceInfoRmcpTool {
 
     fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<crate::Response, ErrorData> {
         let cmd = request.build_cmd()?;
-        let mut output = execute_command(cmd, Self::NAME)?;
+        let cwd = command_cwd(request.manifest_path.as_deref());
+        let mut output = execute_command(cmd, Self::NAME, cwd)?;
 
         if !output.success() {
             return Ok(output.into());

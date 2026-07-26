@@ -22,6 +22,7 @@ use tool::Tool;
 use tracing_appender::rolling;
 use tracing_subscriber::{EnvFilter, fmt};
 use version::AppVersion;
+use workspace::command_cwd;
 
 const RMCP_VERSION: &str = env!("RMCP_VERSION");
 

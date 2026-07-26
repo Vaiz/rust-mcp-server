@@ -29,7 +29,7 @@ pub use workspace_info::CargoWorkspaceInfoRmcpTool;
 use std::process::Command;
 
 use crate::{
-    Tool, execute_command,
+    Tool, command_cwd, execute_command,
     serde_utils::{
         deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
@@ -110,7 +110,8 @@ impl Tool for CargoGenerateLockfileRmcpTool {
     type RequestArgs = CargoGenerateLockfileRequest;
 
     fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<crate::Response, ErrorData> {
-        execute_command(request.build_cmd()?, Self::NAME).map(Into::into)
+        let cwd = command_cwd(request.manifest_path.as_deref());
+        execute_command(request.build_cmd()?, Self::NAME, cwd).map(Into::into)
     }
 }
 
@@ -248,7 +249,8 @@ impl Tool for CargoCleanRmcpTool {
     type RequestArgs = CargoCleanRequest;
 
     fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<crate::Response, ErrorData> {
-        execute_command(request.build_cmd()?, Self::NAME).map(Into::into)
+        let cwd = command_cwd(request.manifest_path.as_deref());
+        execute_command(request.build_cmd()?, Self::NAME, cwd).map(Into::into)
     }
 }
 
@@ -389,7 +391,8 @@ impl Tool for CargoFmtRmcpTool {
     type RequestArgs = CargoFmtRequest;
 
     fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<crate::Response, ErrorData> {
-        let output = execute_command(request.build_cmd()?, Self::NAME)?;
+        let cwd = command_cwd(request.manifest_path.as_deref());
+        let output = execute_command(request.build_cmd()?, Self::NAME, cwd)?;
         let failed = !output.success();
         let mut response: crate::Response = output.into();
 
@@ -515,7 +518,7 @@ impl Tool for CargoNewRmcpTool {
     type RequestArgs = CargoNewRequest;
 
     fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<crate::Response, ErrorData> {
-        execute_command(request.build_cmd()?, Self::NAME).map(Into::into)
+        execute_command(request.build_cmd()?, Self::NAME, command_cwd(None)).map(Into::into)
     }
 }
 
@@ -539,7 +542,7 @@ impl Tool for CargoListRmcpTool {
     type RequestArgs = CargoListRequest;
 
     fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<crate::Response, ErrorData> {
-        execute_command(request.build_cmd()?, Self::NAME).map(Into::into)
+        execute_command(request.build_cmd()?, Self::NAME, command_cwd(None)).map(Into::into)
     }
 }
 

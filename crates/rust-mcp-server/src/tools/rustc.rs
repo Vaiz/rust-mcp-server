@@ -1,6 +1,6 @@
 use std::process::Command;
 
-use crate::{Tool, execute_command, serde_utils::deserialize_string};
+use crate::{Tool, command_cwd, execute_command, serde_utils::deserialize_string};
 use rmcp::ErrorData;
 
 #[derive(Debug, ::serde::Deserialize, ::schemars::JsonSchema)]
@@ -37,6 +37,6 @@ impl Tool for RustcExplainRmcpTool {
     type RequestArgs = RustcExplainRequest;
 
     fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<crate::Response, ErrorData> {
-        execute_command(request.build_cmd()?, Self::NAME).map(Into::into)
+        execute_command(request.build_cmd()?, Self::NAME, command_cwd(None)).map(Into::into)
     }
 }

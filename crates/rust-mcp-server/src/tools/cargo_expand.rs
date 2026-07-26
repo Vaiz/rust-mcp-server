@@ -3,7 +3,7 @@ use std::process::Command;
 use rmcp::ErrorData;
 
 use crate::{
-    Tool, execute_command,
+    Tool, command_cwd, execute_command,
     serde_utils::{deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags},
 };
 
@@ -197,6 +197,7 @@ impl Tool for CargoExpandRmcpTool {
     type RequestArgs = CargoExpandRequest;
 
     fn call_rmcp_tool(&self, req: Self::RequestArgs) -> Result<crate::Response, rmcp::ErrorData> {
-        execute_command(req.build_cmd()?, Self::NAME).map(Into::into)
+        let cwd = command_cwd(req.manifest_path.as_deref());
+        execute_command(req.build_cmd()?, Self::NAME, cwd).map(Into::into)
     }
 }

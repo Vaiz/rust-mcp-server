@@ -1,6 +1,6 @@
 use std::process::Command;
 
-use crate::{Tool, execute_command, serde_utils::deserialize_string_vec};
+use crate::{Tool, command_cwd, execute_command, serde_utils::deserialize_string_vec};
 use rmcp::ErrorData;
 
 #[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
@@ -67,7 +67,7 @@ impl Tool for CargoMacheteRmcpTool {
     type RequestArgs = CargoMacheteRequest;
 
     fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<crate::Response, ErrorData> {
-        execute_command(request.build_cmd()?, Self::NAME).map(Into::into)
+        execute_command(request.build_cmd()?, Self::NAME, command_cwd(None)).map(Into::into)
     }
 }
 
@@ -92,6 +92,6 @@ impl Tool for CargoMacheteInstallRmcpTool {
     type RequestArgs = CargoMacheteInstallRequest;
 
     fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<crate::Response, ErrorData> {
-        execute_command(request.build_cmd()?, Self::NAME).map(Into::into)
+        execute_command(request.build_cmd()?, Self::NAME, command_cwd(None)).map(Into::into)
     }
 }
