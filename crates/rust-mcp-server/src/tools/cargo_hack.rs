@@ -1,7 +1,7 @@
 use std::process::Command;
 
 use crate::{
-    Tool, execute_command,
+    Tool, command_cwd, execute_command,
     serde_utils::{deserialize_string, deserialize_string_vec, output_verbosity_to_cli_flags},
 };
 use rmcp::ErrorData;
@@ -338,7 +338,8 @@ impl Tool for CargoHackRmcpTool {
     type RequestArgs = CargoHackRequest;
 
     fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<crate::Response, ErrorData> {
-        execute_command(request.build_cmd()?, Self::NAME).map(Into::into)
+        let cwd = command_cwd(request.manifest_path.as_deref());
+        execute_command(request.build_cmd()?, Self::NAME, cwd).map(Into::into)
     }
 }
 
@@ -364,6 +365,6 @@ impl Tool for CargoHackInstallRmcpTool {
     type RequestArgs = CargoHackInstallRequest;
 
     fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<crate::Response, ErrorData> {
-        execute_command(request.build_cmd()?, Self::NAME).map(Into::into)
+        execute_command(request.build_cmd()?, Self::NAME, command_cwd(None)).map(Into::into)
     }
 }

@@ -1,7 +1,7 @@
 use std::process::Command;
 
 use crate::{
-    Response, Tool, execute_command,
+    Response, Tool, command_cwd, execute_command,
     serde_utils::{
         deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
@@ -285,8 +285,9 @@ impl Tool for CargoBuildRmcpTool {
 
     fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<crate::Response, ErrorData> {
         let cmd = request.build_cmd()?;
+        let cwd = command_cwd(request.manifest_path.as_deref());
         let start_time = std::time::Instant::now();
-        let output = execute_command(cmd, Self::NAME)?;
+        let output = execute_command(cmd, Self::NAME, cwd)?;
         let duration = start_time.elapsed();
 
         let mut response: Response = output.into();

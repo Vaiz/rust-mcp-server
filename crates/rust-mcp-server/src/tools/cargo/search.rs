@@ -1,7 +1,7 @@
 use std::process::Command;
 
 use crate::{
-    Tool, execute_command,
+    Tool, command_cwd, execute_command,
     serde_utils::{deserialize_string, output_verbosity_to_cli_flags},
     tools::Registry,
 };
@@ -52,6 +52,6 @@ impl Tool for CargoSearchRmcpTool {
 
     fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<crate::Response, ErrorData> {
         let cmd = request.build_cmd()?;
-        execute_command(cmd, Self::NAME).map(Into::into)
+        execute_command(cmd, Self::NAME, command_cwd(None)).map(Into::into)
     }
 }

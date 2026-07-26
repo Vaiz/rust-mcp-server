@@ -1,7 +1,7 @@
 use std::process::Command;
 
 use crate::{
-    Tool, execute_command,
+    Tool, command_cwd, execute_command,
     serde_utils::{
         deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
@@ -134,7 +134,8 @@ impl Tool for CargoMetadataRmcpTool {
 
     fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<crate::Response, ErrorData> {
         let cmd = request.build_cmd()?;
-        let mut response: crate::Response = execute_command(cmd, Self::NAME)?.into();
+        let cwd = command_cwd(request.manifest_path.as_deref());
+        let mut response: crate::Response = execute_command(cmd, Self::NAME, cwd)?.into();
 
         if !request.no_deps.unwrap_or(false) {
             response.add_recommendation(

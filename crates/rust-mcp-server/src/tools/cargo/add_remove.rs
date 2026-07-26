@@ -1,7 +1,7 @@
 use std::process::Command;
 
 use crate::{
-    Response, Tool, execute_command,
+    Response, Tool, command_cwd, execute_command,
     serde_utils::{
         PackageWithVersion, deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
@@ -233,7 +233,8 @@ impl Tool for CargoAddRmcpTool {
     type RequestArgs = CargoAddRequest;
 
     fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<Response, ErrorData> {
-        execute_command(request.build_cmd()?, Self::NAME).map(Into::into)
+        let cwd = command_cwd(request.manifest_path.as_deref());
+        execute_command(request.build_cmd()?, Self::NAME, cwd).map(Into::into)
     }
 }
 
@@ -356,7 +357,8 @@ impl Tool for CargoRemoveRmcpTool {
     type RequestArgs = CargoRemoveRequest;
 
     fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<Response, ErrorData> {
-        execute_command(request.build_cmd()?, Self::NAME).map(Into::into)
+        let cwd = command_cwd(request.manifest_path.as_deref());
+        execute_command(request.build_cmd()?, Self::NAME, cwd).map(Into::into)
     }
 }
 
