@@ -4,7 +4,10 @@ use rmcp::ErrorData;
 
 use crate::{
     Tool, command_cwd, execute_command,
-    serde_utils::{deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags},
+    serde_utils::{
+        PackageName, deserialize_package, deserialize_string, deserialize_string_vec,
+        locking_mode_to_cli_flags,
+    },
 };
 
 fn kind_to_cli_flag(kind: Option<&str>) -> Result<Option<&'static str>, ErrorData> {
@@ -39,8 +42,8 @@ pub struct CargoExpandRequest {
     item: Option<String>,
 
     /// Package to expand
-    #[serde(default, deserialize_with = "deserialize_string")]
-    package: Option<String>,
+    #[serde(default, deserialize_with = "deserialize_package")]
+    package: Option<PackageName>,
 
     /// Kind of target to expand. Only one can be specified.
     /// Valid options: "lib", "bin", "example", "test", "bench"

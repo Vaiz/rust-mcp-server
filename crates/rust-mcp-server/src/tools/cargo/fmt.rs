@@ -11,7 +11,9 @@ use std::{path::Path, process::Command};
 
 use crate::{
     Response, Tool, command_cwd, execute_command,
-    serde_utils::{deserialize_string, deserialize_string_vec, output_verbosity_to_cli_flags},
+    serde_utils::{
+        PackageName, deserialize_package_vec, deserialize_string, output_verbosity_to_cli_flags,
+    },
 };
 use rmcp::ErrorData;
 use serde::Deserialize;
@@ -23,8 +25,8 @@ pub struct CargoFmtRequest {
     toolchain: Option<String>,
 
     /// The name of the package(s) to format. If not specified, formats the current package.
-    #[serde(default, deserialize_with = "deserialize_string_vec")]
-    package: Option<Vec<String>>,
+    #[serde(default, deserialize_with = "deserialize_package_vec")]
+    package: Option<Vec<PackageName>>,
 
     /// Format all packages, and also their local path-based dependencies.
     /// When unset, `--all` is added automatically for virtual workspace manifests.
@@ -199,7 +201,12 @@ impl CargoFmtRmcpTool {
             .as_ref()
             .filter(|packages| !packages.is_empty())
         {
-            return Ok((packages.len() > 1).then(|| packages.clone()));
+            return Ok((packages.len() > 1).then(|| {
+                packages
+                    .iter()
+                    .map(|package| package.as_str().to_owned())
+                    .collect()
+            }));
         }
 
         let mut cmd = Command::new("cargo");

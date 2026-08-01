@@ -3,8 +3,8 @@ use std::process::Command;
 use crate::{
     Tool, command_cwd, execute_command,
     serde_utils::{
-        deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
-        output_verbosity_to_cli_flags,
+        PackageName, deserialize_package_vec, deserialize_string, deserialize_string_vec,
+        locking_mode_to_cli_flags, output_verbosity_to_cli_flags,
     },
 };
 use rmcp::ErrorData;
@@ -32,16 +32,16 @@ pub struct CargoTestRequest {
     no_fail_fast: Option<bool>,
 
     /// Package(s) to run tests for
-    #[serde(default, deserialize_with = "deserialize_string_vec")]
-    package: Option<Vec<String>>,
+    #[serde(default, deserialize_with = "deserialize_package_vec")]
+    package: Option<Vec<PackageName>>,
 
     /// Test all packages in the workspace
     #[serde(default)]
     workspace: Option<bool>,
 
     /// Exclude packages from the test
-    #[serde(default, deserialize_with = "deserialize_string_vec")]
-    exclude: Option<Vec<String>>,
+    #[serde(default, deserialize_with = "deserialize_package_vec")]
+    exclude: Option<Vec<PackageName>>,
 
     /// Test only this package's library
     #[serde(default)]
@@ -355,10 +355,7 @@ mod tests {
         let tool: Result<CargoTestRequest, _> = serde_json::from_value(input);
         let tool = tool.expect("Deserialization should succeed with package array");
 
-        assert_eq!(
-            tool.package.unwrap(),
-            ["my_package".to_owned(), "another_package".to_owned()]
-        );
+        assert_eq!(tool.package.unwrap(), ["my_package", "another_package"]);
         assert_eq!(tool.workspace, None);
         assert_eq!(tool.all_features, None);
     }
@@ -372,7 +369,7 @@ mod tests {
         let tool: Result<CargoTestRequest, _> = serde_json::from_value(input);
         let tool = tool.expect("Deserialization should succeed with single-item package array");
 
-        assert_eq!(tool.package.unwrap(), ["single_package".to_owned()]);
+        assert_eq!(tool.package.unwrap(), ["single_package"]);
     }
 
     #[test]
@@ -384,7 +381,7 @@ mod tests {
         let tool: Result<CargoTestRequest, _> = serde_json::from_value(input);
         let tool = tool.expect("Deserialization should succeed with single-item package array");
 
-        assert_eq!(tool.package.unwrap(), ["single_package".to_owned()]);
+        assert_eq!(tool.package.unwrap(), ["single_package"]);
     }
 
     #[test]

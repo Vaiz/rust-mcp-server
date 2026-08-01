@@ -2,7 +2,10 @@ use std::process::Command;
 
 use crate::{
     Tool, command_cwd, execute_command,
-    serde_utils::{deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags},
+    serde_utils::{
+        PackageName, deserialize_package_vec, deserialize_string, deserialize_string_vec,
+        locking_mode_to_cli_flags,
+    },
 };
 use rmcp::ErrorData;
 
@@ -72,8 +75,8 @@ pub struct CargoDenyCheckRequest {
     workspace: Option<bool>,
 
     /// One or more crates to exclude from the crate graph that is used
-    #[serde(default, deserialize_with = "deserialize_string_vec")]
-    exclude: Option<Vec<String>>,
+    #[serde(default, deserialize_with = "deserialize_package_vec")]
+    exclude: Option<Vec<PackageName>>,
 
     /// One or more platforms to filter crates by
     #[serde(default, deserialize_with = "deserialize_string_vec")]

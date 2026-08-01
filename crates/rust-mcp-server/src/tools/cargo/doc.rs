@@ -6,8 +6,8 @@ use rmcp::{ErrorData, model::ContentBlock};
 use crate::{
     Tool, command_cwd, execute_command,
     serde_utils::{
-        deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
-        output_verbosity_to_cli_flags,
+        PackageName, deserialize_package_vec, deserialize_string, deserialize_string_vec,
+        locking_mode_to_cli_flags, output_verbosity_to_cli_flags,
     },
     tools::get_workspace_root,
 };
@@ -20,16 +20,16 @@ pub struct CargoDocRequest {
 
     /// Package(s) to document. If not specified, documents the current package/workspace.
     /// Recommended to specify specific packages for faster builds.
-    #[serde(default, deserialize_with = "deserialize_string_vec")]
-    package: Option<Vec<String>>,
+    #[serde(default, deserialize_with = "deserialize_package_vec")]
+    package: Option<Vec<PackageName>>,
 
     /// Document all packages in the workspace
     #[serde(default)]
     workspace: Option<bool>,
 
     /// Exclude packages from documentation build
-    #[serde(default, deserialize_with = "deserialize_string_vec")]
-    exclude: Option<Vec<String>>,
+    #[serde(default, deserialize_with = "deserialize_package_vec")]
+    exclude: Option<Vec<PackageName>>,
 
     /// Don't build documentation for dependencies (recommended for faster builds)
     #[serde(default)]
@@ -296,7 +296,7 @@ impl CargoDocRequest {
             && let Some(first_package) = packages.first()
         {
             // Convert package name to the format used in file paths (hyphens to underscores)
-            let package_path_name = first_package.replace('-', "_");
+            let package_path_name = first_package.as_str().replace('-', "_");
             let package_index = absolute_doc_dir.join(&package_path_name).join("index.html");
             if package_index.exists() {
                 return Some(Self::normalize_path(&package_index));

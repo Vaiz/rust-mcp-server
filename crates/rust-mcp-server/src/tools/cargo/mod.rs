@@ -33,7 +33,7 @@ use std::process::Command;
 use crate::{
     Tool, command_cwd, execute_command,
     serde_utils::{
-        deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
+        PackageName, deserialize_package_vec, deserialize_string, locking_mode_to_cli_flags,
         output_verbosity_to_cli_flags,
     },
     tools::Registry,
@@ -124,8 +124,8 @@ pub struct CargoCleanRequest {
     toolchain: Option<String>,
 
     /// Package(s) to clean artifacts for. If not specified, cleans the entire workspace.
-    #[serde(default, deserialize_with = "deserialize_string_vec")]
-    package: Option<Vec<String>>,
+    #[serde(default, deserialize_with = "deserialize_package_vec")]
+    package: Option<Vec<PackageName>>,
 
     /// Clean artifacts of the specified profile. If not specified, cleans everything.
     /// Default rust profiles:

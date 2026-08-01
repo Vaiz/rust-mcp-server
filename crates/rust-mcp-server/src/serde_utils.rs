@@ -78,6 +78,131 @@ where
     }
 }
 
+/// A cargo package spec: a crate name, optionally `name@version`.
+///
+/// Distinct from a plain string field because the `"null"` sentinel used by
+/// [`deserialize_string`] is a real crate name, as is `true`. Silently dropping those is
+/// worse than letting cargo reject a name it doesn't recognise.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PackageName(String);
+
+impl PackageName {
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
+}
+
+impl From<String> for PackageName {
+    fn from(name: String) -> Self {
+        Self(name)
+    }
+}
+
+impl AsRef<std::ffi::OsStr> for PackageName {
+    fn as_ref(&self) -> &std::ffi::OsStr {
+        self.0.as_ref()
+    }
+}
+
+impl PartialEq<&str> for PackageName {
+    fn eq(&self, other: &&str) -> bool {
+        self.0 == *other
+    }
+}
+
+impl std::fmt::Display for PackageName {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&self.0)
+    }
+}
+
+impl<'de> serde::Deserialize<'de> for PackageName {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        struct PackageNameVisitor;
+
+        impl serde::de::Visitor<'_> for PackageNameVisitor {
+            type Value = PackageName;
+
+            fn expecting(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                f.write_str("a package name")
+            }
+
+            fn visit_str<E: serde::de::Error>(self, value: &str) -> Result<Self::Value, E> {
+                Ok(PackageName(value.to_owned()))
+            }
+
+            fn visit_string<E: serde::de::Error>(self, value: String) -> Result<Self::Value, E> {
+                Ok(PackageName(value))
+            }
+        }
+
+        deserializer.deserialize_string(PackageNameVisitor)
+    }
+}
+
+impl schemars::JsonSchema for PackageName {
+    fn schema_name() -> std::borrow::Cow<'static, str> {
+        std::borrow::Cow::Borrowed("string")
+    }
+
+    fn schema_id() -> std::borrow::Cow<'static, str> {
+        std::borrow::Cow::Borrowed("string")
+    }
+
+    fn inline_schema() -> bool {
+        true
+    }
+
+    fn json_schema(_gen: &mut schemars::SchemaGenerator) -> schemars::Schema {
+        schemars::json_schema!({ "type": "string" })
+    }
+}
+
+/// Parses an optional package name, treating only JSON `null` and an empty string as absent.
+pub fn deserialize_package<'de, D>(deserializer: D) -> Result<Option<PackageName>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    use serde::Deserialize;
+
+    let package = Option::<PackageName>::deserialize(deserializer)?;
+    Ok(package.filter(|p| !p.0.is_empty()))
+}
+
+/// Parses an optional list of package names, accepting either a single name or an array.
+/// Unlike [`deserialize_string_vec`], only JSON `null` and an empty string mean absent.
+/// Empty names are dropped, and a list left with no names at all counts as absent.
+pub fn deserialize_package_vec<'de, D>(
+    deserializer: D,
+) -> Result<Option<Vec<PackageName>>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    use serde::Deserialize;
+
+    #[derive(Deserialize)]
+    #[serde(untagged)]
+    enum OneOrMany {
+        One(PackageName),
+        Many(Vec<PackageName>),
+    }
+
+    let packages = match Option::<OneOrMany>::deserialize(deserializer)? {
+        None => return Ok(None),
+        Some(OneOrMany::One(package)) => vec![package],
+        Some(OneOrMany::Many(packages)) => packages,
+    };
+
+    let packages: Vec<_> = packages
+        .into_iter()
+        .filter(|package| !package.0.is_empty())
+        .collect();
+    Ok((!packages.is_empty()).then_some(packages))
+}
+
 /// Convert locking mode string to CLI flags for cargo commands.
 /// Returns a vector of flags to add to the command.
 ///
@@ -134,7 +259,7 @@ pub fn output_verbosity_to_cli_flags(mode: Option<&str>) -> Result<Vec<&'static 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, serde::Deserialize, schemars::JsonSchema)]
 pub struct PackageWithVersion {
     /// The package name
-    pub package: String,
+    pub package: PackageName,
     /// Optional version specification
     #[serde(default, deserialize_with = "deserialize_string")]
     pub version: Option<String>,
@@ -145,7 +270,7 @@ impl PackageWithVersion {
     #[cfg(test)]
     pub fn new(package: String) -> Self {
         Self {
-            package,
+            package: package.into(),
             version: None,
         }
     }
@@ -154,7 +279,7 @@ impl PackageWithVersion {
     #[cfg(test)]
     pub fn with_version(package: String, version: String) -> Self {
         Self {
-            package,
+            package: package.into(),
             version: Some(version),
         }
     }
@@ -163,7 +288,7 @@ impl PackageWithVersion {
     pub fn to_spec(&self) -> String {
         match &self.version {
             Some(version) => format!("{}@{}", self.package, version),
-            None => self.package.clone(),
+            None => self.package.as_str().to_owned(),
         }
     }
 }
@@ -255,6 +380,73 @@ mod tests {
         let json = r#"{ "value": [1, 2, 3] }"#;
         let result: Result<TestStringVec, _> = serde_json::from_str(json);
         assert!(result.is_err());
+    }
+
+    #[derive(Debug, serde::Deserialize, PartialEq)]
+    struct TestPackage {
+        #[serde(deserialize_with = "deserialize_package")]
+        value: Option<PackageName>,
+    }
+
+    #[derive(Debug, serde::Deserialize, PartialEq)]
+    struct TestPackageVec {
+        #[serde(deserialize_with = "deserialize_package_vec")]
+        value: Option<Vec<PackageName>>,
+    }
+
+    #[test]
+    fn test_deserialize_package_keeps_odd_names() {
+        for name in ["true", "false", "null", "NULL"] {
+            let json = format!(r#"{{ "value": "{name}" }}"#);
+            let result: TestPackage = serde_json::from_str(&json).unwrap();
+            assert_eq!(result.value.unwrap(), name);
+        }
+    }
+
+    #[test]
+    fn test_deserialize_package_absent() {
+        for json in [r#"{ "value": null }"#, r#"{ "value": "" }"#] {
+            let result: TestPackage = serde_json::from_str(json).unwrap();
+            assert_eq!(result.value, None);
+        }
+    }
+
+    #[test]
+    fn test_deserialize_package_rejects_non_string() {
+        let error = serde_json::from_str::<TestPackage>(r#"{ "value": true }"#)
+            .expect_err("a boolean is not a package name");
+        assert!(
+            error.to_string().contains("expected a package name"),
+            "{error}"
+        );
+    }
+
+    #[test]
+    fn test_deserialize_package_vec_single_or_array() {
+        let result: TestPackageVec = serde_json::from_str(r#"{ "value": "tokio" }"#).unwrap();
+        assert_eq!(result.value.unwrap(), ["tokio"]);
+
+        let result: TestPackageVec = serde_json::from_str(r#"{ "value": ["null"] }"#).unwrap();
+        assert_eq!(result.value.unwrap(), ["null"]);
+    }
+
+    #[test]
+    fn test_deserialize_package_vec_absent() {
+        for json in [
+            r#"{ "value": null }"#,
+            r#"{ "value": "" }"#,
+            r#"{ "value": [] }"#,
+            r#"{ "value": ["", ""] }"#,
+        ] {
+            let result: TestPackageVec = serde_json::from_str(json).unwrap();
+            assert_eq!(result.value, None, "{json}");
+        }
+    }
+
+    #[test]
+    fn test_deserialize_package_vec_drops_empty_names() {
+        let result: TestPackageVec = serde_json::from_str(r#"{ "value": ["", "tokio"] }"#).unwrap();
+        assert_eq!(result.value.unwrap(), ["tokio"]);
     }
 
     // PackageWithVersion tests

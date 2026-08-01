@@ -3,8 +3,8 @@ use std::process::Command;
 use crate::{
     Response, Tool, command_cwd, execute_command,
     serde_utils::{
-        PackageWithVersion, deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
-        output_verbosity_to_cli_flags,
+        PackageName, PackageWithVersion, deserialize_string, deserialize_string_vec,
+        locking_mode_to_cli_flags, output_verbosity_to_cli_flags,
     },
     tools::Registry,
 };
@@ -63,7 +63,7 @@ pub struct CargoAddRequest {
     pub rename: Option<String>,
 
     /// Package to modify, must be specified
-    pub target_package: String,
+    pub target_package: PackageName,
 
     /// Filesystem path to local crate to add
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -261,7 +261,7 @@ pub struct CargoRemoveRequest {
     pub target: Option<String>,
 
     /// Package to remove from, must be specified
-    pub target_package: String,
+    pub target_package: PackageName,
 
     /// Don't actually write the manifest
     #[serde(default)]

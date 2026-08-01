@@ -4,7 +4,10 @@ use rmcp::ErrorData;
 
 use crate::{
     Tool, command_cwd, execute_command,
-    serde_utils::{deserialize_string, deserialize_string_vec, output_verbosity_to_cli_flags},
+    serde_utils::{
+        PackageName, deserialize_package_vec, deserialize_string, deserialize_string_vec,
+        output_verbosity_to_cli_flags,
+    },
 };
 
 #[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
@@ -20,12 +23,12 @@ pub struct CargoInstaUpdateSnapshotsRequest {
 
     // ── Package / target selection ────────────────────────────────────────────
     /// Package(s) to run tests for
-    #[serde(default, deserialize_with = "deserialize_string_vec")]
-    package: Option<Vec<String>>,
+    #[serde(default, deserialize_with = "deserialize_package_vec")]
+    package: Option<Vec<PackageName>>,
 
     /// Exclude packages from the test
-    #[serde(default, deserialize_with = "deserialize_string_vec")]
-    exclude: Option<Vec<String>>,
+    #[serde(default, deserialize_with = "deserialize_package_vec")]
+    exclude: Option<Vec<PackageName>>,
 
     /// Test only this package's library unit tests
     #[serde(default)]
