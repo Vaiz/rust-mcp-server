@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.1](https://github.com/Vaiz/rust-mcp-server/compare/v0.4.0...v0.4.1) - 2026-08-01
+
+### Fixed
+
+- improve PackageName parsing ([#146](https://github.com/Vaiz/rust-mcp-server/pull/146))
+- implement a workaround for rust-lang/rustfmt/issues/6934 ([#144](https://github.com/Vaiz/rust-mcp-server/pull/144))
+- use manifest path as cwd
+- *(cargo-fmt)* automatically detect virtual manifest and apply `--all` ([#136](https://github.com/Vaiz/rust-mcp-server/pull/136))
+
+### Other
+
+- upgrade rmcp to 3.1 ([#145](https://github.com/Vaiz/rust-mcp-server/pull/145))
+
 ## [0.4.0](https://github.com/Vaiz/rust-mcp-server/compare/v0.3.8...v0.4.0) - 2026-07-05
 
 ### Added
