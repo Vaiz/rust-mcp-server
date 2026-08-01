@@ -214,9 +214,13 @@ impl CargoFmtRmcpTool {
             cmd.current_dir(cwd);
         }
 
-        let output = cmd
-            .output()
-            .map_err(|error| ErrorData::internal_error(error.to_string(), None))?;
+        let output = match cmd.output() {
+            Ok(output) => output,
+            Err(error) => {
+                tracing::warn!("Could not run cargo metadata for cargo fmt retry: {error}");
+                return Ok(None);
+            }
+        };
         if !output.status.success() {
             tracing::warn!(
                 "Could not inspect workspace for cargo fmt retry: {}",
