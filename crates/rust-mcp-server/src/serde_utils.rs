@@ -174,6 +174,7 @@ where
 
 /// Parses an optional list of package names, accepting either a single name or an array.
 /// Unlike [`deserialize_string_vec`], only JSON `null` and an empty string mean absent.
+/// Empty names are dropped, and a list left with no names at all counts as absent.
 pub fn deserialize_package_vec<'de, D>(
     deserializer: D,
 ) -> Result<Option<Vec<PackageName>>, D::Error>
@@ -189,13 +190,17 @@ where
         Many(Vec<PackageName>),
     }
 
-    let value = Option::<OneOrMany>::deserialize(deserializer)?;
-    Ok(match value {
-        None => None,
-        Some(OneOrMany::One(package)) if package.0.is_empty() => None,
-        Some(OneOrMany::One(package)) => Some(vec![package]),
-        Some(OneOrMany::Many(packages)) => Some(packages),
-    })
+    let packages = match Option::<OneOrMany>::deserialize(deserializer)? {
+        None => return Ok(None),
+        Some(OneOrMany::One(package)) => vec![package],
+        Some(OneOrMany::Many(packages)) => packages,
+    };
+
+    let packages: Vec<_> = packages
+        .into_iter()
+        .filter(|package| !package.0.is_empty())
+        .collect();
+    Ok((!packages.is_empty()).then_some(packages))
 }
 
 /// Convert locking mode string to CLI flags for cargo commands.
@@ -427,10 +432,21 @@ mod tests {
 
     #[test]
     fn test_deserialize_package_vec_absent() {
-        for json in [r#"{ "value": null }"#, r#"{ "value": "" }"#] {
+        for json in [
+            r#"{ "value": null }"#,
+            r#"{ "value": "" }"#,
+            r#"{ "value": [] }"#,
+            r#"{ "value": ["", ""] }"#,
+        ] {
             let result: TestPackageVec = serde_json::from_str(json).unwrap();
-            assert_eq!(result.value, None);
+            assert_eq!(result.value, None, "{json}");
         }
+    }
+
+    #[test]
+    fn test_deserialize_package_vec_drops_empty_names() {
+        let result: TestPackageVec = serde_json::from_str(r#"{ "value": ["", "tokio"] }"#).unwrap();
+        assert_eq!(result.value.unwrap(), ["tokio"]);
     }
 
     // PackageWithVersion tests
