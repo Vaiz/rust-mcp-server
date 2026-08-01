@@ -3,9 +3,9 @@
 //! - rust-mcp-server#136: `cargo fmt --manifest-path` fails for virtual manifests unless
 //!   `--all` or an explicit package is selected. Add `--all` automatically when the caller
 //!   leaves `all` unset.
-//! - rust-lang/rustfmt#6934: large workspaces can exceed the OS command-line limit. Retry
-//!   eligible workspace or explicit-package requests one package at a time. Never apply this
-//!   retry to `--all`, because it also covers local path dependencies outside the workspace.
+//! - rust-lang/rustfmt#6934: large Windows workspaces can exceed the OS command-line limit.
+//!   Retry eligible workspace or explicit-package requests one package at a time. Never apply
+//!   this retry to `--all`, because it also covers local path dependencies outside the workspace.
 
 use std::{path::Path, process::Command};
 
@@ -55,7 +55,7 @@ pub struct CargoFmtRequest {
 
 impl CargoFmtRequest {
     pub fn build_cmd(&self) -> Result<Command, ErrorData> {
-        let mut cmd = self.base_cmd();
+        let mut cmd = self.base_cmd()?;
 
         if let Some(packages) = &self.package {
             for package in packages {
@@ -67,42 +67,23 @@ impl CargoFmtRequest {
             cmd.arg("--all");
         }
 
-        self.push_common_args(&mut cmd)?;
-
         Ok(cmd)
     }
 
     /// Builds a `cargo fmt` command scoped to a single package.
     fn build_package_cmd(&self, package: &str) -> Result<Command, ErrorData> {
-        let mut cmd = self.base_cmd();
+        let mut cmd = self.base_cmd()?;
         cmd.arg("--package").arg(package);
-        self.push_common_args(&mut cmd)?;
         Ok(cmd)
     }
 
-    /// `cargo [+toolchain] fmt` without any package or formatting options.
-    fn base_cmd(&self) -> Command {
+    /// `cargo [+toolchain] fmt` with formatting, manifest and output options.
+    fn base_cmd(&self) -> Result<Command, ErrorData> {
         let mut cmd = Command::new("cargo");
         if let Some(toolchain) = &self.toolchain {
             cmd.arg(format!("+{toolchain}"));
         }
         cmd.arg("fmt");
-        cmd
-    }
-
-    fn use_all(&self) -> bool {
-        self.all.unwrap_or_else(|| {
-            self.package.as_ref().is_none_or(Vec::is_empty)
-                && self
-                    .manifest_path
-                    .as_deref()
-                    .is_some_and(is_virtual_manifest)
-        })
-    }
-
-    /// Appends the formatting, manifest and output options shared by every
-    /// `cargo fmt` invocation.
-    fn push_common_args(&self, cmd: &mut Command) -> Result<(), ErrorData> {
         if self.check {
             cmd.arg("--check");
         }
@@ -115,18 +96,29 @@ impl CargoFmtRequest {
         cmd.args(output_verbosity_to_cli_flags(
             self.output_verbosity.as_deref(),
         )?);
-        Ok(())
+        Ok(cmd)
+    }
+
+    fn use_all(&self) -> bool {
+        self.all.unwrap_or_else(|| {
+            self.package.as_ref().is_none_or(Vec::is_empty)
+                && self
+                    .manifest_path
+                    .as_deref()
+                    .is_some_and(is_virtual_manifest)
+        })
     }
 }
 
-/// Returns `true` when `stderr` shows the rust-lang/rustfmt#6934 failure, where
-/// `cargo fmt` builds a command line longer than the OS allows ("os error 206"
-/// on Windows).
+#[cfg(not(windows))]
+fn cmd_line_too_long(_stderr: &str) -> bool {
+    false
+}
+
+/// Returns `true` when `stderr` shows the rust-lang/rustfmt#6934 failure.
+#[cfg(windows)]
 fn cmd_line_too_long(stderr: &str) -> bool {
-    stderr.contains("os error 206")
-        || stderr.contains("filename or extension is too long")
-        || stderr.contains("os error 7")
-        || stderr.contains("argument list too long")
+    stderr.contains("os error 206") || stderr.contains("filename or extension is too long")
 }
 
 fn is_virtual_manifest(manifest_path: &str) -> bool {
@@ -385,6 +377,7 @@ mod tests {
         ));
     }
 
+    #[cfg(windows)]
     #[test]
     fn detects_command_line_too_long() {
         // Windows surfaces rust-lang/rustfmt#6934 as os error 206.
@@ -392,11 +385,19 @@ mod tests {
             "error: The filename or extension is too long. (os error 206)"
         ));
         assert!(cmd_line_too_long("The filename or extension is too long."));
-        assert!(cmd_line_too_long(
-            "error: Argument list too long (os error 7)"
-        ));
         assert!(!cmd_line_too_long(
             "error[internal]: left behind trailing whitespace"
+        ));
+    }
+
+    #[cfg(not(windows))]
+    #[test]
+    fn ignores_command_line_too_long() {
+        assert!(!cmd_line_too_long(
+            "error: The filename or extension is too long. (os error 206)"
+        ));
+        assert!(!cmd_line_too_long(
+            "error: Argument list too long (os error 7)"
         ));
     }
 
