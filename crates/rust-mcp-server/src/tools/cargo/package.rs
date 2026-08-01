@@ -3,8 +3,8 @@ use std::process::Command;
 use crate::{
     Tool, command_cwd, execute_command,
     serde_utils::{
-        deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
-        output_verbosity_to_cli_flags,
+        PackageName, deserialize_package_vec, deserialize_string, deserialize_string_vec,
+        locking_mode_to_cli_flags, output_verbosity_to_cli_flags,
     },
     tools::Registry,
 };
@@ -20,8 +20,8 @@ pub struct CargoPackageRequest {
     /// [Optional] Specific package(s) to assemble. Can specify multiple packages by name.
     /// If not specified, packages the current package or workspace root.
     /// Example: ["my-lib", "my-binary"]
-    #[serde(default, deserialize_with = "deserialize_string_vec")]
-    package: Option<Vec<String>>,
+    #[serde(default, deserialize_with = "deserialize_package_vec")]
+    package: Option<Vec<PackageName>>,
 
     /// [Optional] Assemble all packages in the workspace into separate tarballs.
     /// Useful for workspaces with multiple publishable crates.
@@ -31,8 +31,8 @@ pub struct CargoPackageRequest {
     /// [Optional] Don't assemble specified packages when using --workspace.
     /// Allows selective packaging of workspace members.
     /// Example: ["internal-tools", "test-utils"]
-    #[serde(default, deserialize_with = "deserialize_string_vec")]
-    exclude: Option<Vec<String>>,
+    #[serde(default, deserialize_with = "deserialize_package_vec")]
+    exclude: Option<Vec<PackageName>>,
 
     /// [Optional] Print files that would be included in the package without creating the tarball.
     /// Useful for reviewing package contents and debugging .gitignore rules.

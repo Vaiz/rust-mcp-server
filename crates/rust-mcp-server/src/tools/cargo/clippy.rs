@@ -5,8 +5,8 @@ use crate::{
     command::execute_command,
     command_cwd,
     serde_utils::{
-        deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
-        output_verbosity_to_cli_flags,
+        PackageName, deserialize_package_vec, deserialize_string, deserialize_string_vec,
+        locking_mode_to_cli_flags, output_verbosity_to_cli_flags,
     },
     tools::cargo::CargoFmtRmcpTool,
 };
@@ -19,16 +19,16 @@ pub struct CargoClippyRequest {
     toolchain: Option<String>,
 
     /// Package(s) to check
-    #[serde(default, deserialize_with = "deserialize_string_vec")]
-    package: Option<Vec<String>>,
+    #[serde(default, deserialize_with = "deserialize_package_vec")]
+    package: Option<Vec<PackageName>>,
 
     /// Check all packages in the workspace
     #[serde(default)]
     workspace: Option<bool>,
 
     /// Exclude packages from the check
-    #[serde(default, deserialize_with = "deserialize_string_vec")]
-    exclude: Option<Vec<String>>,
+    #[serde(default, deserialize_with = "deserialize_package_vec")]
+    exclude: Option<Vec<PackageName>>,
 
     /// Run Clippy only on the given crate, without linting the dependencies
     #[serde(default)]
@@ -362,7 +362,7 @@ mod tests {
         let tool: Result<CargoClippyRequest, _> = serde_json::from_value(input);
         let tool = tool.expect("Deserialization should succeed");
 
-        assert_eq!(tool.package.unwrap(), ["my_package".to_owned()]);
+        assert_eq!(tool.package.unwrap(), ["my_package"]);
         assert_eq!(tool.workspace, None);
         assert_eq!(tool.all_features, None);
         assert_eq!(tool.allow_dirty, None);

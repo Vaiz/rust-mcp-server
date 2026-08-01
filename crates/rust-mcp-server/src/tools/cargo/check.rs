@@ -3,8 +3,8 @@ use std::process::Command;
 use crate::{
     Tool, command_cwd, execute_command,
     serde_utils::{
-        deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
-        output_verbosity_to_cli_flags,
+        PackageName, deserialize_package_vec, deserialize_string, deserialize_string_vec,
+        locking_mode_to_cli_flags, output_verbosity_to_cli_flags,
     },
 };
 use rmcp::ErrorData;
@@ -16,16 +16,16 @@ pub struct CargoCheckRequest {
     toolchain: Option<String>,
 
     /// Package(s) to check
-    #[serde(default, deserialize_with = "deserialize_string_vec")]
-    package: Option<Vec<String>>,
+    #[serde(default, deserialize_with = "deserialize_package_vec")]
+    package: Option<Vec<PackageName>>,
 
     /// Check all packages in the workspace
     #[serde(default)]
     workspace: Option<bool>,
 
     /// Exclude packages from the check
-    #[serde(default, deserialize_with = "deserialize_string_vec")]
-    exclude: Option<Vec<String>>,
+    #[serde(default, deserialize_with = "deserialize_package_vec")]
+    exclude: Option<Vec<PackageName>>,
 
     /// Check only this package's library
     #[serde(default)]

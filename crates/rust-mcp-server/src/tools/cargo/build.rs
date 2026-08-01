@@ -3,8 +3,8 @@ use std::process::Command;
 use crate::{
     Response, Tool, command_cwd, execute_command,
     serde_utils::{
-        deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags,
-        output_verbosity_to_cli_flags,
+        PackageName, deserialize_package_vec, deserialize_string, deserialize_string_vec,
+        locking_mode_to_cli_flags, output_verbosity_to_cli_flags,
     },
     tools::cargo::CargoCheckRmcpTool,
 };
@@ -17,16 +17,16 @@ pub struct CargoBuildRequest {
     toolchain: Option<String>,
 
     /// The name of the package to build. If not specified, the current package/workspace is built.
-    #[serde(default, deserialize_with = "deserialize_string_vec")]
-    package: Option<Vec<String>>,
+    #[serde(default, deserialize_with = "deserialize_package_vec")]
+    package: Option<Vec<PackageName>>,
 
     /// Build all packages in the workspace
     #[serde(default)]
     workspace: Option<bool>,
 
     /// Exclude packages from the build
-    #[serde(default, deserialize_with = "deserialize_string_vec")]
-    exclude: Option<Vec<String>>,
+    #[serde(default, deserialize_with = "deserialize_package_vec")]
+    exclude: Option<Vec<PackageName>>,
 
     /// Build only this package's library
     #[serde(default)]

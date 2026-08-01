@@ -3,7 +3,10 @@ use std::process::Command;
 use crate::{
     Tool, command_cwd, execute_command,
     response::Response,
-    serde_utils::{deserialize_string, deserialize_string_vec, locking_mode_to_cli_flags},
+    serde_utils::{
+        PackageName, deserialize_package, deserialize_package_vec, deserialize_string,
+        deserialize_string_vec, locking_mode_to_cli_flags,
+    },
 };
 use rmcp::ErrorData;
 
@@ -14,28 +17,30 @@ pub struct CargoTreeRequest {
     toolchain: Option<String>,
 
     /// Package to be used as the root of the tree
-    #[serde(default, deserialize_with = "deserialize_string_vec")]
-    package: Option<Vec<String>>,
+    #[serde(default, deserialize_with = "deserialize_package_vec")]
+    package: Option<Vec<PackageName>>,
 
     /// Display the tree for all packages in the workspace
     #[serde(default)]
     workspace: Option<bool>,
 
     /// Exclude specific workspace members
-    #[serde(default, deserialize_with = "deserialize_string_vec")]
-    exclude: Option<Vec<String>>,
+    #[serde(default, deserialize_with = "deserialize_package_vec")]
+    exclude: Option<Vec<PackageName>>,
 
     /// The kinds of dependencies to display (features, normal, build, dev, all, no-normal, no-build, no-dev, no-proc-macro)
     #[serde(default, deserialize_with = "deserialize_string_vec")]
     edges: Option<Vec<String>>,
 
-    /// Invert the tree direction and focus on the given package
-    #[serde(default, deserialize_with = "deserialize_string")]
-    invert: Option<String>,
+    /// Invert the tree direction and focus on the given package, e.g. "tokio".
+    /// This is a package name, not a flag. In a workspace, combine it with `workspace` to
+    /// search across all members.
+    #[serde(default, deserialize_with = "deserialize_package")]
+    invert: Option<PackageName>,
 
     /// Prune the given package from the display of the dependency tree
-    #[serde(default, deserialize_with = "deserialize_string_vec")]
-    prune: Option<Vec<String>>,
+    #[serde(default, deserialize_with = "deserialize_package_vec")]
+    prune: Option<Vec<PackageName>>,
 
     /// Maximum display depth of the dependency tree
     #[serde(default)]
@@ -277,6 +282,43 @@ mod tests {
                 "--locked"
             ]
         );
+    }
+
+    #[test]
+    fn test_with_invert_flag() {
+        let error = serde_json::from_value::<CargoTreeRequest>(json!({"invert": true}))
+            .expect_err("`invert` should reject a boolean");
+        assert!(
+            error.to_string().contains("expected a package name"),
+            "{error}"
+        );
+    }
+
+    #[test]
+    fn test_with_invert_keeps_odd_package_names() {
+        for spec in ["true", "null", "NULL"] {
+            let request: CargoTreeRequest = serde_json::from_value(json!({ "invert": spec }))
+                .expect("Should deserialize request with invert");
+            let cmd = request.build_cmd().expect("Should build command");
+            let args: Vec<_> = cmd.get_args().map(|s| s.to_str().unwrap()).collect();
+
+            assert_eq!(
+                args,
+                vec!["tree", "--charset", "ascii", "--invert", spec, "--locked"]
+            );
+        }
+    }
+
+    #[test]
+    fn test_with_invert_disabled() {
+        for input in [json!({"invert": null}), json!({"invert": ""})] {
+            let request: CargoTreeRequest =
+                serde_json::from_value(input).expect("Should deserialize request without invert");
+            let cmd = request.build_cmd().expect("Should build command");
+            let args: Vec<_> = cmd.get_args().map(|s| s.to_str().unwrap()).collect();
+
+            assert_eq!(args, vec!["tree", "--charset", "ascii", "--locked"]);
+        }
     }
 
     #[test]

@@ -2,7 +2,10 @@ use std::process::Command;
 
 use crate::{
     Tool, command_cwd, execute_command,
-    serde_utils::{deserialize_string, deserialize_string_vec, output_verbosity_to_cli_flags},
+    serde_utils::{
+        PackageName, deserialize_package_vec, deserialize_string, deserialize_string_vec,
+        output_verbosity_to_cli_flags,
+    },
 };
 use rmcp::ErrorData;
 
@@ -17,16 +20,16 @@ pub struct CargoHackRequest {
     command: String,
 
     /// Package(s) to check
-    #[serde(default, deserialize_with = "deserialize_string_vec")]
-    package: Option<Vec<String>>,
+    #[serde(default, deserialize_with = "deserialize_package_vec")]
+    package: Option<Vec<PackageName>>,
 
     /// Perform command for all packages in the workspace
     #[serde(default)]
     workspace: Option<bool>,
 
     /// Exclude packages from the check
-    #[serde(default, deserialize_with = "deserialize_string_vec")]
-    exclude: Option<Vec<String>>,
+    #[serde(default, deserialize_with = "deserialize_package_vec")]
+    exclude: Option<Vec<PackageName>>,
 
     /// Path to Cargo.toml
     #[serde(default, deserialize_with = "deserialize_string")]
