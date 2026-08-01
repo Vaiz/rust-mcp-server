@@ -3,12 +3,21 @@ use rmcp::model::ContentBlock;
 use crate::command::{AgentRecommendation, Output};
 
 pub(crate) struct Response {
-    output: Output,
+    outputs: Vec<Output>,
     additional_content: Vec<ContentBlock>,
     recommendations: Vec<AgentRecommendation>,
 }
 
 impl Response {
+    pub(crate) fn from_outputs(outputs: Vec<Output>) -> Self {
+        debug_assert!(!outputs.is_empty());
+        Self {
+            outputs,
+            additional_content: Vec::new(),
+            recommendations: Vec::new(),
+        }
+    }
+
     pub(crate) fn add_content(&mut self, content: ContentBlock) {
         self.additional_content.push(content);
     }
@@ -22,7 +31,15 @@ impl Response {
         self,
         ignore_recommendations: bool,
     ) -> rmcp::model::CallToolResult {
-        let mut result: rmcp::model::CallToolResult = self.output.into();
+        let mut result = rmcp::model::CallToolResult::default();
+        result.is_error = Some(false);
+        for output in self.outputs {
+            let output: rmcp::model::CallToolResult = output.into();
+            result.content.extend(output.content);
+            if output.is_error == Some(true) {
+                result.is_error = Some(true);
+            }
+        }
         result.content.extend(self.additional_content);
         if !ignore_recommendations {
             result
@@ -35,11 +52,7 @@ impl Response {
 
 impl From<Output> for Response {
     fn from(val: Output) -> Self {
-        Response {
-            output: val,
-            additional_content: Vec::new(),
-            recommendations: Vec::new(),
-        }
+        Self::from_outputs(vec![val])
     }
 }
 
@@ -73,6 +86,31 @@ mod tests {
         );
         assert_eq!(stdout.as_text().unwrap().text, "This is a test output");
         assert_eq!(exit_status.as_text().unwrap().text, "✅ test_tool: Success");
+    }
+
+    #[test]
+    fn multiple_outputs_remain_distinct() {
+        let output = |command: &str| Output {
+            tool_name: "test_tool".into(),
+            stdout: None,
+            stderr: None,
+            cmd_line: CommandLine(command.into()),
+            exit_status: ExitStatus(std::process::ExitStatus::default()),
+        };
+
+        let result =
+            Response::from_outputs(vec![output("first"), output("second")]).into_rmcp_result(false);
+
+        assert_eq!(result.is_error, Some(false));
+        assert_eq!(result.content.len(), 4);
+        assert_eq!(
+            result.content[0].as_text().unwrap().text,
+            "Executed command: `first`"
+        );
+        assert_eq!(
+            result.content[2].as_text().unwrap().text,
+            "Executed command: `second`"
+        );
     }
 
     #[test]

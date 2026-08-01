@@ -3,6 +3,7 @@ mod build;
 mod check;
 mod clippy;
 mod doc;
+mod fmt;
 mod info;
 mod metadata;
 mod package;
@@ -17,6 +18,7 @@ pub use build::CargoBuildRmcpTool;
 pub use check::CargoCheckRmcpTool;
 pub use clippy::CargoClippyRmcpTool;
 pub use doc::CargoDocRmcpTool;
+pub use fmt::CargoFmtRmcpTool;
 pub use info::CargoInfoRmcpTool;
 pub use metadata::CargoMetadataRmcpTool;
 pub use package::CargoPackageRmcpTool;
@@ -255,159 +257,6 @@ impl Tool for CargoCleanRmcpTool {
 }
 
 #[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
-pub struct CargoFmtRequest {
-    /// The toolchain to use, e.g., "stable" or "nightly".
-    #[serde(default, deserialize_with = "deserialize_string")]
-    toolchain: Option<String>,
-
-    /// The name of the package(s) to format. If not specified, formats the current package.
-    #[serde(default, deserialize_with = "deserialize_string_vec")]
-    package: Option<Vec<String>>,
-
-    /// Format all packages, and also their local path-based dependencies.
-    /// When unset, `--all` is added automatically for virtual workspace manifests.
-    #[serde(default)]
-    all: Option<bool>,
-
-    /// Run rustfmt in check mode (don't write changes, just check if formatting is needed)
-    #[serde(default)]
-    check: bool,
-
-    /// Specify path to Cargo.toml
-    #[serde(default, deserialize_with = "deserialize_string")]
-    manifest_path: Option<String>,
-
-    /// Specify message-format: short|json|human
-    #[serde(default, deserialize_with = "deserialize_string")]
-    message_format: Option<String>,
-
-    /// Output verbosity level.
-    ///
-    /// Valid options:
-    /// - "quiet" (default): Show only the essential command output
-    /// - "normal": Show standard output (no additional flags)
-    /// - "verbose": Show detailed output including build information
-    #[serde(default, deserialize_with = "deserialize_string")]
-    output_verbosity: Option<String>,
-}
-
-impl CargoFmtRequest {
-    pub fn build_cmd(&self) -> Result<Command, ErrorData> {
-        let mut cmd = Command::new("cargo");
-        if let Some(toolchain) = &self.toolchain {
-            cmd.arg(format!("+{toolchain}"));
-        }
-        cmd.arg("fmt");
-
-        // Package selection
-        if let Some(packages) = &self.package {
-            for package in packages {
-                cmd.arg("--package").arg(package);
-            }
-        }
-
-        // `cargo fmt` fails with "Failed to find targets" when pointed at a
-        // virtual workspace manifest (a `[workspace]` root without a
-        // `[package]`) unless `--all` or an explicit `--package` is provided.
-        // When `all` is unset, detect that case and add `--all` automatically.
-        let use_all = self.all.unwrap_or_else(|| {
-            let no_package = self.package.as_ref().is_none_or(|p| p.is_empty());
-            let auto = no_package
-                && self
-                    .manifest_path
-                    .as_deref()
-                    .is_some_and(is_virtual_manifest);
-            if auto {
-                tracing::info!(
-                    "Detected virtual workspace manifest; adding --all to cargo fmt automatically"
-                );
-            }
-            auto
-        });
-
-        if use_all {
-            cmd.arg("--all");
-        }
-
-        // Formatting options
-        if self.check {
-            cmd.arg("--check");
-        }
-
-        // Manifest options
-        if let Some(manifest_path) = &self.manifest_path {
-            cmd.arg("--manifest-path").arg(manifest_path);
-        }
-
-        if let Some(message_format) = &self.message_format {
-            cmd.arg("--message-format").arg(message_format);
-        }
-
-        // Output options
-        let output_flags = output_verbosity_to_cli_flags(self.output_verbosity.as_deref())?;
-        cmd.args(output_flags);
-
-        Ok(cmd)
-    }
-}
-
-/// Returns `true` if the given `Cargo.toml` is a virtual manifest, i.e. a
-/// workspace root that contains a `[workspace]` table but no `[package]`.
-///
-/// Returns `false` when the file cannot be read, so callers fall back to
-/// cargo's default behavior.
-fn is_virtual_manifest(manifest_path: &str) -> bool {
-    let Ok(contents) = std::fs::read_to_string(manifest_path) else {
-        return false;
-    };
-    manifest_contents_are_virtual(&contents)
-}
-
-/// Returns `true` if the manifest contents describe a virtual manifest, i.e.
-/// they contain a `[workspace]` table but no `[package]` table (matching
-/// cargo's definition of a virtual manifest). Sub-tables such as
-/// `[workspace.package]` and `[package.metadata]` are recognized as well.
-fn manifest_contents_are_virtual(contents: &str) -> bool {
-    let mut has_workspace = false;
-    let mut has_package = false;
-    for line in contents.lines() {
-        let line = line.trim();
-        if line.starts_with("[workspace]") || line.starts_with("[workspace.") {
-            has_workspace = true;
-        } else if line.starts_with("[package]") || line.starts_with("[package.") {
-            has_package = true;
-        }
-    }
-    has_workspace && !has_package
-}
-
-pub struct CargoFmtRmcpTool;
-
-impl Tool for CargoFmtRmcpTool {
-    const NAME: &'static str = "cargo-fmt";
-    const TITLE: &'static str = "Format Rust code";
-    const DESCRIPTION: &'static str =
-        "Formats Rust code using rustfmt. Usually, run without any additional arguments.";
-    type RequestArgs = CargoFmtRequest;
-
-    fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<crate::Response, ErrorData> {
-        let cwd = command_cwd(request.manifest_path.as_deref());
-        let output = execute_command(request.build_cmd()?, Self::NAME, cwd)?;
-        let failed = !output.success();
-        let mut response: crate::Response = output.into();
-
-        if failed && request.check {
-            response.add_recommendation(format!(
-                "Run #{} with `check: false` to automatically format the code",
-                Self::NAME
-            ));
-        }
-
-        Ok(response)
-    }
-}
-
-#[derive(Debug, ::serde::Deserialize, schemars::JsonSchema)]
 pub struct CargoNewRequest {
     /// The toolchain to use, e.g., "stable" or "nightly".
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -543,31 +392,5 @@ impl Tool for CargoListRmcpTool {
 
     fn call_rmcp_tool(&self, request: Self::RequestArgs) -> Result<crate::Response, ErrorData> {
         execute_command(request.build_cmd()?, Self::NAME, command_cwd(None)).map(Into::into)
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn virtual_manifest_detection() {
-        assert!(manifest_contents_are_virtual(
-            "[workspace]\nmembers = [\"crates/*\"]\n"
-        ));
-        assert!(manifest_contents_are_virtual("[workspace.package]\n"));
-        assert!(!manifest_contents_are_virtual(
-            "[package]\nname = \"foo\"\n"
-        ));
-        assert!(!manifest_contents_are_virtual(
-            "  [package]  # inline comment\nname = \"foo\"\n"
-        ));
-        assert!(!manifest_contents_are_virtual(
-            "[workspace]\n\n[package.metadata]\nkey = \"value\"\n"
-        ));
-        // Neither `[package]` nor `[workspace]`: not a virtual manifest.
-        assert!(!manifest_contents_are_virtual(
-            "[dependencies]\nfoo = \"1\"\n"
-        ));
     }
 }
