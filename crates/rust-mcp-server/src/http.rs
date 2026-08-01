@@ -12,7 +12,7 @@
 use std::net::SocketAddr;
 use std::sync::Arc;
 
-use rmcp::service::{RoleServer, Service};
+use rmcp::ServerHandler;
 use rmcp::transport::StreamableHttpServerConfig;
 use rmcp::transport::streamable_http_server::{
     StreamableHttpService, session::local::LocalSessionManager,
@@ -32,7 +32,7 @@ use rmcp::transport::streamable_http_server::{
 /// or if the underlying HTTP server fails while running.
 pub async fn serve<S, F>(addr: SocketAddr, service_factory: F) -> std::io::Result<()>
 where
-    S: Service<RoleServer> + Send + 'static,
+    S: ServerHandler + Send + 'static,
     F: Fn() -> Result<S, std::io::Error> + Send + Sync + 'static,
 {
     let service = StreamableHttpService::new(

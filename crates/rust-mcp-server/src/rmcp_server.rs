@@ -239,9 +239,6 @@ impl rmcp::ServerHandler for Server {
         _context: RequestContext<rmcp::RoleServer>,
     ) -> Result<ListToolsResult, ErrorData> {
         let mut tools: Vec<rmcp::model::Tool> = Vec::new();
-        // currently none of the tools support tasking
-        let execution = rmcp::model::ToolExecution::new()
-            .with_task_support(rmcp::model::TaskSupport::Forbidden);
 
         for tool in self.tools.values() {
             let schema = Arc::new(tool.json_schema());
@@ -250,22 +247,17 @@ impl rmcp::ServerHandler for Server {
             tool_def.title = Some(tool.title().into());
             tool_def.description = Some(tool.description().trim().trim_matches('\n').into());
             tool_def.input_schema = schema;
-            tool_def.execution = Some(execution.clone());
             tools.push(tool_def);
         }
 
-        Ok(ListToolsResult {
-            meta: None,
-            next_cursor: None,
-            tools,
-        })
+        Ok(ListToolsResult::with_all_items(tools))
     }
 
     async fn call_tool(
         &self,
         request: rmcp::model::CallToolRequestParams,
         _context: RequestContext<rmcp::RoleServer>,
-    ) -> Result<rmcp::model::CallToolResult, ErrorData> {
+    ) -> Result<rmcp::model::CallToolResponse, ErrorData> {
         let (&tool_name, tool) =
             self.tools
                 .get_key_value(request.name.as_ref())
@@ -277,7 +269,7 @@ impl rmcp::ServerHandler for Server {
 
         tokio::task::spawn_blocking(move || {
             tool.call_rmcp_tool(request)
-                .map(|r| r.into_rmcp_result(ignore_recommendations))
+                .map(|r| r.into_rmcp_result(ignore_recommendations).into())
         })
         .await
         .map_err(|e| {
