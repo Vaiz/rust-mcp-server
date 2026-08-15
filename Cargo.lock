@@ -605,9 +605,9 @@ dependencies = [
 
 [[package]]
 name = "ohno"
-version = "0.3.8"
+version = "0.3.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "23b16aa0c03511614585d73caca74e966be50f8f0d518b0a92232b91acb588ff"
+checksum = "7e1bac82d3708416594f822a397521d6fb2782bda6a5e848f0e1141bccfb5fcf"
 dependencies = [
  "ohno_macros",
  "typeid",
